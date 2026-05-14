@@ -21,6 +21,9 @@ export default async function MapPage({ searchParams }: MapPageProps) {
       .map((item) => [item.station_id, item]),
   );
   const coordinatesReady = stations.filter((station) => station.latitude != null && station.longitude != null);
+  const municipalitiesRepresented = new Set(
+    coordinatesReady.map((station) => station.municipality ?? station.name ?? station.station_id),
+  ).size;
   const pulseNodes = coordinatesReady
     .map((station) => {
       const observation = no2ByStation.get(station.station_id);
@@ -63,8 +66,9 @@ export default async function MapPage({ searchParams }: MapPageProps) {
               {copy.mapPageTitle}
             </h1>
             <p className="mt-6 max-w-2xl text-lg leading-8 text-soft/74">{copy.mapPageSubtitle}</p>
+            <p className="mt-4 max-w-xl text-sm leading-6 text-soft/58">{copy.mapStatusBody}</p>
           </div>
-          <div className="grid gap-4 md:grid-cols-2">
+            <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
             <div className="glass-panel rounded-[1.75rem] p-5 shadow-atmosphere">
                 <p className="eyebrow text-soft/55">{copy.mapStationsReady}</p>
                 <p className="mt-4 font-data text-3xl text-bone">{pulseNodes.length}</p>
@@ -83,15 +87,24 @@ export default async function MapPage({ searchParams }: MapPageProps) {
                 </p>
                 <p className="mt-3 text-sm text-soft/70">{copy.freshness[payload.summary?.freshness ?? "unknown"] ?? copy.freshness.unknown}</p>
               </div>
-              <div className="glass-panel rounded-[1.75rem] p-5 shadow-atmosphere md:col-span-2">
+              <div className="glass-panel rounded-[1.75rem] p-5 shadow-atmosphere">
                 <p className="eyebrow text-soft/55">{copy.worstStation}</p>
                 <p className="mt-4 font-data text-3xl text-bone">{payload.summary?.worst_station_id ?? "-"}</p>
                 <p className="mt-3 text-sm text-soft/70">{priorityStations[0] ? `${priorityStations[0].label} · ${priorityStations[0].value.toFixed(1)}` : "-"}</p>
               </div>
+              <div className="glass-panel rounded-[1.75rem] p-5 shadow-atmosphere">
+                <p className="eyebrow text-soft/55">{language === "es" ? "Cobertura territorial" : "Territorial coverage"}</p>
+                <p className="mt-4 font-data text-3xl text-bone">{municipalitiesRepresented}</p>
+                <p className="mt-3 text-sm text-soft/70">
+                  {language === "es"
+                    ? "Municipios con al menos una estación representada en el mapa actual."
+                    : "Municipalities with at least one station represented in the current map."}
+                </p>
+              </div>
             </div>
           </div>
 
-          {/* Interactive MapLibre GL map */}
+          {/* Interactive map */}
           <section className="glass-panel rounded-[2rem] p-5 shadow-atmosphere">
             <div className="mb-5 flex flex-wrap items-center justify-between gap-3">
               <p className="eyebrow text-soft/60">{copy.mapRosterTitle}</p>

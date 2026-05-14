@@ -54,13 +54,23 @@ def list_alerts() -> AlertEnvelope:
         freshness = build_freshness_label(latest_timestamp)
         if freshness != "fresh":
             severity = "critical" if freshness == "stale" else "warning"
+            if observations_source == "cloudflare_d1":
+                freshness_body = (
+                    f"La API está leyendo desde Cloudflare D1, pero la última observación válida sigue marcada como '{freshness}'. "
+                    "Conviene revisar el ciclo de ingestión protegido antes que la conexión a la base."
+                )
+            else:
+                freshness_body = (
+                    f"La última observación válida está marcada como '{freshness}' y requiere revisar el ciclo de ingestión."
+                )
+
             items.append(
                 AlertItem(
                     id=f"freshness-{freshness}",
                     category="data",
                     severity=severity,
                     title="Frescura observacional degradada",
-                    body=f"La última observación válida está marcada como '{freshness}' y requiere revisar el ciclo de ingestión.",
+                    body=freshness_body,
                     measured_at=latest_timestamp.to_pydatetime(),
                     source=observations_source,
                 )

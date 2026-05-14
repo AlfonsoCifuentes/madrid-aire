@@ -23,6 +23,13 @@ type AtmosphericMapProps = {
   className?: string;
 };
 
+const MADRID_REFERENCE_BOUNDS: [[number, number], [number, number]] = [
+  [40.22, -4.28],
+  [41.08, -3.18],
+];
+
+const MADRID_CORE: [number, number] = [40.4168, -3.7038];
+
 const RISK_COLORS: Record<string, string> = {
   good: "#80FFB2",
   acceptable: "#D8FF4F",
@@ -43,7 +50,7 @@ const FRESHNESS_OPACITY: Record<string, number> = {
 function valueToRadius(value: number): number {
   // Clamp between 6 and 18 based on NO2 value (0–300 µg/m³ range)
   const clamped = Math.max(0, Math.min(300, value));
-  return 6 + (clamped / 300) * 12;
+  return 8 + (clamped / 300) * 14;
 }
 
 function renderStations(
@@ -68,29 +75,37 @@ function renderStations(
 
     if (node.highlight) {
       leaflet.circleMarker([node.latitude, node.longitude], {
-        radius: radius + 9,
+        radius: radius + 11,
         stroke: false,
         fillColor: color,
-        fillOpacity: 0.16,
+        fillOpacity: 0.2,
         pane: "shadowPane",
       }).addTo(layerGroup);
     }
 
     leaflet.circleMarker([node.latitude, node.longitude], {
-      radius: radius + 3,
-      color,
-      weight: node.highlight ? 2.5 : 1.5,
-      opacity,
+      radius: radius + 4,
+      color: "#F4F1EA",
+      weight: node.highlight ? 2.6 : 2,
+      opacity: 0.9,
       fillOpacity: 0,
     }).addTo(layerGroup);
 
     const marker = leaflet.circleMarker([node.latitude, node.longitude], {
       radius,
-      color: "#080A0C",
-      weight: 1,
-      opacity: 0.5,
+      color: "#111418",
+      weight: 1.3,
+      opacity: 0.78,
       fillColor: color,
-      fillOpacity: Math.max(opacity, 0.3),
+      fillOpacity: Math.max(opacity, 0.72),
+    }).addTo(layerGroup);
+
+    leaflet.circleMarker([node.latitude, node.longitude], {
+      radius: Math.max(2.2, radius * 0.22),
+      stroke: false,
+      fillColor: "#081014",
+      fillOpacity: 0.92,
+      interactive: false,
     }).addTo(layerGroup);
 
     marker.bindTooltip(node.label, {
@@ -105,11 +120,15 @@ function renderStations(
   });
 
   if (fitBounds) {
-    const bounds = leaflet.latLngBounds(nodes.map((node) => [node.latitude, node.longitude] as [number, number]));
-    if (bounds.isValid()) {
-      map.fitBounds(bounds.pad(0.14), {
+    const stationBounds = leaflet.latLngBounds(nodes.map((node) => [node.latitude, node.longitude] as [number, number]));
+    const focusBounds = leaflet.latLngBounds(MADRID_REFERENCE_BOUNDS);
+
+    if (stationBounds.isValid()) {
+      focusBounds.extend(stationBounds);
+      map.fitBounds(focusBounds, {
         animate: false,
-        padding: [28, 28],
+        padding: [18, 18],
+        maxZoom: 9.9,
       });
     }
   }
@@ -139,21 +158,32 @@ export function AtmosphericMap({
       const map = leaflet.map(containerRef.current, {
         zoomControl: false,
         attributionControl: false,
-        preferCanvas: true,
         scrollWheelZoom: true,
+        minZoom: 8.5,
       });
       map.setView([40.4168, -3.7038], 10.5);
 
-      leaflet.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
-        maxZoom: 19,
-        attribution: "&copy; OpenStreetMap contributors",
+      leaflet.tileLayer("https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png", {
+        subdomains: "abcd",
+        maxZoom: 20,
+        attribution: "&copy; OpenStreetMap contributors &copy; CARTO",
         crossOrigin: true,
+      }).addTo(map);
+
+      leaflet.circle(MADRID_CORE, {
+        radius: 19000,
+        color: "#C60B1E",
+        weight: 1,
+        opacity: 0.22,
+        fillColor: "#C60B1E",
+        fillOpacity: 0.04,
+        interactive: false,
       }).addTo(map);
 
       leaflet.control.zoom({ position: "topright" }).addTo(map);
       leaflet.control
         .attribution({ position: "bottomright", prefix: false })
-        .addAttribution("&copy; OpenStreetMap contributors")
+        .addAttribution("&copy; OpenStreetMap contributors &copy; CARTO")
         .addTo(map);
 
       const layerGroup = leaflet.layerGroup().addTo(map);

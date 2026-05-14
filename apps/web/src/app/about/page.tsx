@@ -1,8 +1,9 @@
 import Link from "next/link";
 
 import { MobileBottomNav } from "@/components/MobileBottomNav";
+import { OperationalStatusStrip } from "@/components/OperationalStatusStrip";
 import { PublicPageHeader, buildPublicMobileNavItems, type PublicNavLabels } from "@/components/PublicPageHeader";
-import { getDashboardPayload } from "@/lib/api";
+import { getDashboardPayload, getSystemStatusPayload } from "@/lib/api";
 import { copyByLanguage, resolveLanguage } from "@/lib/i18n";
 
 type AboutPageProps = {
@@ -48,7 +49,7 @@ export default async function AboutPage({ searchParams }: AboutPageProps) {
   const language = resolveLanguage(params?.lang);
   const locale = language === "es" ? "es-ES" : "en-GB";
   const copy = copyByLanguage[language];
-  const dashboard = await getDashboardPayload();
+  const [dashboard, system] = await Promise.all([getDashboardPayload(), getSystemStatusPayload()]);
   const summary = dashboard.summary;
   const publicRoutes = [
     { href: `/dashboard?lang=${language}`, title: copy.dashboardTitle, description: copy.aboutDashboardDesc },
@@ -118,6 +119,8 @@ export default async function AboutPage({ searchParams }: AboutPageProps) {
             ))}
           </div>
         </section>
+
+        <OperationalStatusStrip language={language} system={system} freshnessLabels={copy.freshness} currentPage="about" />
 
         <section id="advanced" className="grid gap-6 xl:grid-cols-[0.95fr_1.05fr]">
           <div>

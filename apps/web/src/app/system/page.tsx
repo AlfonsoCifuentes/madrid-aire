@@ -1,9 +1,7 @@
-import Link from "next/link";
-
-import { LanguageSelector } from "@/components/LanguageSelector";
-import { MobileBottomNav, type MobileBottomNavItem } from "@/components/MobileBottomNav";
+import { AdvancedPageHeader, buildAdvancedMobileNavItems, type AdvancedNavLabels } from "@/components/AdvancedPageHeader";
+import { MobileBottomNav } from "@/components/MobileBottomNav";
+import { OperationalStatusStrip } from "@/components/OperationalStatusStrip";
 import { PipelineTimeline } from "@/components/PipelineTimeline";
-import { MadridAireWordmark } from "@/components/branding/MadridAireWordmark";
 import { AlertItem, getAlertsPayload, getSystemStatusPayload } from "@/lib/api";
 import { copyByLanguage, resolveLanguage } from "@/lib/i18n";
 
@@ -61,48 +59,25 @@ export default async function SystemPage({ searchParams }: SystemPageProps) {
   const language = resolveLanguage(params?.lang);
   const copy = copyByLanguage[language];
   const [system, alerts] = await Promise.all([getSystemStatusPayload(), getAlertsPayload()]);
-  const mobileNavItems: MobileBottomNavItem[] = [
-    { key: "dashboard", href: `/dashboard?lang=${language}`, label: copy.mobileNavDashboard },
-    { key: "model", href: `/model?lang=${language}`, label: copy.mobileNavModel },
-    { key: "methodology", href: `/methodology?lang=${language}`, label: copy.mobileNavMethodology },
-    { key: "reports", href: `/reports?lang=${language}`, label: copy.mobileNavReports },
-    { key: "system", href: `/system?lang=${language}`, label: copy.mobileNavSystem },
-  ];
+  const advancedLabels: AdvancedNavLabels = {
+    guide: copy.openAbout,
+    dashboard: copy.mobileNavDashboard,
+    model: copy.mobileNavModel,
+    methodology: copy.mobileNavMethodology,
+    reports: copy.mobileNavReports,
+    system: copy.mobileNavSystem,
+    eyebrow: copy.aboutTechnicalLabel,
+    body:
+      language === "es"
+        ? "Aquí se concentra la lectura operativa: datos, alertas, automatización y la diferencia entre lo que está configurado y lo que realmente está entrando en producción."
+        : "This is the operational read: data, alerts, automation, and the gap between what is configured and what is actually flowing in production.",
+  };
+  const mobileNavItems = buildAdvancedMobileNavItems(language, advancedLabels);
 
   return (
     <main className="min-h-screen bg-graphite px-5 py-5 pb-28 text-soft sm:px-7 md:pb-5 lg:px-10 3xl:px-14">
       <section className="mx-auto flex w-full max-w-[1800px] flex-col gap-8">
-        <header className="flex flex-wrap items-center justify-between gap-4">
-          <div className="glass-panel rounded-full px-4 py-3 shadow-atmosphere">
-            <MadridAireWordmark className="items-center" size="compact" />
-          </div>
-          <div className="flex items-center gap-3">
-            <div className="hidden flex-wrap items-center gap-3 md:flex">
-            <Link className="glass-panel rounded-full px-4 py-3 text-sm text-soft/80 shadow-atmosphere hover:bg-white/10" href={`/landing?lang=${language}`}>
-              {copy.backHome}
-            </Link>
-            <Link className="glass-panel rounded-full px-4 py-3 text-sm text-soft/80 shadow-atmosphere hover:bg-white/10" href={`/about?lang=${language}`}>
-              {copy.openAbout}
-            </Link>
-            <Link className="glass-panel rounded-full px-4 py-3 text-sm text-soft/80 shadow-atmosphere hover:bg-white/10" href={`/dashboard?lang=${language}`}>
-              {copy.dashboardTitle}
-            </Link>
-            <Link className="glass-panel rounded-full px-4 py-3 text-sm text-soft/80 shadow-atmosphere hover:bg-white/10" href={`/predictions?lang=${language}`}>
-              {copy.openPredictions}
-            </Link>
-            <Link className="glass-panel rounded-full px-4 py-3 text-sm text-soft/80 shadow-atmosphere hover:bg-white/10" href={`/model?lang=${language}`}>
-              {copy.openModel}
-            </Link>
-            <Link className="glass-panel rounded-full px-4 py-3 text-sm text-soft/80 shadow-atmosphere hover:bg-white/10" href={`/methodology?lang=${language}`}>
-              {copy.openMethodology}
-            </Link>
-            <Link className="glass-panel rounded-full px-4 py-3 text-sm text-soft/80 shadow-atmosphere hover:bg-white/10" href={`/reports?lang=${language}`}>
-              {copy.openReports}
-            </Link>
-            </div>
-            <LanguageSelector currentLanguage={language} pathname="/system" />
-          </div>
-        </header>
+        <AdvancedPageHeader language={language} pathname="/system" currentPage="system" labels={advancedLabels} />
 
         <div className="grid gap-10 xl:grid-cols-[0.95fr_1.05fr]">
           <div>
@@ -131,6 +106,8 @@ export default async function SystemPage({ searchParams }: SystemPageProps) {
             </div>
           </div>
         </div>
+
+        <OperationalStatusStrip language={language} system={system} freshnessLabels={copy.freshness} currentPage="system" />
 
         <section className="glass-panel rounded-[2rem] p-5 shadow-atmosphere">
           <div className="flex flex-wrap items-center justify-between gap-3 mb-5">

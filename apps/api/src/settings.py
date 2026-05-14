@@ -1,8 +1,19 @@
+import os
 from functools import lru_cache
 from pathlib import Path
 
 from pydantic import Field
 from pydantic_settings import BaseSettings, SettingsConfigDict
+
+
+def _default_environment() -> str:
+    if os.getenv("MADRID_AIRE_ENVIRONMENT"):
+        return os.getenv("MADRID_AIRE_ENVIRONMENT", "local")
+    if os.getenv("VERCEL_ENV"):
+        return os.getenv("VERCEL_ENV", "local")
+    if os.getenv("VERCEL"):
+        return "production"
+    return "local"
 
 
 class Settings(BaseSettings):
@@ -14,7 +25,7 @@ class Settings(BaseSettings):
 
     project_name: str = "MADRID Aire API"
     api_prefix: str = "/api"
-    environment: str = "local"
+    environment: str = Field(default_factory=_default_environment, alias="MADRID_AIRE_ENVIRONMENT")
     cloudflare_account_id: str | None = Field(default=None, alias="MADRID_AIRE_CLOUDFLARE_ACCOUNT_ID")
     cloudflare_d1_database_id: str | None = Field(default=None, alias="MADRID_AIRE_CLOUDFLARE_D1_DATABASE_ID")
     cloudflare_api_token: str | None = Field(default=None, alias="MADRID_AIRE_CLOUDFLARE_API_TOKEN")

@@ -1,11 +1,9 @@
-import Link from "next/link";
-
-import { LanguageSelector } from "@/components/LanguageSelector";
+import { AdvancedPageHeader, buildAdvancedMobileNavItems, type AdvancedNavLabels } from "@/components/AdvancedPageHeader";
 import { MetricBars } from "@/components/MetricBars";
 import { ModelErrorChart } from "@/components/ModelErrorChart";
-import { MobileBottomNav, type MobileBottomNavItem } from "@/components/MobileBottomNav";
-import { MadridAireWordmark } from "@/components/branding/MadridAireWordmark";
-import { getModelMetricsPayload } from "@/lib/api";
+import { MobileBottomNav } from "@/components/MobileBottomNav";
+import { OperationalStatusStrip } from "@/components/OperationalStatusStrip";
+import { getModelMetricsPayload, getSystemStatusPayload } from "@/lib/api";
 import { copyByLanguage, resolveLanguage } from "@/lib/i18n";
 
 type ModelPageProps = {
@@ -145,54 +143,28 @@ export default async function ModelPage({ searchParams }: ModelPageProps) {
   const params = searchParams ? await searchParams : undefined;
   const language = resolveLanguage(params?.lang);
   const copy = copyByLanguage[language];
-  const metrics = await getModelMetricsPayload();
+  const [metrics, system] = await Promise.all([getModelMetricsPayload(), getSystemStatusPayload()]);
   const metricNotes = buildMetricNotes(language);
   const modelSections = buildModelSections(language);
-  const mobileNavItems: MobileBottomNavItem[] = [
-    { key: "dashboard", href: `/dashboard?lang=${language}`, label: copy.mobileNavDashboard },
-    { key: "model", href: `/model?lang=${language}`, label: copy.mobileNavModel },
-    { key: "methodology", href: `/methodology?lang=${language}`, label: copy.mobileNavMethodology },
-    { key: "reports", href: `/reports?lang=${language}`, label: copy.mobileNavReports },
-    { key: "system", href: `/system?lang=${language}`, label: copy.mobileNavSystem },
-  ];
+  const advancedLabels: AdvancedNavLabels = {
+    guide: copy.openAbout,
+    dashboard: copy.mobileNavDashboard,
+    model: copy.mobileNavModel,
+    methodology: copy.mobileNavMethodology,
+    reports: copy.mobileNavReports,
+    system: copy.mobileNavSystem,
+    eyebrow: copy.aboutTechnicalLabel,
+    body:
+      language === "es"
+        ? "Esta capa reúne modelo, método, informes y sistema como segunda lectura del producto. Si buscas una lectura pública, vuelve a Resumen o a la Guía."
+        : "This layer gathers model, method, reports, and system as the product's second reading. If you want the public view, go back to Overview or Guide.",
+  };
+  const mobileNavItems = buildAdvancedMobileNavItems(language, advancedLabels);
 
   return (
     <main className="min-h-screen bg-graphite px-5 py-5 pb-28 text-soft sm:px-7 md:pb-5 lg:px-10 3xl:px-14">
       <section className="mx-auto flex w-full max-w-[1800px] flex-col gap-8">
-        <header className="flex flex-wrap items-center justify-between gap-4">
-          <div className="glass-panel rounded-full px-4 py-3 shadow-atmosphere">
-            <MadridAireWordmark className="items-center" size="compact" />
-          </div>
-          <div className="flex items-center gap-3">
-            <div className="hidden flex-wrap items-center gap-3 md:flex">
-            <Link className="glass-panel rounded-full px-4 py-3 text-sm text-soft/80 shadow-atmosphere hover:bg-white/10" href={`/landing?lang=${language}`}>
-              {copy.backHome}
-            </Link>
-            <Link className="glass-panel rounded-full px-4 py-3 text-sm text-soft/80 shadow-atmosphere hover:bg-white/10" href={`/about?lang=${language}`}>
-              {copy.openAbout}
-            </Link>
-            <Link className="glass-panel rounded-full px-4 py-3 text-sm text-soft/80 shadow-atmosphere hover:bg-white/10" href={`/dashboard?lang=${language}`}>
-              {copy.dashboardTitle}
-            </Link>
-            <Link className="glass-panel rounded-full px-4 py-3 text-sm text-soft/80 shadow-atmosphere hover:bg-white/10" href={`/stations?lang=${language}`}>
-              {copy.openStations}
-            </Link>
-            <Link className="glass-panel rounded-full px-4 py-3 text-sm text-soft/80 shadow-atmosphere hover:bg-white/10" href={`/predictions?lang=${language}`}>
-              {copy.openPredictions}
-            </Link>
-            <Link className="glass-panel rounded-full px-4 py-3 text-sm text-soft/80 shadow-atmosphere hover:bg-white/10" href={`/system?lang=${language}`}>
-              {copy.openSystem}
-            </Link>
-            <Link className="glass-panel rounded-full px-4 py-3 text-sm text-soft/80 shadow-atmosphere hover:bg-white/10" href={`/methodology?lang=${language}`}>
-              {copy.openMethodology}
-            </Link>
-            <Link className="glass-panel rounded-full px-4 py-3 text-sm text-soft/80 shadow-atmosphere hover:bg-white/10" href={`/reports?lang=${language}`}>
-              {copy.openReports}
-            </Link>
-            </div>
-            <LanguageSelector currentLanguage={language} pathname="/model" />
-          </div>
-        </header>
+        <AdvancedPageHeader language={language} pathname="/model" currentPage="model" labels={advancedLabels} />
 
         <div className="grid gap-10 xl:grid-cols-[0.95fr_1.05fr]">
           <div>
@@ -221,6 +193,8 @@ export default async function ModelPage({ searchParams }: ModelPageProps) {
             </div>
           </div>
         </div>
+
+        <OperationalStatusStrip language={language} system={system} freshnessLabels={copy.freshness} currentPage="model" />
 
         <section className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
           {metricNotes.map((item) => (

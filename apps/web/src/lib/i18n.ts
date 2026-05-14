@@ -331,7 +331,7 @@ export const copyByLanguage: Record<Language, Copy> = {
     systemPipelineRunsTitle: "Actualizaciones de datos",
     systemDataQualityTitle: "Salud del dato",
     systemPredictionRunsTitle: "Actualización de previsiones",
-    systemActiveAlertsTitle: "Active alerts",
+    systemActiveAlertsTitle: "Alertas activas",
     systemModelProductionTitle: "Modelo actual",
     systemCronStatusTitle: "Automatización",
     systemQualityStatusLabel: "Estado de calidad",

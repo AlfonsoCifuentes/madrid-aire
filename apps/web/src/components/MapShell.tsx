@@ -82,8 +82,8 @@ export function MapShell({ nodes, language = "es" }: MapShellProps) {
 
       <p className="text-xs text-soft/45 print:text-graphite/65">
         {language === "es"
-          ? "Base cartográfica: OpenStreetMap. Los puntos mantienen la lectura y el nivel de riesgo de cada estación."
-          : "Basemap: OpenStreetMap. Points keep the live reading and risk level for each station."}
+          ? "Base cartográfica clara: CARTO + OpenStreetMap. Los puntos mantienen la lectura y el nivel de riesgo de cada estación."
+          : "Light basemap: CARTO + OpenStreetMap. Points keep the live reading and risk level for each station."}
       </p>
     </div>
   );

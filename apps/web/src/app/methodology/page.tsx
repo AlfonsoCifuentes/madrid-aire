@@ -1,9 +1,9 @@
 import Link from "next/link";
 
-import { LanguageSelector } from "@/components/LanguageSelector";
+import { AdvancedPageHeader, buildAdvancedMobileNavItems, type AdvancedNavLabels } from "@/components/AdvancedPageHeader";
 import { MetricBars } from "@/components/MetricBars";
-import { MobileBottomNav, type MobileBottomNavItem } from "@/components/MobileBottomNav";
-import { MadridAireWordmark } from "@/components/branding/MadridAireWordmark";
+import { MobileBottomNav } from "@/components/MobileBottomNav";
+import { OperationalStatusStrip } from "@/components/OperationalStatusStrip";
 import { getModelMetricsPayload, getSystemStatusPayload } from "@/lib/api";
 import { copyByLanguage, resolveLanguage } from "@/lib/i18n";
 
@@ -43,27 +43,27 @@ function buildIntro(language: "es" | "en") {
     return {
       title: "Antes del detalle técnico",
       body: "Si solo quieres interpretar la situación actual, empieza por el resumen, el mapa o la previsión. Esta página entra en el proceso completo: datos, preparación, validación y límites.",
-      cta: "Ir a Acerca de",
+      cta: "Volver a la guía",
     };
   }
 
   return {
     title: "Before the technical detail",
     body: "If you only want to interpret current conditions, start with the overview, the map, or the forecast. This page goes through the full process: data, preparation, validation, and limits.",
-    cta: "Go to About",
+    cta: "Back to guide",
   };
 }
 
 function buildSections(language: "es" | "en", stationCount: number, pollutantCount: number) {
   if (language === "es") {
     return {
-      sourcesTitle: "Sources",
+      sourcesTitle: "Fuentes",
       etlTitle: "ETL",
-      validationTitle: "Validation",
-      featuresTitle: "Feature engineering",
-      splitTitle: "Temporal split",
-      evaluationTitle: "Evaluation",
-      limitationsTitle: "Limitations",
+      validationTitle: "Validación",
+      featuresTitle: "Ingeniería de variables",
+      splitTitle: "Separación temporal",
+      evaluationTitle: "Evaluación",
+      limitationsTitle: "Limitaciones",
       sources: [
         `Comunidad de Madrid: históricos oficiales 2025 y 2026 para calidad del aire.`,
         `CSV oficial de día actual para extender la señal operativa del slice local-first.`,
@@ -164,42 +164,25 @@ export default async function MethodologyPage({ searchParams }: MethodologyPageP
   const [system, metrics] = await Promise.all([getSystemStatusPayload(), getModelMetricsPayload()]);
   const sections = buildSections(language, system?.data_quality.station_count ?? 0, system?.data_quality.pollutant_count ?? 0);
   const intro = buildIntro(language);
-  const mobileNavItems: MobileBottomNavItem[] = [
-    { key: "dashboard", href: `/dashboard?lang=${language}`, label: copy.mobileNavDashboard },
-    { key: "model", href: `/model?lang=${language}`, label: copy.mobileNavModel },
-    { key: "methodology", href: `/methodology?lang=${language}`, label: copy.mobileNavMethodology },
-    { key: "reports", href: `/reports?lang=${language}`, label: copy.mobileNavReports },
-    { key: "system", href: `/system?lang=${language}`, label: copy.mobileNavSystem },
-  ];
+  const advancedLabels: AdvancedNavLabels = {
+    guide: copy.openAbout,
+    dashboard: copy.mobileNavDashboard,
+    model: copy.mobileNavModel,
+    methodology: copy.mobileNavMethodology,
+    reports: copy.mobileNavReports,
+    system: copy.mobileNavSystem,
+    eyebrow: copy.aboutTechnicalLabel,
+    body:
+      language === "es"
+        ? "Aquí se documentan fuentes, preparación, validación y límites. Es la capa para comprobar trazabilidad, no la puerta de entrada pública al producto."
+        : "This is where sources, preparation, validation, and limits are documented. It is the layer for traceability, not the public entry point to the product.",
+  };
+  const mobileNavItems = buildAdvancedMobileNavItems(language, advancedLabels);
 
   return (
     <main className="min-h-screen bg-graphite px-5 py-5 pb-28 text-soft sm:px-7 md:pb-5 lg:px-10 3xl:px-14">
       <section className="mx-auto flex w-full max-w-[1800px] flex-col gap-8">
-        <header className="flex flex-wrap items-center justify-between gap-4">
-          <div className="glass-panel rounded-full px-4 py-3 shadow-atmosphere">
-            <MadridAireWordmark className="items-center" size="compact" />
-          </div>
-          <div className="flex items-center gap-3">
-            <div className="hidden flex-wrap items-center gap-3 md:flex">
-            <Link className="glass-panel rounded-full px-4 py-3 text-sm text-soft/80 shadow-atmosphere hover:bg-white/10" href={`/landing?lang=${language}`}>
-              {copy.backHome}
-            </Link>
-            <Link className="glass-panel rounded-full px-4 py-3 text-sm text-soft/80 shadow-atmosphere hover:bg-white/10" href={`/about?lang=${language}`}>
-              {copy.openAbout}
-            </Link>
-            <Link className="glass-panel rounded-full px-4 py-3 text-sm text-soft/80 shadow-atmosphere hover:bg-white/10" href={`/model?lang=${language}`}>
-              {copy.openModel}
-            </Link>
-            <Link className="glass-panel rounded-full px-4 py-3 text-sm text-soft/80 shadow-atmosphere hover:bg-white/10" href={`/system?lang=${language}`}>
-              {copy.openSystem}
-            </Link>
-            <Link className="glass-panel rounded-full px-4 py-3 text-sm text-soft/80 shadow-atmosphere hover:bg-white/10" href={`/reports?lang=${language}`}>
-              {copy.openReports}
-            </Link>
-            </div>
-            <LanguageSelector currentLanguage={language} pathname="/methodology" />
-          </div>
-        </header>
+        <AdvancedPageHeader language={language} pathname="/methodology" currentPage="methodology" labels={advancedLabels} />
 
         <div className="grid gap-10 xl:grid-cols-[0.95fr_1.05fr]">
           <div>
@@ -229,10 +212,12 @@ export default async function MethodologyPage({ searchParams }: MethodologyPageP
           </div>
         </div>
 
+        <OperationalStatusStrip language={language} system={system} freshnessLabels={copy.freshness} currentPage="methodology" />
+
         <section className="glass-panel rounded-[2rem] p-5 shadow-atmosphere">
           <h2 className="text-2xl font-medium text-bone">{intro.title}</h2>
           <p className="mt-4 max-w-3xl text-sm leading-6 text-soft/74">{intro.body}</p>
-          <Link className="mt-5 inline-flex min-h-11 items-center justify-center rounded-full border border-white/12 bg-white/6 px-5 py-2.5 text-sm font-medium text-soft transition hover:bg-white/10" href={`/about?lang=${language}`}>
+          <Link className="mt-5 inline-flex min-h-11 items-center justify-center rounded-full border border-white/12 bg-white/6 px-5 py-2.5 text-sm font-medium text-soft transition hover:bg-white/10" href={`/about?lang=${language}#advanced`}>
             {intro.cta}
           </Link>
         </section>
