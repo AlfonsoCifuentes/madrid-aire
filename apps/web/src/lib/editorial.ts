@@ -20,6 +20,25 @@ export type ForecastHotspot = {
   riskLevel: string | null;
 };
 
+export function buildPredictionsHref(language: "es" | "en", stationId: string | null, horizon: number | null) {
+  const params = new URLSearchParams({ lang: language });
+
+  if (stationId) {
+    params.set("station", stationId);
+  }
+
+  if (horizon != null) {
+    params.set("h", String(horizon));
+  }
+
+  return `/predictions?${params.toString()}`;
+}
+
+export function buildStationDetailHref(language: "es" | "en", stationId: string) {
+  const params = new URLSearchParams({ lang: language });
+  return `/stations/${stationId}?${params.toString()}`;
+}
+
 export function buildMunicipalitySnapshots(
   stations: StationSummary[],
   latest: LatestObservationItem[],

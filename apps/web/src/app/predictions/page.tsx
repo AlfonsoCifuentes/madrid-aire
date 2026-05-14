@@ -4,10 +4,11 @@ import { HistoryForecastChart } from "@/components/HistoryForecastChart";
 import { MobileBottomNav } from "@/components/MobileBottomNav";
 import { PublicPageHeader, buildPublicMobileNavItems, type PublicNavLabels } from "@/components/PublicPageHeader";
 import { getDashboardPayload, getHistoryPayload, getPredictionsPayload, getSystemStatusPayload } from "@/lib/api";
+import { buildPredictionsHref } from "@/lib/editorial";
 import { copyByLanguage, resolveLanguage } from "@/lib/i18n";
 
 type PredictionsPageProps = {
-  searchParams?: Promise<{ h?: string | string[]; lang?: string | string[] }>;
+  searchParams?: Promise<{ h?: string | string[]; lang?: string | string[]; station?: string | string[] }>;
 };
 
 type PredictionsPageCopy = {
@@ -22,6 +23,8 @@ type PredictionsPageCopy = {
   riskLabel: string;
   riskLabels: Record<string, string>;
   selectedForecastTitle: string;
+  stationSelectorBody: string;
+  stationSelectorTitle: string;
   statusLabel: string;
   targetLabel: string;
 };
@@ -59,6 +62,8 @@ function buildPredictionsPageCopy(language: "es" | "en"): PredictionsPageCopy {
         very_unhealthy: "muy insalubre",
       },
       selectedForecastTitle: "Previsión seleccionada",
+      stationSelectorBody: "Puedes cambiar de estación para revisar cómo cambia el forecast previsto en cada punto prioritario de la red.",
+      stationSelectorTitle: "Selector de estación",
       statusLabel: "Horizontes disponibles",
       targetLabel: "Contaminante",
     };
@@ -85,6 +90,8 @@ function buildPredictionsPageCopy(language: "es" | "en"): PredictionsPageCopy {
       very_unhealthy: "very unhealthy",
     },
     selectedForecastTitle: "Selected forecast",
+    stationSelectorBody: "Switch stations to inspect how the forecast changes across the most relevant points in the network.",
+    stationSelectorTitle: "Station selector",
     statusLabel: "Available horizons",
     targetLabel: "Pollutant",
   };
@@ -115,6 +122,11 @@ function resolveNumericSearchParam(value: string | string[] | undefined) {
 
   const parsed = Number(candidate);
   return Number.isInteger(parsed) && parsed > 0 ? parsed : null;
+}
+
+function resolveStringSearchParam(value: string | string[] | undefined) {
+  const candidate = Array.isArray(value) ? value[0] : value;
+  return candidate ? candidate.trim() : null;
 }
 
 function resolveRiskLabel(riskLevel: string | null | undefined, pageCopy: PredictionsPageCopy) {
@@ -162,11 +174,21 @@ export default async function PredictionsPage({ searchParams }: PredictionsPageP
     .filter((item) => item.pollutant_code === targetPollutant)
     .sort((left, right) => left.horizon_hours - right.horizon_hours || left.station_id.localeCompare(right.station_id));
   const predictedStationIds = [...new Set(allPredictionItems.map((item) => item.station_id))];
+  const requestedStationId = resolveStringSearchParam(params?.station);
   const preferredStationId = dashboard.summary?.worst_station_id ?? dashboard.latest?.items.find((item) => item.pollutant_code === targetPollutant)?.station_id ?? null;
-  const stationId = preferredStationId && predictedStationIds.includes(preferredStationId)
+  const stationId = requestedStationId && predictedStationIds.includes(requestedStationId)
+    ? requestedStationId
+    : preferredStationId && predictedStationIds.includes(preferredStationId)
     ? preferredStationId
     : (predictedStationIds[0] ?? preferredStationId);
   const station = dashboard.stations?.items.find((item) => item.station_id === stationId) ?? null;
+  const stationOptions = dashboard.stations?.items
+    .filter((item) => predictedStationIds.includes(item.station_id))
+    .sort((left, right) => {
+      const leftLabel = `${left.municipality ?? ""} ${left.name ?? left.station_id}`.trim();
+      const rightLabel = `${right.municipality ?? ""} ${right.name ?? right.station_id}`.trim();
+      return leftLabel.localeCompare(rightLabel);
+    }) ?? [];
   const stationPredictions = stationId
     ? allPredictionItems.filter((item) => item.station_id === stationId).sort((left, right) => left.horizon_hours - right.horizon_hours)
     : [];
@@ -233,6 +255,41 @@ export default async function PredictionsPage({ searchParams }: PredictionsPageP
         <section className="glass-panel rounded-[2rem] p-5 shadow-atmosphere">
           <div className="flex flex-wrap items-center justify-between gap-3">
             <div>
+              <p className="eyebrow text-soft/60">{pageCopy.stationSelectorTitle}</p>
+              <p className="mt-3 max-w-3xl text-sm leading-6 text-soft/70">{pageCopy.stationSelectorBody}</p>
+            </div>
+            <p className="font-data text-sm text-soft/55">{stationOptions.length}</p>
+          </div>
+          <div className="mt-5 flex flex-wrap gap-2">
+            {stationOptions.length > 0 ? (
+              stationOptions.map((candidate) => {
+                const isActive = candidate.station_id === stationId;
+
+                return (
+                  <Link
+                    key={candidate.station_id}
+                    href={buildPredictionsHref(language, candidate.station_id, selectedHorizon)}
+                    className={[
+                      "inline-flex min-w-[11rem] flex-col rounded-[1.25rem] border px-4 py-3 transition",
+                      isActive
+                        ? "border-lime/60 bg-lime/15 text-bone shadow-[0_18px_40px_rgba(216,255,79,0.12)]"
+                        : "border-white/10 bg-white/[0.03] text-soft/78 hover:bg-white/[0.08]",
+                    ].join(" ")}
+                  >
+                    <span className="font-data text-sm">{candidate.name ?? candidate.station_id}</span>
+                    <span className="mt-2 text-xs text-soft/65">{candidate.municipality ?? candidate.station_id}</span>
+                  </Link>
+                );
+              })
+            ) : (
+              <p className="text-sm text-soft/70">{copy.stationNoPredictions}</p>
+            )}
+          </div>
+        </section>
+
+        <section className="glass-panel rounded-[2rem] p-5 shadow-atmosphere">
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <div>
               <p className="eyebrow text-soft/60">{pageCopy.horizonSelectorTitle}</p>
               <p className="mt-3 max-w-3xl text-sm leading-6 text-soft/70">{pageCopy.horizonSelectorBody}</p>
             </div>
@@ -247,7 +304,7 @@ export default async function PredictionsPage({ searchParams }: PredictionsPageP
                 return (
                   <Link
                     key={horizon}
-                    href={`/predictions?lang=${language}&h=${horizon}`}
+                    href={buildPredictionsHref(language, stationId, horizon)}
                     className={[
                       "inline-flex min-w-[6.5rem] flex-col rounded-[1.25rem] border px-4 py-3 transition",
                       isActive
@@ -308,7 +365,7 @@ export default async function PredictionsPage({ searchParams }: PredictionsPageP
                     return (
                       <Link
                         key={`${item.station_id}-${item.horizon_hours}`}
-                        href={`/predictions?lang=${language}&h=${item.horizon_hours}`}
+                        href={buildPredictionsHref(language, item.station_id, item.horizon_hours)}
                         className={[
                           "rounded-[1.5rem] border p-4 transition hover:translate-y-[-1px]",
                           resolveRiskSurfaceClass(item.risk_level),

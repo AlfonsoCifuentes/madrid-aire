@@ -1,9 +1,11 @@
+import Link from "next/link";
+
 import { AdvancedPageHeader, buildAdvancedMobileNavItems, type AdvancedNavLabels } from "@/components/AdvancedPageHeader";
 import { MetricBars } from "@/components/MetricBars";
 import { MobileBottomNav } from "@/components/MobileBottomNav";
 import { OperationalStatusStrip } from "@/components/OperationalStatusStrip";
 import { getAlertsPayload, getDashboardPayload, getModelMetricsPayload, getPredictionsPayload, getSystemStatusPayload } from "@/lib/api";
-import { buildForecastHotspots, buildMunicipalitySnapshots } from "@/lib/editorial";
+import { buildForecastHotspots, buildMunicipalitySnapshots, buildPredictionsHref, buildStationDetailHref } from "@/lib/editorial";
 import { copyByLanguage, resolveLanguage } from "@/lib/i18n";
 
 type ReportsPageProps = {
@@ -187,7 +189,10 @@ export default async function ReportsPage({ searchParams }: ReportsPageProps) {
             <h2 className="text-2xl font-medium text-bone">{pageCopy.editorialTitle}</h2>
             <p className="mt-4 text-sm leading-6 text-soft/74">{pageCopy.editorialBody}</p>
             <div className="mt-5 grid gap-4 sm:grid-cols-2">
-              <div className="rounded-[1.5rem] border border-white/10 bg-white/[0.03] p-4">
+              <Link
+                href={leadingMunicipality ? buildStationDetailHref(language, leadingMunicipality.stationId) : `/stations?lang=${language}`}
+                className="rounded-[1.5rem] border border-white/10 bg-white/[0.03] p-4 transition hover:border-lime/30 hover:bg-white/[0.06]"
+              >
                 <p className="eyebrow text-soft/55">{pageCopy.worstStationLabel}</p>
                 <p className="mt-3 text-lg text-bone">
                   {leadingMunicipality
@@ -203,8 +208,11 @@ export default async function ReportsPage({ searchParams }: ReportsPageProps) {
                       : `${pageCopy.peakStationLabel}: ${leadingMunicipality.stationName} (${leadingMunicipality.stationId}) with ${leadingMunicipality.peakValue.toFixed(1)} µg/m³.`
                     : "-"}
                 </p>
-              </div>
-              <div className="rounded-[1.5rem] border border-white/10 bg-white/[0.03] p-4">
+              </Link>
+              <Link
+                href={leadingForecast ? buildPredictionsHref(language, leadingForecast.stationId, leadingForecast.horizonHours) : `/predictions?lang=${language}`}
+                className="rounded-[1.5rem] border border-white/10 bg-white/[0.03] p-4 transition hover:border-lime/30 hover:bg-white/[0.06]"
+              >
                 <p className="eyebrow text-soft/55">{pageCopy.forecastHotspotLabel}</p>
                 <p className="mt-3 text-lg text-bone">
                   {leadingForecast
@@ -220,7 +228,7 @@ export default async function ReportsPage({ searchParams }: ReportsPageProps) {
                       : `${leadingForecast.stationName} reaches ${leadingForecast.predictedValue.toFixed(1)} µg/m³ at H+${leadingForecast.horizonHours}.`
                     : "-"}
                 </p>
-              </div>
+              </Link>
             </div>
           </section>
 
@@ -230,7 +238,11 @@ export default async function ReportsPage({ searchParams }: ReportsPageProps) {
             <div className="mt-5 grid gap-3 sm:grid-cols-2">
               {municipalityWatch.length > 0 ? (
                 municipalityWatch.map((municipality) => (
-                  <div key={municipality.municipality} className="rounded-[1.5rem] border border-white/10 bg-white/[0.03] p-4">
+                  <Link
+                    key={municipality.municipality}
+                    href={buildStationDetailHref(language, municipality.stationId)}
+                    className="rounded-[1.5rem] border border-white/10 bg-white/[0.03] p-4 transition hover:border-lime/30 hover:bg-white/[0.06]"
+                  >
                     <div className="flex items-start justify-between gap-3">
                       <div>
                         <p className="text-sm text-soft/72">{municipality.municipality}</p>
@@ -241,7 +253,7 @@ export default async function ReportsPage({ searchParams }: ReportsPageProps) {
                     <p className="mt-3 text-xs leading-5 text-soft/55">
                       {municipality.stationCount} {pageCopy.municipalityStationsLabel} · {municipality.stationId}
                     </p>
-                  </div>
+                  </Link>
                 ))
               ) : (
                 <p className="text-sm leading-6 text-soft/74">-</p>
@@ -346,7 +358,11 @@ export default async function ReportsPage({ searchParams }: ReportsPageProps) {
           <div className="mt-5 grid gap-3 md:grid-cols-2 xl:grid-cols-4">
             {forecastWatch.length > 0 ? (
               forecastWatch.map((forecast) => (
-                <div key={`${forecast.stationId}-${forecast.horizonHours}`} className="rounded-[1.5rem] border border-white/10 bg-white/[0.03] p-4">
+                <Link
+                  key={`${forecast.stationId}-${forecast.horizonHours}`}
+                  href={buildPredictionsHref(language, forecast.stationId, forecast.horizonHours)}
+                  className="rounded-[1.5rem] border border-white/10 bg-white/[0.03] p-4 transition hover:border-lime/30 hover:bg-white/[0.06]"
+                >
                   <div className="flex items-start justify-between gap-3">
                     <div>
                       <p className="text-sm text-soft/72">{forecast.municipality}</p>
@@ -358,7 +374,7 @@ export default async function ReportsPage({ searchParams }: ReportsPageProps) {
                   <p className="mt-2 text-xs leading-5 text-soft/65">
                     {pageCopy.forecastForLabel}: {formatMoment(forecast.predictedFor, locale)}
                   </p>
-                </div>
+                </Link>
               ))
             ) : (
               <p className="text-sm leading-6 text-soft/74">-</p>

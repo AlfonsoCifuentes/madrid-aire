@@ -1,8 +1,10 @@
+import Link from "next/link";
+
 import { MapShell } from "@/components/MapShell";
 import { MobileBottomNav } from "@/components/MobileBottomNav";
 import { PublicPageHeader, buildPublicMobileNavItems, type PublicNavLabels } from "@/components/PublicPageHeader";
 import { getDashboardPayload } from "@/lib/api";
-import { buildMunicipalitySnapshots } from "@/lib/editorial";
+import { buildMunicipalitySnapshots, buildStationDetailHref } from "@/lib/editorial";
 import { copyByLanguage, resolveLanguage } from "@/lib/i18n";
 
 type MapPageProps = {
@@ -130,7 +132,11 @@ export default async function MapPage({ searchParams }: MapPageProps) {
                 {priorityStations.map((station) => {
                   const stationMeta = stations.find((item) => item.station_id === station.station_id);
                   return (
-                    <div key={station.station_id} className="rounded-[1.5rem] border border-white/10 bg-white/[0.03] p-4">
+                    <Link
+                      key={station.station_id}
+                      href={buildStationDetailHref(language, station.station_id)}
+                      className="rounded-[1.5rem] border border-white/10 bg-white/[0.03] p-4 transition hover:border-lime/30 hover:bg-white/[0.06]"
+                    >
                       <div className="flex items-start justify-between gap-4">
                         <div>
                           <p className="font-data text-sm text-bone">{station.station_id}</p>
@@ -143,7 +149,7 @@ export default async function MapPage({ searchParams }: MapPageProps) {
                       <p className="mt-3 text-xs uppercase tracking-[0.18em] text-soft/55">
                         {station.risk_level ?? "unknown"}
                       </p>
-                    </div>
+                    </Link>
                   );
                 })}
               </div>
@@ -157,7 +163,11 @@ export default async function MapPage({ searchParams }: MapPageProps) {
               <div className="mt-5 grid gap-3">
                 {municipalityWatch.length > 0 ? (
                   municipalityWatch.map((municipality) => (
-                    <div key={municipality.municipality} className="rounded-[1.5rem] border border-white/10 bg-white/[0.03] p-4">
+                    <Link
+                      key={municipality.municipality}
+                      href={buildStationDetailHref(language, municipality.stationId)}
+                      className="rounded-[1.5rem] border border-white/10 bg-white/[0.03] p-4 transition hover:border-lime/30 hover:bg-white/[0.06]"
+                    >
                       <div className="flex items-start justify-between gap-4">
                         <div>
                           <p className="text-sm text-soft/72">{municipality.municipality}</p>
@@ -170,7 +180,7 @@ export default async function MapPage({ searchParams }: MapPageProps) {
                           ? `${municipality.stationCount} estación${municipality.stationCount === 1 ? "" : "es"} con señal · ${municipality.stationId}`
                           : `${municipality.stationCount} active station${municipality.stationCount === 1 ? "" : "s"} · ${municipality.stationId}`}
                       </p>
-                    </div>
+                    </Link>
                   ))
                 ) : (
                   <div className="rounded-[1.5rem] border border-white/10 bg-white/[0.03] p-4 text-sm leading-6 text-soft/70">
