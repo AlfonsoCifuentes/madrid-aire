@@ -1,0 +1,18 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "framework": null,
+  "buildCommand": "",
+  "installCommand": "pip install -r requirements.txt",
+  "routes": [
+    {
+      "src": "/api/(.*)",
+      "dest": "/api/index.py"
+    }
+  ],
+  "functions": {
+    "api/index.py": {
+      "maxDuration": 60,
+      "includeFiles": "{apps/api/src/**,data/sample_real/*.normalized.csv,data/sample_real/stations_from_official_source_*.csv,data/artifacts/no2_model_v1_*_20260513T231337Z.*}"
+    }
+  }
+}

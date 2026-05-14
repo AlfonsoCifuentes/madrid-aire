@@ -11,3 +11,4 @@ apps/api/.pytest_cache/
 *.pyc
 .env
 .env.local
+.vercel

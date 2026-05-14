@@ -1,0 +1,17 @@
+apps/web/
+node_modules/
+.venv/
+docs/
+.git/
+data/sample_real/community_historical_2025.normalized.csv
+data/sample_real/community_historical_2025.csv
+data/sample_real/community_historical_2026.csv
+data/sample_real/community_current_day_2026-05-13.csv
+data/artifacts/no2_model_v1_bundle_20260513T231032Z.joblib
+data/artifacts/no2_model_v1_metrics_20260513T231032Z.json
+data/artifacts/no2_model_v1_predictions_20260513T231032Z.csv
+data/artifacts/no2_baseline_metrics_20260513T213255Z.json
+data/artifacts/no2_baseline_predictions_20260513T213255Z.csv
+package.json
+package-lock.json
+MADRID_Aire_ultimate_product_engineering_bible_v6_copilot.md
