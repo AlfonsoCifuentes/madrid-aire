@@ -1,4 +1,4 @@
-@import "maplibre-gl/dist/maplibre-gl.css";
+@import "leaflet/dist/leaflet.css";
 
 @tailwind base;
 @tailwind components;
@@ -35,6 +35,48 @@ body {
     linear-gradient(180deg, var(--graphite) 0%, var(--asphalt) 46%, #0d1014 100%);
   color: var(--soft);
   font-family: var(--font-ui), sans-serif;
+}
+
+.leaflet-container {
+  background: linear-gradient(180deg, #d8e5ef 0%, #c7d7e3 100%);
+  font-family: var(--font-ui), sans-serif;
+}
+
+.leaflet-control-zoom a {
+  color: var(--graphite);
+}
+
+.leaflet-control-attribution {
+  background: rgba(8, 10, 12, 0.78) !important;
+  color: rgba(244, 241, 234, 0.78) !important;
+  border-radius: 999px;
+  margin: 0 10px 10px 0 !important;
+  padding: 4px 10px !important;
+}
+
+.leaflet-control-attribution a {
+  color: rgba(216, 255, 79, 0.9) !important;
+}
+
+.leaflet-tooltip {
+  border: 0;
+  border-radius: 999px;
+  background: rgba(8, 10, 12, 0.9);
+  color: var(--soft);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.18);
+  font-size: 12px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.leaflet-tooltip::before {
+  display: none;
+}
+
+@media print {
+  .leaflet-control-container {
+    display: none !important;
+  }
 }
 
 a {

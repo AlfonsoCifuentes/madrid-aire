@@ -2,6 +2,10 @@
 
 import { useEffect, useRef } from "react";
 
+type LeafletModule = typeof import("leaflet");
+type LeafletMap = import("leaflet").Map;
+type LeafletLayerGroup = import("leaflet").LayerGroup;
+
 export type MapNode = {
   station_id: string;
   label: string;
@@ -17,14 +21,7 @@ type AtmosphericMapProps = {
   nodes: MapNode[];
   onStationSelect?: (stationId: string) => void;
   className?: string;
-  onStaticPreviewChange?: (dataUrl: string | null) => void;
 };
-
-const MAP_STYLE_CANDIDATES = [
-  "https://basemaps.cartocdn.com/gl/positron-gl-style/style.json",
-  "https://basemaps.cartocdn.com/gl/voyager-gl-style/style.json",
-  "https://demotiles.maplibre.org/style.json",
-] as const;
 
 const RISK_COLORS: Record<string, string> = {
   good: "#80FFB2",
@@ -49,178 +46,154 @@ function valueToRadius(value: number): number {
   return 6 + (clamped / 300) * 12;
 }
 
-function buildGeoJson(nodes: MapNode[]) {
-  return {
-    type: "FeatureCollection" as const,
-    features: nodes.map((node) => ({
-      type: "Feature" as const,
-      geometry: {
-        type: "Point" as const,
-        coordinates: [node.longitude, node.latitude],
-      },
-      properties: {
-        station_id: node.station_id,
-        label: node.label,
-        value: node.value,
-        risk_level: node.risk_level,
-        freshness: node.freshness,
-        highlight: node.highlight ?? false,
-        color: RISK_COLORS[node.risk_level ?? "unknown"] ?? RISK_COLORS.unknown,
-        opacity: FRESHNESS_OPACITY[node.freshness] ?? 0.5,
-        radius: valueToRadius(node.value),
-      },
-    })),
-  };
-}
+function renderStations(
+  leaflet: LeafletModule,
+  map: LeafletMap,
+  layerGroup: LeafletLayerGroup,
+  nodes: MapNode[],
+  onStationSelect?: (stationId: string) => void,
+  fitBounds = false,
+) {
+  layerGroup.clearLayers();
 
-async function resolveMapStyle() {
-  for (const styleUrl of MAP_STYLE_CANDIDATES) {
-    try {
-      const response = await fetch(styleUrl, { method: "GET", cache: "force-cache" });
-      if (response.ok) {
-        return styleUrl;
-      }
-    } catch {
-      continue;
-    }
+  if (nodes.length === 0) {
+    map.setView([40.4168, -3.7038], 10.5);
+    return;
   }
 
-  return MAP_STYLE_CANDIDATES[MAP_STYLE_CANDIDATES.length - 1];
+  nodes.forEach((node) => {
+    const color = RISK_COLORS[node.risk_level ?? "unknown"] ?? RISK_COLORS.unknown;
+    const opacity = FRESHNESS_OPACITY[node.freshness] ?? 0.5;
+    const radius = valueToRadius(node.value);
+
+    if (node.highlight) {
+      leaflet.circleMarker([node.latitude, node.longitude], {
+        radius: radius + 9,
+        stroke: false,
+        fillColor: color,
+        fillOpacity: 0.16,
+        pane: "shadowPane",
+      }).addTo(layerGroup);
+    }
+
+    leaflet.circleMarker([node.latitude, node.longitude], {
+      radius: radius + 3,
+      color,
+      weight: node.highlight ? 2.5 : 1.5,
+      opacity,
+      fillOpacity: 0,
+    }).addTo(layerGroup);
+
+    const marker = leaflet.circleMarker([node.latitude, node.longitude], {
+      radius,
+      color: "#080A0C",
+      weight: 1,
+      opacity: 0.5,
+      fillColor: color,
+      fillOpacity: Math.max(opacity, 0.3),
+    }).addTo(layerGroup);
+
+    marker.bindTooltip(node.label, {
+      direction: "top",
+      offset: [0, -radius],
+      opacity: 0.92,
+    });
+
+    if (onStationSelect) {
+      marker.on("click", () => onStationSelect(node.station_id));
+    }
+  });
+
+  if (fitBounds) {
+    const bounds = leaflet.latLngBounds(nodes.map((node) => [node.latitude, node.longitude] as [number, number]));
+    if (bounds.isValid()) {
+      map.fitBounds(bounds.pad(0.14), {
+        animate: false,
+        padding: [28, 28],
+      });
+    }
+  }
 }
 
 export function AtmosphericMap({
   nodes,
   onStationSelect,
   className,
-  onStaticPreviewChange,
 }: AtmosphericMapProps) {
   const containerRef = useRef<HTMLDivElement>(null);
-  const mapRef = useRef<unknown>(null);
+  const mapRef = useRef<LeafletMap | null>(null);
+  const layerGroupRef = useRef<LeafletLayerGroup | null>(null);
+  const leafletRef = useRef<LeafletModule | null>(null);
+  const boundsAppliedRef = useRef(false);
 
   useEffect(() => {
     if (!containerRef.current || mapRef.current) return;
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    let map: any;
     let disposed = false;
 
-    void import("maplibre-gl").then(async ({ default: maplibregl }) => {
-      const style = await resolveMapStyle();
+    void import("leaflet").then((leaflet) => {
       if (disposed || !containerRef.current) {
         return;
       }
 
-      map = new maplibregl.Map({
-        container: containerRef.current,
-        style,
-        center: [-3.7038, 40.4168],
-        zoom: 10.5,
+      const map = leaflet.map(containerRef.current, {
+        zoomControl: false,
         attributionControl: false,
+        preferCanvas: true,
+        scrollWheelZoom: true,
       });
+      map.setView([40.4168, -3.7038], 10.5);
 
-      map.on("load", () => {
-        map.addSource("stations", {
-          type: "geojson",
-          data: buildGeoJson(nodes),
-        });
+      leaflet.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+        maxZoom: 19,
+        attribution: "&copy; OpenStreetMap contributors",
+        crossOrigin: true,
+      }).addTo(map);
 
-        map.addLayer({
-          id: "stations-highlight",
-          type: "circle",
-          source: "stations",
-          filter: ["==", ["get", "highlight"], true],
-          paint: {
-            "circle-radius": ["*", ["get", "radius"], 2.5],
-            "circle-color": ["get", "color"],
-            "circle-opacity": 0.15,
-            "circle-stroke-width": 0,
-          },
-        });
+      leaflet.control.zoom({ position: "topright" }).addTo(map);
+      leaflet.control
+        .attribution({ position: "bottomright", prefix: false })
+        .addAttribution("&copy; OpenStreetMap contributors")
+        .addTo(map);
 
-        map.addLayer({
-          id: "stations-ring",
-          type: "circle",
-          source: "stations",
-          paint: {
-            "circle-radius": ["*", ["get", "radius"], 1.6],
-            "circle-color": "transparent",
-            "circle-opacity": 0,
-            "circle-stroke-width": 1.5,
-            "circle-stroke-color": ["get", "color"],
-            "circle-stroke-opacity": ["get", "opacity"],
-          },
-        });
-
-        map.addLayer({
-          id: "stations-dot",
-          type: "circle",
-          source: "stations",
-          paint: {
-            "circle-radius": ["get", "radius"],
-            "circle-color": ["get", "color"],
-            "circle-opacity": ["get", "opacity"],
-            "circle-stroke-width": 1,
-            "circle-stroke-color": "#080A0C",
-            "circle-stroke-opacity": 0.4,
-          },
-        });
-
-        map.on("mouseenter", "stations-dot", () => {
-          (map.getCanvas() as HTMLCanvasElement).style.cursor = "pointer";
-        });
-        map.on("mouseleave", "stations-dot", () => {
-          (map.getCanvas() as HTMLCanvasElement).style.cursor = "";
-        });
-
-        if (onStationSelect) {
-          map.on("click", "stations-dot", (e: unknown) => {
-            const event = e as { point: unknown };
-            const features = map.queryRenderedFeatures(event.point, { layers: ["stations-dot"] });
-            if (features.length > 0) {
-              const stationId = features[0].properties?.station_id as string | undefined;
-              if (stationId) {
-                onStationSelect(stationId);
-              }
-            }
-          });
-        }
-      });
-
-      map.on("idle", () => {
-        if (!onStaticPreviewChange) {
-          return;
-        }
-
-        try {
-          const preview = (map.getCanvas() as HTMLCanvasElement).toDataURL("image/png");
-          onStaticPreviewChange(preview);
-        } catch {
-          onStaticPreviewChange(null);
-        }
-      });
-
+      const layerGroup = leaflet.layerGroup().addTo(map);
+      leafletRef.current = leaflet;
       mapRef.current = map;
+      layerGroupRef.current = layerGroup;
+
+      renderStations(leaflet, map, layerGroup, nodes, onStationSelect, true);
+      boundsAppliedRef.current = true;
+
+      requestAnimationFrame(() => {
+        map.invalidateSize(false);
+      });
     });
 
     return () => {
       disposed = true;
-      if (map) map.remove();
+      mapRef.current?.remove();
+      mapRef.current = null;
+      layerGroupRef.current = null;
+      leafletRef.current = null;
+      boundsAppliedRef.current = false;
     };
-  }, [nodes, onStationSelect, onStaticPreviewChange]);
+  }, [nodes, onStationSelect]);
 
-  // Update source data when nodes change without re-initialising map
   useEffect(() => {
-    const map = mapRef.current as {
-      getSource?: (id: string) => { setData: (data: unknown) => void } | undefined;
-      isStyleLoaded?: () => boolean;
-    } | null;
-    if (!map?.getSource || !map.isStyleLoaded?.()) return;
+    if (!leafletRef.current || !mapRef.current || !layerGroupRef.current) {
+      return;
+    }
 
-    const source = map.getSource("stations");
-    if (!source) return;
-
-    source.setData(buildGeoJson(nodes));
-  }, [nodes]);
+    renderStations(
+      leafletRef.current,
+      mapRef.current,
+      layerGroupRef.current,
+      nodes,
+      onStationSelect,
+      !boundsAppliedRef.current,
+    );
+    boundsAppliedRef.current = true;
+  }, [nodes, onStationSelect]);
 
   return (
     <div
