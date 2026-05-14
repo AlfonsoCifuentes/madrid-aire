@@ -222,7 +222,7 @@ export default async function ModelPage({ searchParams }: ModelPageProps) {
           </div>
         </div>
 
-        <section className="grid gap-4 md:grid-cols-3">
+        <section className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
           {metricNotes.map((item) => (
             <div key={item.title} className="glass-panel rounded-[1.75rem] p-5 shadow-atmosphere">
               <p className="eyebrow text-soft/55">{item.title}</p>

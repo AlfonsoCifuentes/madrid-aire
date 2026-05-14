@@ -227,7 +227,7 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
           </section>
         )}
 
-        <div className="grid gap-4 md:grid-cols-3">
+        <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
           <div className="glass-panel rounded-[1.75rem] p-5 shadow-atmosphere">
             <p className="eyebrow text-soft/55">{copy.dashboardDominantPollutant}</p>
             <p className="mt-4 font-data text-3xl text-bone">{dominantPollutant}</p>

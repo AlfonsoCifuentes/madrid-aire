@@ -198,7 +198,7 @@ export default async function ReportsPage({ searchParams }: ReportsPageProps) {
           <section className="glass-panel rounded-[2rem] p-5 shadow-atmosphere">
             <h2 className="text-2xl font-medium text-bone">{pageCopy.weeklyTitle}</h2>
             <p className="mt-4 text-sm leading-6 text-soft/74">{pageCopy.weeklyNote}</p>
-            <div className="mt-5 grid gap-4 md:grid-cols-3">
+            <div className="mt-5 grid gap-4 sm:grid-cols-2 2xl:grid-cols-3">
               <div>
                 <p className="eyebrow text-soft/55">{copy.selectedBaseline}</p>
                 <p className="mt-2 font-data text-sm text-bone">{formatModelName(metrics?.selected_baseline, language)}</p>
@@ -220,7 +220,7 @@ export default async function ReportsPage({ searchParams }: ReportsPageProps) {
           <section className="glass-panel rounded-[2rem] p-5 shadow-atmosphere">
             <h2 className="text-2xl font-medium text-bone">{pageCopy.freshnessTitle}</h2>
             <p className="mt-4 text-sm leading-6 text-soft/74">{pageCopy.freshnessNote}</p>
-            <div className="mt-5 grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+            <div className="mt-5 grid gap-4 sm:grid-cols-2 2xl:grid-cols-3">
               <div>
                 <p className="eyebrow text-soft/55">{copy.systemGlobalStatusLabel}</p>
                 <p className="mt-2 font-data text-sm text-bone">{system?.status ?? "-"}</p>

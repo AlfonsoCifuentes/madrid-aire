@@ -141,7 +141,7 @@ export default async function LandingPage({ searchParams }: LandingPageProps) {
               {copy.cycleTitle}
             </h2>
           </div>
-          <div className="grid gap-4 md:grid-cols-3">
+          <div className="grid gap-4 sm:grid-cols-2 2xl:grid-cols-3">
             {copy.cycleFocus.map((item, index) => (
               <div key={item} className="glass-panel rounded-[1.75rem] p-5 shadow-atmosphere">
                 <p className="eyebrow text-soft/50">0{index + 1}</p>
@@ -206,7 +206,7 @@ export default async function LandingPage({ searchParams }: LandingPageProps) {
                 </div>
               </div>
 
-              <div className="absolute bottom-5 left-5 right-5 z-10 grid gap-3 sm:grid-cols-3">
+              <div className="absolute bottom-5 left-5 right-5 z-10 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
                 <div className="rounded-[1.25rem] border border-white/10 bg-black/30 p-4 backdrop-blur">
                   <p className="eyebrow text-soft/55">{copy.pollutantCoverage}</p>
                   <p className="mt-2 font-data text-lg text-bone">{summary?.pollutant_count ?? 0}</p>

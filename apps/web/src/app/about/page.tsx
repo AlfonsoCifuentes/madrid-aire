@@ -102,7 +102,7 @@ export default async function AboutPage({ searchParams }: AboutPageProps) {
             </h1>
             <p className="mt-6 max-w-2xl text-lg leading-8 text-soft/74">{copy.aboutSubtitle}</p>
           </div>
-          <div className="grid gap-4 md:grid-cols-3">
+          <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
             <div className="glass-panel rounded-[1.75rem] p-5 shadow-atmosphere">
               <p className="eyebrow text-soft/55">{copy.stationsOnline}</p>
               <p className="mt-4 font-data text-3xl text-bone">{summary?.station_count ?? 0}</p>

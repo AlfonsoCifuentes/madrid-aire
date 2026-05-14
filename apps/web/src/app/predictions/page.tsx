@@ -295,7 +295,7 @@ export default async function PredictionsPage({ searchParams }: PredictionsPageP
             <div className="mt-5">
               <HistoryForecastChart observed={observed} predicted={predicted} observedLabel={copy.observedLabel} predictedLabel={copy.predictedLabel} />
             </div>
-            <div className="mt-5 grid gap-4 md:grid-cols-3">
+            <div className="mt-5 grid gap-4 sm:grid-cols-2 2xl:grid-cols-3">
               <div className="rounded-[1.5rem] border border-white/10 bg-white/[0.03] p-4">
                 <p className="eyebrow text-soft/55">{pageCopy.forecastForLabel}</p>
                 <p className="mt-2 font-data text-sm text-bone">{formatMoment(selectedPrediction?.predicted_for, locale)}</p>

@@ -163,7 +163,7 @@ export default async function SystemPage({ searchParams }: SystemPageProps) {
               <h2 className="text-2xl font-medium text-bone">{copy.systemDataQualityTitle}</h2>
               <p className="font-data text-xs uppercase tracking-[0.24em] text-soft/55">{copy.freshness[system?.data_quality.freshness ?? "unknown"] ?? system?.data_quality.freshness ?? "-"}</p>
             </div>
-            <div className="mt-5 grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+            <div className="mt-5 grid gap-4 sm:grid-cols-2 2xl:grid-cols-3">
               <div>
                 <p className="eyebrow text-soft/55">{copy.stationsOnline}</p>
                 <p className="mt-2 font-data text-3xl text-bone">{system?.data_quality.station_count ?? 0}</p>
@@ -184,7 +184,7 @@ export default async function SystemPage({ searchParams }: SystemPageProps) {
               <h2 className="text-2xl font-medium text-bone">{copy.systemPredictionRunsTitle}</h2>
               <p className="font-data text-xs uppercase tracking-[0.24em] text-soft/55">{system?.predictions.status ?? "predictions_pending"}</p>
             </div>
-            <div className="mt-5 grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+            <div className="mt-5 grid gap-4 sm:grid-cols-2 2xl:grid-cols-3">
               <div>
                 <p className="eyebrow text-soft/55">{copy.systemPredictionRowsLabel}</p>
                 <p className="mt-2 font-data text-3xl text-bone">{system?.predictions.row_count ?? 0}</p>
@@ -215,7 +215,7 @@ export default async function SystemPage({ searchParams }: SystemPageProps) {
               <h2 className="text-2xl font-medium text-bone">{copy.systemModelProductionTitle}</h2>
               <p className="font-data text-xs uppercase tracking-[0.24em] text-soft/55">{system?.model.status ?? "model_pending"}</p>
             </div>
-            <div className="mt-5 grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+            <div className="mt-5 grid gap-4 sm:grid-cols-2 2xl:grid-cols-3">
               <div>
                 <p className="eyebrow text-soft/55">{copy.selectedBaseline}</p>
                 <p className="mt-2 font-data text-sm text-bone">{system?.model.selected_model ?? "-"}</p>
