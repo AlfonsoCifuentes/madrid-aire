@@ -686,43 +686,39 @@ La landing debe ser una portada de producto. Debe impresionar sin parecer decora
 
 ```text
 Top-left:
-  [flag] MADRID Aire compact
+  [flag] MADRID Aire compact  →  href="#build"
 
 Top-right:
-  LIVE · MADRID · AIR QUALITY
+  LIVE · MADRID · AIR QUALITY  |  About  |  Language
 
-Center:
-  [flag] MADRID Aire huge
+Center (single column, max-w full):
+  Eyebrow: "Calidad del aire · Madrid"
+  [flag] MADRID Aire huge wordmark
 
-Below:
-  A living atmospheric atlas of Madrid.
+Below wordmark:
+  Claim text (max-w-2xl)
 
-CTA:
-  Seguir
+CTA row:
+  [Seguir]  [Abrir Dashboard →]
 
-Bottom-left:
-  NO2 · latest value · risk
-
-Bottom-right:
-  Updated · timestamp
+Below CTA (max-w-2xl, 2-col grid on sm+):
+  ┌──────────────────────┐  ┌──────────────────────┐
+  │ Señal en tiempo real │  │ Previsión NO2 · 24h  │
+  │ headline (stations)  │  │ NO2 · 24h            │
+  │ body copy            │  │ body copy            │
+  └──────────────────────┘  └──────────────────────┘
 ```
+
+No aside panel. No 2xl grid split. Signal + Forecast cards are inline below the CTA buttons,
+visible at all breakpoints. No bottom status section, no build timestamp section.
 
 ## 8.3 Ultra-wide layout
 
 ```text
-Left:
-  Wordmark huge
-  Claim
-  CTA
-
-Center/right:
-  Atmospheric map field
-
-Right rail:
-  Current signal
-  Worst station
-  Forecast trend
-  Stations online
+Same single-column layout as desktop.
+Wordmark scales to landing size.
+Signal + Forecast cards remain max-w-2xl, left-aligned.
+No right-rail aside.
 ```
 
 ## 8.4 Mobile layout

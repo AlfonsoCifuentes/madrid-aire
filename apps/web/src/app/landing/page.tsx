@@ -45,11 +45,6 @@ export default async function LandingPage({ searchParams }: LandingPageProps) {
     timeStyle: "short",
     timeZone: "Europe/Madrid",
   });
-  const workspaceBuild = new Intl.DateTimeFormat(language === "es" ? "es-ES" : "en-GB", {
-    dateStyle: "medium",
-    timeStyle: "short",
-    timeZone: "UTC",
-  }).format(new Date());
   const freshnessLabel = copy.freshness[summary?.freshness ?? "pending"] ?? copy.freshness.pending;
   const latestTimestampValue = summary?.latest_timestamp
     ? madridDateTimeFormatter.format(new Date(summary.latest_timestamp))
@@ -62,13 +57,6 @@ export default async function LandingPage({ searchParams }: LandingPageProps) {
     freshnessLabel,
     copy,
   );
-  const metricCards = summary?.observations_ready
-    ? [
-        `${copy.worstStation}: ${worstStationId}`,
-        `${copy.latestTimestamp}: ${latestTimestampValue}`,
-        `${copy.pollutantCoverage}: ${summary?.pollutant_count ?? 0}`,
-      ]
-    : copy.principles;
   const footerLinks = [
     { href: `/dashboard?lang=${language}`, label: copy.dashboardTitle },
     { href: `/map?lang=${language}`, label: copy.mapPageTitle },
@@ -89,9 +77,9 @@ export default async function LandingPage({ searchParams }: LandingPageProps) {
         <PollutantGlow className="absolute bottom-[16%] right-[12%] h-72 w-72 animate-float reduced-motion:animate-none" variant="alert" />
       </div>
 
-      <section className="relative mx-auto flex min-h-screen w-full max-w-[1800px] flex-col px-5 pb-8 pt-5 sm:px-7 lg:px-10 3xl:px-14">
+      <section className="relative mx-auto flex min-h-screen w-full max-w-[1800px] flex-col px-5 pb-16 pt-5 sm:px-7 lg:px-10 3xl:px-14">
         <header className="flex items-start justify-between gap-6">
-          <a className="glass-panel rounded-full px-4 py-3 shadow-atmosphere" href="#signal">
+          <a className="glass-panel rounded-full px-4 py-3 shadow-atmosphere" href="#build">
             <MadridAireWordmark className="items-center" size="compact" />
           </a>
           <div className="flex flex-wrap items-center justify-end gap-3">
@@ -107,34 +95,31 @@ export default async function LandingPage({ searchParams }: LandingPageProps) {
         </header>
 
         <div className="relative flex flex-1 flex-col justify-center py-12 lg:py-20">
-          <div className="grid gap-14 2xl:grid-cols-[minmax(0,3fr)_minmax(320px,1fr)] 2xl:gap-10">
-            <div className="min-w-0 max-w-full 2xl:max-w-[75vw] 2xl:pr-6">
-              <p className="eyebrow mb-6 text-soft/70">{copy.heroEyebrow}</p>
-              <MadridAireWordmark className="max-w-full" size="landing" />
-              <p className="mt-8 max-w-2xl text-balance text-xl leading-8 text-soft/78 sm:text-2xl sm:leading-9 lg:text-[2rem] lg:leading-[1.35]">
-                {copy.heroClaim}
-              </p>
-              <div className="mt-10 flex flex-col gap-4 sm:flex-row">
-                <a
-                  className="inline-flex min-h-12 items-center justify-center rounded-full bg-lime px-7 py-3 font-medium text-graphite transition hover:bg-[#ebff93]"
-                  href="#signal"
-                >
-                  {copy.heroCtaPrimary}
-                </a>
-                <Link
-                  className="inline-flex min-h-12 items-center justify-center rounded-full border border-white/14 bg-white/5 px-7 py-3 font-medium text-soft transition hover:bg-white/10"
-                  href={`/dashboard?lang=${language}`}
-                >
-                  {copy.heroCtaSecondary}
-                </Link>
-              </div>
+          <div className="max-w-full">
+            <p className="eyebrow mb-6 text-soft/70">{copy.heroEyebrow}</p>
+            <MadridAireWordmark className="max-w-full" size="landing" />
+            <p className="mt-8 max-w-2xl text-balance text-xl leading-8 text-soft/78 sm:text-2xl sm:leading-9 lg:text-[2rem] lg:leading-[1.35]">
+              {copy.heroClaim}
+            </p>
+            <div className="mt-10 flex flex-col gap-4 sm:flex-row">
+              <a
+                className="inline-flex min-h-12 items-center justify-center rounded-full bg-lime px-7 py-3 font-medium text-graphite transition hover:bg-[#ebff93]"
+                href="#build"
+              >
+                {copy.heroCtaPrimary}
+              </a>
+              <Link
+                className="inline-flex min-h-12 items-center justify-center rounded-full border border-white/14 bg-white/5 px-7 py-3 font-medium text-soft transition hover:bg-white/10"
+                href={`/dashboard?lang=${language}`}
+              >
+                {copy.heroCtaSecondary}
+              </Link>
             </div>
-
-            <aside className="grid gap-4 self-end 2xl:min-w-0 2xl:pb-12">
+            <div className="mt-8 grid max-w-2xl gap-4 sm:grid-cols-2">
               <div className="glass-panel rounded-[2rem] p-5 shadow-atmosphere">
                 <p className="eyebrow text-soft/60">{copy.signalTitle}</p>
-                <p className="mt-3 font-data text-3xl text-bone">{signalCopy.headline}</p>
-                <p className="mt-3 max-w-[28ch] text-sm leading-6 text-soft/68">
+                <p className="mt-3 font-data text-2xl text-bone">{signalCopy.headline}</p>
+                <p className="mt-3 text-sm leading-6 text-soft/68">
                   {summary?.observations_ready ? copy.signalReadyBody : signalCopy.body}
                 </p>
               </div>
@@ -143,34 +128,7 @@ export default async function LandingPage({ searchParams }: LandingPageProps) {
                 <p className="mt-3 font-data text-2xl text-no2">NO2 · 24h</p>
                 <p className="mt-3 text-sm leading-6 text-soft/68">{copy.forecastBody}</p>
               </div>
-            </aside>
-          </div>
-        </div>
-
-        <div className="grid gap-4 pb-3 md:grid-cols-2 xl:grid-cols-[1.1fr_0.9fr]">
-          <div id="signal" className="glass-panel rounded-[2rem] p-5 shadow-atmosphere">
-            <div className="flex flex-wrap items-center justify-between gap-3">
-              <p className="eyebrow text-soft/60">{copy.currentSignal}</p>
-              <p className="font-data text-sm text-soft/55">{copy.noSyntheticMetrics}</p>
             </div>
-            <div className="mt-5 grid gap-4 md:grid-cols-3">
-              {metricCards.map((item) => (
-                <div key={item} className="rounded-[1.5rem] border border-white/10 bg-white/4 p-4">
-                  <p className="eyebrow text-soft/55">{copy.constraintLabel}</p>
-                  <p className="mt-4 text-base leading-7 text-soft/82">{item}</p>
-                </div>
-              ))}
-            </div>
-          </div>
-          <div className="glass-panel rounded-[2rem] p-5 shadow-atmosphere">
-            <div className="flex flex-wrap items-center justify-between gap-3">
-              <p className="eyebrow text-soft/60">{copy.workspaceBuild}</p>
-              <p className="font-data text-sm text-soft/55">UTC</p>
-            </div>
-            <p className="mt-4 font-data text-2xl text-bone">{workspaceBuild}</p>
-            <p className="mt-4 text-sm leading-6 text-soft/68">
-              {copy.buildTimestampBody}
-            </p>
           </div>
         </div>
       </section>
@@ -194,7 +152,7 @@ export default async function LandingPage({ searchParams }: LandingPageProps) {
         </div>
       </section>
 
-      <section className="relative border-t border-white/8 px-5 py-16 sm:px-7 lg:px-10 3xl:px-14">
+      <section id="overview" className="relative border-t border-white/8 px-5 py-16 sm:px-7 lg:px-10 3xl:px-14">
         <div className="mx-auto grid w-full max-w-[1800px] gap-10 xl:grid-cols-[0.9fr_1.1fr] xl:items-center">
           <div>
             <p className="eyebrow text-soft/55">{copy.landingMapPreviewEyebrow}</p>

@@ -198,7 +198,7 @@ export const copyByLanguage: Record<Language, Copy> = {
     signalReadyBody:
       "La red de estaciones ya está aportando lecturas oficiales y la web resume dónde está la peor situación, cuándo se actualizó y cómo se reparte por Madrid.",
     signalPendingBody:
-      "La primera capa visual está lista. Las mediciones aparecerán en cuanto llegue la siguiente actualización oficial.",
+      "La red de estaciones está lista. Los datos aparecerán en cuanto se procese la siguiente actualización oficial.",
     forecastPolicy: "Previsión a corto plazo",
     forecastBody:
       "La previsión resume lo que puede pasar con el NO2 durante las próximas 24 horas y se muestra junto a la evolución observada recientemente.",
@@ -421,7 +421,7 @@ export const copyByLanguage: Record<Language, Copy> = {
     signalReadyBody:
       "The station network is already providing official readings, and the site highlights where pressure is highest, when it was updated, and how it is distributed across Madrid.",
     signalPendingBody:
-      "The first visual layer is ready. Measurements will appear as soon as the next official update arrives.",
+      "The monitoring network is ready. Data will appear as soon as the next official update is processed.",
     forecastPolicy: "Short-term forecast",
     forecastBody:
       "The forecast summarises what may happen with NO2 over the next 24 hours and is shown together with the most recent observed trend.",
