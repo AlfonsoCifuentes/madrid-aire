@@ -2,6 +2,7 @@ import { MapShell } from "@/components/MapShell";
 import { MobileBottomNav } from "@/components/MobileBottomNav";
 import { PublicPageHeader, buildPublicMobileNavItems, type PublicNavLabels } from "@/components/PublicPageHeader";
 import { getDashboardPayload } from "@/lib/api";
+import { buildMunicipalitySnapshots } from "@/lib/editorial";
 import { copyByLanguage, resolveLanguage } from "@/lib/i18n";
 
 type MapPageProps = {
@@ -24,6 +25,7 @@ export default async function MapPage({ searchParams }: MapPageProps) {
   const municipalitiesRepresented = new Set(
     coordinatesReady.map((station) => station.municipality ?? station.name ?? station.station_id),
   ).size;
+  const municipalityWatch = buildMunicipalitySnapshots(stations, latest).slice(0, 6);
   const pulseNodes = coordinatesReady
     .map((station) => {
       const observation = no2ByStation.get(station.station_id);
@@ -116,7 +118,7 @@ export default async function MapPage({ searchParams }: MapPageProps) {
           </section>
 
           {/* Below-map panels */}
-          <section className="grid gap-6 xl:grid-cols-2">
+          <section className="grid gap-6 xl:grid-cols-3">
             <section className="glass-panel rounded-[2rem] p-5 shadow-atmosphere">
               <div className="flex flex-wrap items-center justify-between gap-3">
                 <p className="eyebrow text-soft/60">{copy.mapPriorityStations}</p>
@@ -144,6 +146,39 @@ export default async function MapPage({ searchParams }: MapPageProps) {
                     </div>
                   );
                 })}
+              </div>
+            </section>
+
+            <section className="glass-panel rounded-[2rem] p-5 shadow-atmosphere">
+              <div className="flex flex-wrap items-center justify-between gap-3">
+                <p className="eyebrow text-soft/60">{language === "es" ? "Municipios a comparar" : "Municipalities to compare"}</p>
+                <p className="font-data text-sm text-soft/55">{municipalityWatch.length}</p>
+              </div>
+              <div className="mt-5 grid gap-3">
+                {municipalityWatch.length > 0 ? (
+                  municipalityWatch.map((municipality) => (
+                    <div key={municipality.municipality} className="rounded-[1.5rem] border border-white/10 bg-white/[0.03] p-4">
+                      <div className="flex items-start justify-between gap-4">
+                        <div>
+                          <p className="text-sm text-soft/72">{municipality.municipality}</p>
+                          <p className="mt-2 font-data text-sm text-bone">{municipality.stationName}</p>
+                        </div>
+                        <p className="font-data text-xl text-bone">{municipality.peakValue.toFixed(1)}</p>
+                      </div>
+                      <p className="mt-3 text-xs text-soft/55">
+                        {language === "es"
+                          ? `${municipality.stationCount} estación${municipality.stationCount === 1 ? "" : "es"} con señal · ${municipality.stationId}`
+                          : `${municipality.stationCount} active station${municipality.stationCount === 1 ? "" : "s"} · ${municipality.stationId}`}
+                      </p>
+                    </div>
+                  ))
+                ) : (
+                  <div className="rounded-[1.5rem] border border-white/10 bg-white/[0.03] p-4 text-sm leading-6 text-soft/70">
+                    {language === "es"
+                      ? "Todavía no hay suficiente lectura reciente para comparar municipios con contexto territorial."
+                      : "There is not enough recent signal yet to compare municipalities with territorial context."}
+                  </div>
+                )}
               </div>
             </section>
 

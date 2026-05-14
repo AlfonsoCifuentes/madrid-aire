@@ -2,7 +2,8 @@ import { AdvancedPageHeader, buildAdvancedMobileNavItems, type AdvancedNavLabels
 import { MetricBars } from "@/components/MetricBars";
 import { MobileBottomNav } from "@/components/MobileBottomNav";
 import { OperationalStatusStrip } from "@/components/OperationalStatusStrip";
-import { getAlertsPayload, getDashboardPayload, getModelMetricsPayload, getSystemStatusPayload } from "@/lib/api";
+import { getAlertsPayload, getDashboardPayload, getModelMetricsPayload, getPredictionsPayload, getSystemStatusPayload } from "@/lib/api";
+import { buildForecastHotspots, buildMunicipalitySnapshots } from "@/lib/editorial";
 import { copyByLanguage, resolveLanguage } from "@/lib/i18n";
 
 type ReportsPageProps = {
@@ -73,6 +74,16 @@ function buildCopy(language: "es" | "en") {
       activeAlertsLabel: "Alertas activas",
       predictorLabel: "Modelo actual",
       overallNote: "No es un parte oficial; es una lectura editorial construida sobre datos oficiales y el estado actual del proyecto.",
+      editorialTitle: "Lectura editorial del día",
+      editorialBody: "Un resumen corto para entender dónde mirar ahora, qué zona concentra más presión y qué tramo del forecast conviene seguir a continuación.",
+      municipalitiesTitle: "Municipios a vigilar",
+      municipalitiesBody: "La lectura territorial se apoya en el peor valor actual de NO2 por municipio con presencia operativa en la red.",
+      forecastWatchTitle: "Próximos picos previstos",
+      forecastWatchBody: "Estos son los puntos donde el forecast actual concentra los valores más altos en la próxima ventana operativa.",
+      municipalityStationsLabel: "estaciones con señal",
+      peakStationLabel: "Punto más alto",
+      forecastForLabel: "Previsto para",
+      forecastHotspotLabel: "Siguiente foco previsto",
     };
   }
 
@@ -89,6 +100,16 @@ function buildCopy(language: "es" | "en") {
     activeAlertsLabel: "Active alerts",
     predictorLabel: "Current model",
     overallNote: "This is not an official bulletin; it is an editorial reading built on official data and the current state of the project.",
+    editorialTitle: "Editorial briefing",
+    editorialBody: "A short read to understand where to look now, which area is carrying more pressure, and which part of the forecast is worth watching next.",
+    municipalitiesTitle: "Municipalities to watch",
+    municipalitiesBody: "The territorial reading is based on the highest current NO2 value per municipality with active network presence.",
+    forecastWatchTitle: "Next forecast peaks",
+    forecastWatchBody: "These are the points where the current forecast concentrates the highest values in the next operating window.",
+    municipalityStationsLabel: "stations with signal",
+    peakStationLabel: "Highest point",
+    forecastForLabel: "Forecast for",
+    forecastHotspotLabel: "Next forecast hotspot",
   };
 }
 
@@ -112,12 +133,19 @@ export default async function ReportsPage({ searchParams }: ReportsPageProps) {
         : "This section brings editorial reading and technical follow-up together. Use it when you want context, not just a public-facing screen.",
   };
   const mobileNavItems = buildAdvancedMobileNavItems(language, advancedLabels);
-  const [dashboard, metrics, system, alerts] = await Promise.all([
+  const [dashboard, metrics, system, alerts, predictions] = await Promise.all([
     getDashboardPayload(),
     getModelMetricsPayload(),
     getSystemStatusPayload(),
     getAlertsPayload(),
+    getPredictionsPayload(),
   ]);
+  const stations = dashboard.stations?.items ?? [];
+  const latest = dashboard.latest?.items ?? [];
+  const municipalityWatch = buildMunicipalitySnapshots(stations, latest).slice(0, 6);
+  const forecastWatch = buildForecastHotspots(stations, predictions?.items ?? [], predictions?.target ?? "NO2", 4);
+  const leadingMunicipality = municipalityWatch[0] ?? null;
+  const leadingForecast = forecastWatch[0] ?? null;
 
   return (
     <main className="min-h-screen bg-graphite px-5 py-5 pb-28 text-soft sm:px-7 md:pb-5 lg:px-10 3xl:px-14">
@@ -153,6 +181,74 @@ export default async function ReportsPage({ searchParams }: ReportsPageProps) {
         </div>
 
         <OperationalStatusStrip language={language} system={system} freshnessLabels={copy.freshness} currentPage="reports" />
+
+        <div className="grid gap-5 xl:grid-cols-[1.05fr_0.95fr]">
+          <section className="glass-panel rounded-[2rem] p-5 shadow-atmosphere">
+            <h2 className="text-2xl font-medium text-bone">{pageCopy.editorialTitle}</h2>
+            <p className="mt-4 text-sm leading-6 text-soft/74">{pageCopy.editorialBody}</p>
+            <div className="mt-5 grid gap-4 sm:grid-cols-2">
+              <div className="rounded-[1.5rem] border border-white/10 bg-white/[0.03] p-4">
+                <p className="eyebrow text-soft/55">{pageCopy.worstStationLabel}</p>
+                <p className="mt-3 text-lg text-bone">
+                  {leadingMunicipality
+                    ? language === "es"
+                      ? `${leadingMunicipality.municipality} lidera la lectura territorial actual.`
+                      : `${leadingMunicipality.municipality} is currently leading the territorial read.`
+                    : "-"}
+                </p>
+                <p className="mt-3 text-sm leading-6 text-soft/70">
+                  {leadingMunicipality
+                    ? language === "es"
+                      ? `${pageCopy.peakStationLabel}: ${leadingMunicipality.stationName} (${leadingMunicipality.stationId}) con ${leadingMunicipality.peakValue.toFixed(1)} µg/m³.`
+                      : `${pageCopy.peakStationLabel}: ${leadingMunicipality.stationName} (${leadingMunicipality.stationId}) with ${leadingMunicipality.peakValue.toFixed(1)} µg/m³.`
+                    : "-"}
+                </p>
+              </div>
+              <div className="rounded-[1.5rem] border border-white/10 bg-white/[0.03] p-4">
+                <p className="eyebrow text-soft/55">{pageCopy.forecastHotspotLabel}</p>
+                <p className="mt-3 text-lg text-bone">
+                  {leadingForecast
+                    ? language === "es"
+                      ? `${leadingForecast.municipality} concentra el próximo pico previsto.`
+                      : `${leadingForecast.municipality} concentrates the next forecast peak.`
+                    : "-"}
+                </p>
+                <p className="mt-3 text-sm leading-6 text-soft/70">
+                  {leadingForecast
+                    ? language === "es"
+                      ? `${leadingForecast.stationName} marca ${leadingForecast.predictedValue.toFixed(1)} µg/m³ en H+${leadingForecast.horizonHours}.`
+                      : `${leadingForecast.stationName} reaches ${leadingForecast.predictedValue.toFixed(1)} µg/m³ at H+${leadingForecast.horizonHours}.`
+                    : "-"}
+                </p>
+              </div>
+            </div>
+          </section>
+
+          <section className="glass-panel rounded-[2rem] p-5 shadow-atmosphere">
+            <h2 className="text-2xl font-medium text-bone">{pageCopy.municipalitiesTitle}</h2>
+            <p className="mt-4 text-sm leading-6 text-soft/74">{pageCopy.municipalitiesBody}</p>
+            <div className="mt-5 grid gap-3 sm:grid-cols-2">
+              {municipalityWatch.length > 0 ? (
+                municipalityWatch.map((municipality) => (
+                  <div key={municipality.municipality} className="rounded-[1.5rem] border border-white/10 bg-white/[0.03] p-4">
+                    <div className="flex items-start justify-between gap-3">
+                      <div>
+                        <p className="text-sm text-soft/72">{municipality.municipality}</p>
+                        <p className="mt-2 font-data text-sm text-bone">{municipality.stationName}</p>
+                      </div>
+                      <p className="font-data text-xl text-bone">{municipality.peakValue.toFixed(1)}</p>
+                    </div>
+                    <p className="mt-3 text-xs leading-5 text-soft/55">
+                      {municipality.stationCount} {pageCopy.municipalityStationsLabel} · {municipality.stationId}
+                    </p>
+                  </div>
+                ))
+              ) : (
+                <p className="text-sm leading-6 text-soft/74">-</p>
+              )}
+            </div>
+          </section>
+        </div>
 
         <div className="grid gap-5 xl:grid-cols-2">
           <section className="glass-panel rounded-[2rem] p-5 shadow-atmosphere">
@@ -240,6 +336,35 @@ export default async function ReportsPage({ searchParams }: ReportsPageProps) {
             </div>
           </section>
         </div>
+
+        <section className="glass-panel rounded-[2rem] p-5 shadow-atmosphere">
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <h2 className="text-2xl font-medium text-bone">{pageCopy.forecastWatchTitle}</h2>
+            <p className="font-data text-sm text-soft/55">{predictions?.target ?? "NO2"} · {forecastWatch.length}</p>
+          </div>
+          <p className="mt-4 text-sm leading-6 text-soft/74">{pageCopy.forecastWatchBody}</p>
+          <div className="mt-5 grid gap-3 md:grid-cols-2 xl:grid-cols-4">
+            {forecastWatch.length > 0 ? (
+              forecastWatch.map((forecast) => (
+                <div key={`${forecast.stationId}-${forecast.horizonHours}`} className="rounded-[1.5rem] border border-white/10 bg-white/[0.03] p-4">
+                  <div className="flex items-start justify-between gap-3">
+                    <div>
+                      <p className="text-sm text-soft/72">{forecast.municipality}</p>
+                      <p className="mt-2 font-data text-sm text-bone">{forecast.stationName}</p>
+                    </div>
+                    <p className="font-data text-xl text-bone">{forecast.predictedValue.toFixed(1)}</p>
+                  </div>
+                  <p className="mt-3 text-xs leading-5 text-soft/55">H+{forecast.horizonHours} · {forecast.stationId}</p>
+                  <p className="mt-2 text-xs leading-5 text-soft/65">
+                    {pageCopy.forecastForLabel}: {formatMoment(forecast.predictedFor, locale)}
+                  </p>
+                </div>
+              ))
+            ) : (
+              <p className="text-sm leading-6 text-soft/74">-</p>
+            )}
+          </div>
+        </section>
       </section>
       <MobileBottomNav currentLanguage={language} currentPage="reports" ariaLabel={copy.mobileNavAriaLabel} items={mobileNavItems} />
     </main>
