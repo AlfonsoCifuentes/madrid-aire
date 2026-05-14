@@ -174,6 +174,10 @@ type Copy = {
   dashboardModelImprovementLabel: string;
   dashboardDominantPollutant: string;
   dashboardAverageNo2Label: string;
+  mapPollutantSelector: string;
+  mapNoStation: string;
+  mapStationDrawerClose: string;
+  mapStationDrawerCoords: string;
   freshness: Record<string, string>;
 };
 
@@ -389,6 +393,10 @@ export const copyByLanguage: Record<Language, Copy> = {
     dashboardModelImprovementLabel: "Mejora vs. referencia",
     dashboardDominantPollutant: "Contaminante dominante",
     dashboardAverageNo2Label: "Promedio NO2 · red",
+    mapPollutantSelector: "Contaminante",
+    mapNoStation: "Selecciona una estación",
+    mapStationDrawerClose: "Cerrar",
+    mapStationDrawerCoords: "Coordenadas",
     freshness: {
       fresh: "fresco",
       delayed: "retrasado",
@@ -608,6 +616,10 @@ export const copyByLanguage: Record<Language, Copy> = {
     dashboardModelImprovementLabel: "Improvement vs. baseline",
     dashboardDominantPollutant: "Dominant pollutant",
     dashboardAverageNo2Label: "Average NO2 · network",
+    mapPollutantSelector: "Pollutant",
+    mapNoStation: "Select a station",
+    mapStationDrawerClose: "Close",
+    mapStationDrawerCoords: "Coordinates",
     freshness: {
       fresh: "fresh",
       delayed: "delayed",

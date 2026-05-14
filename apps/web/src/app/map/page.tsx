@@ -1,8 +1,8 @@
 import Link from "next/link";
 
 import { LanguageSelector } from "@/components/LanguageSelector";
+import { MapShell } from "@/components/MapShell";
 import { MobileBottomNav, type MobileBottomNavItem } from "@/components/MobileBottomNav";
-import { StationPulseField } from "@/components/StationPulseField";
 import { MadridAireWordmark } from "@/components/branding/MadridAireWordmark";
 import { getDashboardPayload } from "@/lib/api";
 import { copyByLanguage, resolveLanguage } from "@/lib/i18n";
@@ -105,64 +105,57 @@ export default async function MapPage({ searchParams }: MapPageProps) {
           </div>
         </div>
 
-        <section className="grid gap-6 xl:grid-cols-[1.3fr_0.7fr]">
-          <div className="glass-panel rounded-[2rem] p-5 shadow-atmosphere">
+        {/* Interactive MapLibre GL map */}
+        <section className="glass-panel rounded-[2rem] p-5 shadow-atmosphere">
+          <div className="mb-5 flex flex-wrap items-center justify-between gap-3">
+            <p className="eyebrow text-soft/60">{copy.mapRosterTitle}</p>
+            <p className="font-data text-sm text-soft/55">
+              {language === "es" ? "NO2 · lectura actual · nivel" : "NO2 · latest reading · level"}
+            </p>
+          </div>
+          <MapShell nodes={pulseNodes} language={language} />
+        </section>
+
+        {/* Below-map panels */}
+        <section className="grid gap-6 xl:grid-cols-2">
+          <section className="glass-panel rounded-[2rem] p-5 shadow-atmosphere">
             <div className="flex flex-wrap items-center justify-between gap-3">
-              <p className="eyebrow text-soft/60">{copy.mapRosterTitle}</p>
-              <p className="font-data text-sm text-soft/55">{language === "es" ? "NO2 · lectura actual · nivel" : "NO2 · latest reading · level"}</p>
+              <p className="eyebrow text-soft/60">{copy.mapPriorityStations}</p>
+              <p className="font-data text-sm text-soft/55">
+                {copy.freshness[payload.summary?.freshness ?? "unknown"] ?? copy.freshness.unknown}
+              </p>
             </div>
-            <div className="mt-5">
-              <StationPulseField nodes={pulseNodes} />
-            </div>
-          </div>
-
-          <div className="grid gap-6">
-            <section className="glass-panel rounded-[2rem] p-5 shadow-atmosphere">
-              <p className="eyebrow text-soft/60">{copy.mapLegendTitle}</p>
-              <div className="mt-5 grid gap-4 text-sm text-soft/72">
-                <div className="rounded-[1.25rem] border border-white/10 bg-white/[0.03] p-4">{copy.mapNodeSize}</div>
-                <div className="rounded-[1.25rem] border border-white/10 bg-white/[0.03] p-4">{copy.mapNodeColor}</div>
-                <div className="rounded-[1.25rem] border border-white/10 bg-white/[0.03] p-4">{copy.mapNodeFreshness}</div>
-              </div>
-            </section>
-
-            <section className="glass-panel rounded-[2rem] p-5 shadow-atmosphere">
-              <div className="flex flex-wrap items-center justify-between gap-3">
-                <p className="eyebrow text-soft/60">{copy.mapPriorityStations}</p>
-                <p className="font-data text-sm text-soft/55">{copy.freshness[payload.summary?.freshness ?? "unknown"] ?? copy.freshness.unknown}</p>
-              </div>
-              <div className="mt-5 grid gap-3">
-                {priorityStations.map((station) => {
-                  const stationMeta = stations.find((item) => item.station_id === station.station_id);
-                  return (
-                    <div key={station.station_id} className="rounded-[1.5rem] border border-white/10 bg-white/[0.03] p-4">
-                      <div className="flex items-start justify-between gap-4">
-                        <div>
-                          <p className="font-data text-sm text-bone">{station.station_id}</p>
-                          <p className="mt-2 text-sm text-soft/74">{stationMeta?.name ?? stationMeta?.municipality ?? station.station_id}</p>
-                        </div>
-                        <p className="font-data text-xl text-bone">{station.value.toFixed(1)}</p>
-                      </div>
-                      <p className="mt-3 text-xs uppercase tracking-[0.18em] text-soft/55">{station.risk_level ?? "unknown"}</p>
-                    </div>
-                  );
-                })}
-              </div>
-            </section>
-
-            <section className="glass-panel rounded-[2rem] p-5 shadow-atmosphere">
-              <p className="eyebrow text-soft/60">{copy.mapStationContext}</p>
-              <div className="mt-5 grid gap-3 sm:grid-cols-2 xl:grid-cols-1">
-                {stations.slice(0, 6).map((station) => (
+            <div className="mt-5 grid gap-3 sm:grid-cols-2">
+              {priorityStations.map((station) => {
+                const stationMeta = stations.find((item) => item.station_id === station.station_id);
+                return (
                   <div key={station.station_id} className="rounded-[1.5rem] border border-white/10 bg-white/[0.03] p-4">
-                    <p className="font-data text-sm text-bone">{station.station_id}</p>
-                    <p className="mt-2 text-sm text-soft/74">{station.name ?? station.municipality ?? station.station_id}</p>
-                    <p className="mt-3 text-sm text-soft/62">{station.postal_address ?? station.zone_description ?? station.metadata_status}</p>
+                    <div className="flex items-start justify-between gap-4">
+                      <div>
+                        <p className="font-data text-sm text-bone">{station.station_id}</p>
+                        <p className="mt-2 text-sm text-soft/74">
+                          {stationMeta?.name ?? stationMeta?.municipality ?? station.station_id}
+                        </p>
+                      </div>
+                      <p className="font-data text-xl text-bone">{station.value.toFixed(1)}</p>
+                    </div>
+                    <p className="mt-3 text-xs uppercase tracking-[0.18em] text-soft/55">
+                      {station.risk_level ?? "unknown"}
+                    </p>
                   </div>
-                ))}
-              </div>
-            </section>
-          </div>
+                );
+              })}
+            </div>
+          </section>
+
+          <section className="glass-panel rounded-[2rem] p-5 shadow-atmosphere">
+            <p className="eyebrow text-soft/60">{copy.mapLegendTitle}</p>
+            <div className="mt-5 grid gap-4 text-sm text-soft/72">
+              <div className="rounded-[1.25rem] border border-white/10 bg-white/[0.03] p-4">{copy.mapNodeSize}</div>
+              <div className="rounded-[1.25rem] border border-white/10 bg-white/[0.03] p-4">{copy.mapNodeColor}</div>
+              <div className="rounded-[1.25rem] border border-white/10 bg-white/[0.03] p-4">{copy.mapNodeFreshness}</div>
+            </div>
+          </section>
         </section>
       </section>
       <MobileBottomNav currentLanguage={language} currentPage="map" ariaLabel={copy.mobileNavAriaLabel} items={mobileNavItems} />

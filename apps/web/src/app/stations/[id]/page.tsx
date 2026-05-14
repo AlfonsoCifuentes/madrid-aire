@@ -1,9 +1,11 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
+import { DataTimestamp } from "@/components/DataTimestamp";
 import { HistoryForecastChart } from "@/components/HistoryForecastChart";
 import { LanguageSelector } from "@/components/LanguageSelector";
 import { MobileBottomNav, type MobileBottomNavItem } from "@/components/MobileBottomNav";
+import { Sparkline } from "@/components/Sparkline";
 import { MadridAireWordmark } from "@/components/branding/MadridAireWordmark";
 import { getDashboardPayload, getHistoryPayload, getModelMetricsPayload, getPredictionsPayload } from "@/lib/api";
 import { copyByLanguage, resolveLanguage } from "@/lib/i18n";
@@ -97,6 +99,7 @@ export default async function StationDetailPage({ params, searchParams }: Statio
   const freshnessKey = toFreshnessBucket(no2Current?.measured_at ?? currentValues[0]?.measured_at);
   const observed = (history?.items ?? []).map((item) => ({ timestamp: item.measured_at, value: item.value }));
   const predicted = (predictions?.items ?? []).map((item) => ({ timestamp: item.predicted_for, value: item.predicted_value }));
+  const no2SparklineData = observed.map((o) => o.value);
   const pollutants = [...new Set(currentValues.map((item) => item.pollutant_code))];
   const selectedMetric =
     metrics?.items.find((item) => item.baseline_name === metrics.selected_baseline && item.split_name === "test") ??
@@ -188,7 +191,11 @@ export default async function StationDetailPage({ params, searchParams }: Statio
           <section className="glass-panel rounded-[2rem] p-5 shadow-atmosphere">
             <div className="flex flex-wrap items-center justify-between gap-3">
               <p className="eyebrow text-soft/60">{copy.stationCurrentValuesTitle}</p>
-              <p className="font-data text-sm text-soft/55">{currentValues[0]?.measured_at ? new Intl.DateTimeFormat(locale, { dateStyle: "short", timeStyle: "short", timeZone: "Europe/Madrid" }).format(new Date(currentValues[0].measured_at)) : "-"}</p>
+              <DataTimestamp
+                isoString={currentValues[0]?.measured_at}
+                language={language}
+                className="font-data text-sm text-soft/55"
+              />
             </div>
             <div className="mt-5 grid gap-3 sm:grid-cols-2">
               {currentValues.map((item) => (
@@ -198,7 +205,12 @@ export default async function StationDetailPage({ params, searchParams }: Statio
                       <p className="font-data text-sm text-bone">{item.pollutant_code}</p>
                       <p className="mt-2 text-xs uppercase tracking-[0.18em] text-soft/52">{item.risk_level ?? "unknown"}</p>
                     </div>
-                    <p className="font-data text-xl text-bone">{item.value.toLocaleString(locale, { maximumFractionDigits: 1 })}</p>
+                    <div className="flex flex-col items-end gap-1.5">
+                      <p className="font-data text-xl text-bone">{item.value.toLocaleString(locale, { maximumFractionDigits: 1 })}</p>
+                      {item.pollutant_code === "NO2" && no2SparklineData.length >= 2 && (
+                        <Sparkline data={no2SparklineData} width={60} height={20} color="#FFB000" />
+                      )}
+                    </div>
                   </div>
                 </div>
               ))}

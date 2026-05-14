@@ -1,0 +1,149 @@
+"use client";
+
+import type { MapNode } from "./AtmosphericMap";
+
+type StationDrawerProps = {
+  node: MapNode | null;
+  onClose: () => void;
+  language?: "es" | "en";
+};
+
+const RISK_COLORS: Record<string, string> = {
+  good: "#80FFB2",
+  acceptable: "#D8FF4F",
+  moderate: "#FFB000",
+  poor: "#FF6B35",
+  very_poor: "#C2410C",
+  extreme: "#F43F5E",
+  unknown: "#8B949E",
+};
+
+const RISK_LABELS: Record<string, { es: string; en: string }> = {
+  good: { es: "Bueno", en: "Good" },
+  acceptable: { es: "Aceptable", en: "Acceptable" },
+  moderate: { es: "Moderado", en: "Moderate" },
+  poor: { es: "Deficiente", en: "Poor" },
+  very_poor: { es: "Muy deficiente", en: "Very poor" },
+  extreme: { es: "Extremo", en: "Extreme" },
+  unknown: { es: "Desconocido", en: "Unknown" },
+};
+
+const FRESHNESS_LABELS: Record<string, { es: string; en: string }> = {
+  fresh: { es: "Reciente", en: "Fresh" },
+  delayed: { es: "Retrasado", en: "Delayed" },
+  stale: { es: "Desactualizado", en: "Stale" },
+  unknown: { es: "Desconocido", en: "Unknown" },
+};
+
+export function StationDrawer({ node, onClose, language = "es" }: StationDrawerProps) {
+  const isOpen = node !== null;
+
+  return (
+    <>
+      {/* Backdrop (mobile only) */}
+      {isOpen && (
+        <div
+          className="fixed inset-0 z-30 bg-graphite/60 backdrop-blur-sm xl:hidden"
+          onClick={onClose}
+          aria-hidden
+        />
+      )}
+
+      {/* Drawer panel */}
+      <div
+        className={[
+          "fixed z-40 transition-transform duration-300 ease-out",
+          // Mobile: bottom sheet
+          "bottom-0 left-0 right-0 rounded-t-3xl xl:rounded-none",
+          // Desktop: right panel
+          "xl:bottom-0 xl:left-auto xl:right-0 xl:top-0 xl:w-80",
+          // Visibility
+          isOpen ? "translate-y-0 xl:translate-x-0" : "translate-y-full xl:translate-x-full",
+          "glass-panel shadow-atmosphere border-l border-white/5",
+          "px-6 py-7",
+        ].join(" ")}
+        role="complementary"
+        aria-label={language === "es" ? "Detalle de estación" : "Station detail"}
+      >
+        <div className="flex items-center justify-between">
+          <p className="eyebrow text-soft/55">
+            {language === "es" ? "Estación seleccionada" : "Selected station"}
+          </p>
+          <button
+            type="button"
+            onClick={onClose}
+            className="rounded-full p-1.5 text-soft/60 hover:bg-white/10 hover:text-soft"
+            aria-label={language === "es" ? "Cerrar" : "Close"}
+          >
+            <svg viewBox="0 0 20 20" fill="currentColor" className="h-4 w-4">
+              <path d="M6.28 5.22a.75.75 0 00-1.06 1.06L8.94 10l-3.72 3.72a.75.75 0 101.06 1.06L10 11.06l3.72 3.72a.75.75 0 101.06-1.06L11.06 10l3.72-3.72a.75.75 0 00-1.06-1.06L10 8.94 6.28 5.22z" />
+            </svg>
+          </button>
+        </div>
+
+        {node && (
+          <div className="mt-5 flex flex-col gap-5">
+            <div>
+              <p className="font-data text-2xl text-bone">{node.label}</p>
+              <p className="mt-1 font-data text-xs text-soft/50">{node.station_id}</p>
+            </div>
+
+            <div className="grid grid-cols-2 gap-3">
+              <div className="glass-panel rounded-2xl p-4">
+                <p className="eyebrow text-soft/50">NO2</p>
+                <p className="mt-2 font-data text-2xl" style={{ color: RISK_COLORS[node.risk_level ?? "unknown"] ?? "#8B949E" }}>
+                  {node.value.toFixed(1)}
+                  <span className="ml-1 font-data text-xs text-soft/50">µg/m³</span>
+                </p>
+              </div>
+              <div className="glass-panel rounded-2xl p-4">
+                <p className="eyebrow text-soft/50">
+                  {language === "es" ? "Nivel" : "Level"}
+                </p>
+                <p className="mt-2 text-sm font-medium" style={{ color: RISK_COLORS[node.risk_level ?? "unknown"] ?? "#8B949E" }}>
+                  {(RISK_LABELS[node.risk_level ?? "unknown"] ?? RISK_LABELS.unknown)[language]}
+                </p>
+              </div>
+            </div>
+
+            <div className="flex items-center gap-2.5">
+              <span
+                className="inline-block h-2 w-2 rounded-full flex-shrink-0"
+                style={{
+                  backgroundColor:
+                    node.freshness === "fresh"
+                      ? "#80FFB2"
+                      : node.freshness === "delayed"
+                      ? "#FFB000"
+                      : "#FF6B35",
+                }}
+              />
+              <span className="text-xs text-soft/60">
+                {(FRESHNESS_LABELS[node.freshness] ?? FRESHNESS_LABELS.unknown)[language]}
+              </span>
+            </div>
+
+            <div className="glass-panel rounded-2xl p-4">
+              <p className="eyebrow text-soft/50">
+                {language === "es" ? "Coordenadas" : "Coordinates"}
+              </p>
+              <p className="mt-2 font-data text-xs text-bone/70">
+                {node.latitude.toFixed(4)}°N · {node.longitude.toFixed(4)}°E
+              </p>
+            </div>
+
+            {node.highlight && (
+              <div className="rounded-2xl border border-lime/30 bg-lime/5 px-4 py-3">
+                <p className="text-xs text-lime/80">
+                  {language === "es"
+                    ? "Peor estación activa de la red"
+                    : "Worst active station in the network"}
+                </p>
+              </div>
+            )}
+          </div>
+        )}
+      </div>
+    </>
+  );
+}
