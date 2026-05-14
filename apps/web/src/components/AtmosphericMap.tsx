@@ -17,7 +17,14 @@ type AtmosphericMapProps = {
   nodes: MapNode[];
   onStationSelect?: (stationId: string) => void;
   className?: string;
+  onStaticPreviewChange?: (dataUrl: string | null) => void;
 };
+
+const MAP_STYLE_CANDIDATES = [
+  "https://basemaps.cartocdn.com/gl/positron-gl-style/style.json",
+  "https://basemaps.cartocdn.com/gl/voyager-gl-style/style.json",
+  "https://demotiles.maplibre.org/style.json",
+] as const;
 
 const RISK_COLORS: Record<string, string> = {
   good: "#80FFB2",
@@ -42,7 +49,51 @@ function valueToRadius(value: number): number {
   return 6 + (clamped / 300) * 12;
 }
 
-export function AtmosphericMap({ nodes, onStationSelect, className }: AtmosphericMapProps) {
+function buildGeoJson(nodes: MapNode[]) {
+  return {
+    type: "FeatureCollection" as const,
+    features: nodes.map((node) => ({
+      type: "Feature" as const,
+      geometry: {
+        type: "Point" as const,
+        coordinates: [node.longitude, node.latitude],
+      },
+      properties: {
+        station_id: node.station_id,
+        label: node.label,
+        value: node.value,
+        risk_level: node.risk_level,
+        freshness: node.freshness,
+        highlight: node.highlight ?? false,
+        color: RISK_COLORS[node.risk_level ?? "unknown"] ?? RISK_COLORS.unknown,
+        opacity: FRESHNESS_OPACITY[node.freshness] ?? 0.5,
+        radius: valueToRadius(node.value),
+      },
+    })),
+  };
+}
+
+async function resolveMapStyle() {
+  for (const styleUrl of MAP_STYLE_CANDIDATES) {
+    try {
+      const response = await fetch(styleUrl, { method: "GET", cache: "force-cache" });
+      if (response.ok) {
+        return styleUrl;
+      }
+    } catch {
+      continue;
+    }
+  }
+
+  return MAP_STYLE_CANDIDATES[MAP_STYLE_CANDIDATES.length - 1];
+}
+
+export function AtmosphericMap({
+  nodes,
+  onStationSelect,
+  className,
+  onStaticPreviewChange,
+}: AtmosphericMapProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const mapRef = useRef<unknown>(null);
 
@@ -51,46 +102,28 @@ export function AtmosphericMap({ nodes, onStationSelect, className }: Atmospheri
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     let map: any;
+    let disposed = false;
 
-    import("maplibre-gl").then(({ default: maplibregl }) => {
+    void import("maplibre-gl").then(async ({ default: maplibregl }) => {
+      const style = await resolveMapStyle();
+      if (disposed || !containerRef.current) {
+        return;
+      }
+
       map = new maplibregl.Map({
-        container: containerRef.current!,
-        style: "https://basemaps.cartocdn.com/gl/dark-matter-gl-style/style.json",
-        center: [-3.7038, 40.4168], // Madrid center
+        container: containerRef.current,
+        style,
+        center: [-3.7038, 40.4168],
         zoom: 10.5,
         attributionControl: false,
       });
 
-      // Minimal attribution
       map.on("load", () => {
-        const geojson = {
-          type: "FeatureCollection" as const,
-          features: nodes.map((node) => ({
-            type: "Feature" as const,
-            geometry: {
-              type: "Point" as const,
-              coordinates: [node.longitude, node.latitude],
-            },
-            properties: {
-              station_id: node.station_id,
-              label: node.label,
-              value: node.value,
-              risk_level: node.risk_level,
-              freshness: node.freshness,
-              highlight: node.highlight ?? false,
-              color: RISK_COLORS[node.risk_level ?? "unknown"] ?? RISK_COLORS.unknown,
-              opacity: FRESHNESS_OPACITY[node.freshness] ?? 0.5,
-              radius: valueToRadius(node.value),
-            },
-          })),
-        };
-
         map.addSource("stations", {
           type: "geojson",
-          data: geojson,
+          data: buildGeoJson(nodes),
         });
 
-        // Glow halo for highlighted station
         map.addLayer({
           id: "stations-highlight",
           type: "circle",
@@ -104,7 +137,6 @@ export function AtmosphericMap({ nodes, onStationSelect, className }: Atmospheri
           },
         });
 
-        // Outer ring
         map.addLayer({
           id: "stations-ring",
           type: "circle",
@@ -119,7 +151,6 @@ export function AtmosphericMap({ nodes, onStationSelect, className }: Atmospheri
           },
         });
 
-        // Main dot
         map.addLayer({
           id: "stations-dot",
           type: "circle",
@@ -134,7 +165,6 @@ export function AtmosphericMap({ nodes, onStationSelect, className }: Atmospheri
           },
         });
 
-        // Pointer cursor on hover
         map.on("mouseenter", "stations-dot", () => {
           (map.getCanvas() as HTMLCanvasElement).style.cursor = "pointer";
         });
@@ -142,7 +172,6 @@ export function AtmosphericMap({ nodes, onStationSelect, className }: Atmospheri
           (map.getCanvas() as HTMLCanvasElement).style.cursor = "";
         });
 
-        // Click to select station
         if (onStationSelect) {
           map.on("click", "stations-dot", (e: unknown) => {
             const event = e as { point: unknown };
@@ -157,14 +186,27 @@ export function AtmosphericMap({ nodes, onStationSelect, className }: Atmospheri
         }
       });
 
+      map.on("idle", () => {
+        if (!onStaticPreviewChange) {
+          return;
+        }
+
+        try {
+          const preview = (map.getCanvas() as HTMLCanvasElement).toDataURL("image/png");
+          onStaticPreviewChange(preview);
+        } catch {
+          onStaticPreviewChange(null);
+        }
+      });
+
       mapRef.current = map;
     });
 
     return () => {
+      disposed = true;
       if (map) map.remove();
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [nodes, onStationSelect, onStaticPreviewChange]);
 
   // Update source data when nodes change without re-initialising map
   useEffect(() => {
@@ -177,25 +219,7 @@ export function AtmosphericMap({ nodes, onStationSelect, className }: Atmospheri
     const source = map.getSource("stations");
     if (!source) return;
 
-    const geojson = {
-      type: "FeatureCollection",
-      features: nodes.map((node) => ({
-        type: "Feature",
-        geometry: { type: "Point", coordinates: [node.longitude, node.latitude] },
-        properties: {
-          station_id: node.station_id,
-          label: node.label,
-          value: node.value,
-          risk_level: node.risk_level,
-          freshness: node.freshness,
-          highlight: node.highlight ?? false,
-          color: RISK_COLORS[node.risk_level ?? "unknown"] ?? RISK_COLORS.unknown,
-          opacity: FRESHNESS_OPACITY[node.freshness] ?? 0.5,
-          radius: valueToRadius(node.value),
-        },
-      })),
-    };
-    source.setData(geojson);
+    source.setData(buildGeoJson(nodes));
   }, [nodes]);
 
   return (

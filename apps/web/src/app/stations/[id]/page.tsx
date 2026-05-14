@@ -1,13 +1,11 @@
-import Link from "next/link";
 import { notFound } from "next/navigation";
 
 import { DataTimestamp } from "@/components/DataTimestamp";
 import { HistoryForecastChart } from "@/components/HistoryForecastChart";
 import { HourlyHeatmap } from "@/components/HourlyHeatmap";
-import { LanguageSelector } from "@/components/LanguageSelector";
-import { MobileBottomNav, type MobileBottomNavItem } from "@/components/MobileBottomNav";
+import { MobileBottomNav } from "@/components/MobileBottomNav";
+import { PublicPageHeader, buildPublicMobileNavItems, type PublicNavLabels } from "@/components/PublicPageHeader";
 import { Sparkline } from "@/components/Sparkline";
-import { MadridAireWordmark } from "@/components/branding/MadridAireWordmark";
 import { getDashboardPayload, getHistoryPayload, getModelMetricsPayload, getPredictionsPayload } from "@/lib/api";
 import { copyByLanguage, resolveLanguage } from "@/lib/i18n";
 
@@ -118,39 +116,20 @@ export default async function StationDetailPage({ params, searchParams }: Statio
     metrics?.items.find((item) => item.baseline_name === metrics.selected_baseline && item.split_name === "test") ??
     metrics?.items[0] ??
     null;
-  const mobileNavItems: MobileBottomNavItem[] = [
-    { key: "dashboard", href: `/dashboard?lang=${language}`, label: copy.mobileNavDashboard },
-    { key: "map", href: `/map?lang=${language}`, label: copy.mobileNavMap },
-    { key: "stations", href: `/stations?lang=${language}`, label: copy.mobileNavStations },
-    { key: "predictions", href: `/predictions?lang=${language}`, label: copy.mobileNavPredictions },
-    { key: "about", href: `/about?lang=${language}`, label: copy.mobileNavAbout },
-  ];
+  const navigationLabels: PublicNavLabels = {
+    home: language === "es" ? "Inicio" : "Home",
+    dashboard: copy.mobileNavDashboard,
+    map: copy.mobileNavMap,
+    stations: copy.mobileNavStations,
+    predictions: copy.mobileNavPredictions,
+    about: copy.mobileNavAbout,
+  };
+  const mobileNavItems = buildPublicMobileNavItems(language, navigationLabels);
 
   return (
     <main className="min-h-screen bg-graphite px-5 py-5 pb-28 text-soft sm:px-7 md:pb-5 lg:px-10 3xl:px-14">
       <section className="mx-auto flex w-full max-w-[1800px] flex-col gap-8">
-        <header className="flex flex-wrap items-center justify-between gap-4">
-          <div className="glass-panel rounded-full px-4 py-3 shadow-atmosphere">
-            <MadridAireWordmark className="items-center" size="compact" />
-          </div>
-          <div className="flex items-center gap-3">
-            <div className="hidden flex-wrap items-center gap-3 md:flex">
-            <Link className="glass-panel rounded-full px-4 py-3 text-sm text-soft/80 shadow-atmosphere hover:bg-white/10" href={`/stations?lang=${language}`}>
-              {copy.stationBackToExplorer}
-            </Link>
-            <Link className="glass-panel rounded-full px-4 py-3 text-sm text-soft/80 shadow-atmosphere hover:bg-white/10" href={`/map?lang=${language}`}>
-              {copy.openMap}
-            </Link>
-            <Link className="glass-panel rounded-full px-4 py-3 text-sm text-soft/80 shadow-atmosphere hover:bg-white/10" href={`/predictions?lang=${language}`}>
-              {copy.openPredictions}
-            </Link>
-            <Link className="glass-panel rounded-full px-4 py-3 text-sm text-soft/80 shadow-atmosphere hover:bg-white/10" href={`/about?lang=${language}`}>
-              {copy.openAbout}
-            </Link>
-            </div>
-            <LanguageSelector currentLanguage={language} pathname={`/stations/${stationId}`} />
-          </div>
-        </header>
+        <PublicPageHeader language={language} pathname={`/stations/${stationId}`} currentPage="stations" labels={navigationLabels} />
 
         <div className="grid gap-10 xl:grid-cols-[0.95fr_1.05fr]">
           <div>

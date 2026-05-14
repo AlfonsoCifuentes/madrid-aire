@@ -62,7 +62,8 @@ El proyecto ha fracasado si ocurre cualquiera de estas cosas:
 La web parece una plantilla.
 La landing parece generada por IA.
 Hay datos inventados.
-El mapa usa estilo default sin personalidad.
+El mapa no deja leer Madrid con claridad en pantalla.
+El mapa impreso o exportado a PDF pierde el contexto geográfico y deja solo puntos sobre un fondo plano.
 Las gráficas parecen Recharts por defecto.
 El ML no tiene baseline.
 El frontend depende de datos falsos.
@@ -221,6 +222,14 @@ Objetivo: añadir contexto, explicar decisiones y enlazar a la profundidad técn
 TECHNICAL / DEEP DIVE
 Rutas: /model, /methodology, /system
 Objetivo: documentar métricas, método, automatización, limitaciones y estado operativo real.
+```
+
+Regla adicional de navegación:
+
+```text
+La navegación principal del producto público se limita a /dashboard, /map, /stations, /predictions y /about.
+Model, methodology, reports y system se consideran capa avanzada y deben descubrirse desde /about o desde una navegación secundaria explícita.
+La experiencia pública no puede obligar a un usuario general a atravesar superficies técnicas para orientarse.
 ```
 
 ---
@@ -699,7 +708,7 @@ Below wordmark:
   Claim text (max-w-2xl)
 
 CTA row:
-  [Seguir]  [Abrir Dashboard →]
+  [Ver situación actual]  [Explorar el mapa →]
 
 Below CTA (max-w-2xl, 2-col grid on sm+):
   ┌──────────────────────┐  ┌──────────────────────┐
@@ -707,6 +716,9 @@ Below CTA (max-w-2xl, 2-col grid on sm+):
   │ headline (stations)  │  │ NO2 · 24h            │
   │ body copy            │  │ body copy            │
   └──────────────────────┘  └──────────────────────┘
+
+Below signal cards:
+  [Guía]  [Avanzado]
 ```
 
 No aside panel. No 2xl grid split. Signal + Forecast cards are inline below the CTA buttons,
@@ -849,8 +861,8 @@ Hero fullscreen.
 Live Atmospheric Status.
 Map preview.
 Forecast preview.
-Model Intelligence.
-Methodology preview.
+Guide / About preview.
+Advanced access from About.
 Footer.
 ```
 
@@ -870,8 +882,8 @@ Stations online.
 Forecast trend.
 Map preview.
 History chart.
-Model status.
-Data quality.
+Forecast status framed in public language.
+Last update / freshness.
 ```
 
 ## 10.3 `/map`
@@ -887,7 +899,8 @@ Pollutant selector.
 Map.
 Legend.
 Station drawer.
-Observed/predicted toggle.
+Readable Madrid basemap.
+Print-safe static map preview.
 Freshness indicator.
 ```
 
@@ -990,7 +1003,7 @@ Modules:
 What the site offers.
 How to read the public surfaces.
 Direct links to dashboard, map, stations and predictions.
-Direct links to model, methodology, reports and system.
+Explicit advanced section for model, methodology, reports and system.
 ```
 
 ---

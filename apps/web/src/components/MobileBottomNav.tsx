@@ -26,8 +26,10 @@ export function MobileBottomNav({ currentLanguage, currentPage, ariaLabel, items
             <Link
               key={item.key}
               className={[
-                "flex min-w-0 flex-1 items-center justify-center rounded-[1.2rem] px-1 py-2 text-[10px] font-semibold uppercase tracking-[0.14em] transition",
-                active ? "bg-lime text-graphite" : "text-soft/72 hover:bg-white/8 hover:text-soft",
+                "flex min-w-0 flex-1 items-center justify-center rounded-[1.2rem] px-2 py-3 text-[11px] font-medium tracking-[0.01em] transition",
+                active
+                  ? "bg-lime text-graphite shadow-[0_12px_30px_rgba(216,255,79,0.18)]"
+                  : "text-soft/78 hover:bg-white/8 hover:text-soft",
               ].join(" ")}
               href={item.href}
               aria-current={active ? "page" : undefined}

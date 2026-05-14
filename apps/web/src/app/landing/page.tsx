@@ -57,13 +57,19 @@ export default async function LandingPage({ searchParams }: LandingPageProps) {
     freshnessLabel,
     copy,
   );
+  const publicRoutes = [
+    { href: `/dashboard?lang=${language}`, title: copy.dashboardTitle, description: copy.aboutDashboardDesc },
+    { href: `/map?lang=${language}`, title: copy.mapPageTitle, description: copy.aboutMapDesc },
+    { href: `/stations?lang=${language}`, title: copy.stationsPageTitle, description: copy.aboutStationsDesc },
+    { href: `/predictions?lang=${language}`, title: copy.predictionsTitle, description: copy.aboutPredictionsDesc },
+  ];
   const footerLinks = [
     { href: `/dashboard?lang=${language}`, label: copy.dashboardTitle },
     { href: `/map?lang=${language}`, label: copy.mapPageTitle },
     { href: `/stations?lang=${language}`, label: copy.stationsPageTitle },
     { href: `/predictions?lang=${language}`, label: copy.predictionsTitle },
-    { href: `/methodology?lang=${language}`, label: copy.methodologyTitle },
     { href: `/about?lang=${language}`, label: copy.aboutTitle },
+    { href: `/about?lang=${language}#advanced`, label: copy.aboutTechnicalLabel },
   ];
 
   return (
@@ -104,17 +110,25 @@ export default async function LandingPage({ searchParams }: LandingPageProps) {
               {copy.heroClaim}
             </p>
             <div className="mt-10 flex max-w-2xl flex-col gap-4 sm:flex-row">
-              <a
-                className="inline-flex min-h-12 items-center justify-center rounded-full bg-lime px-7 py-3 font-medium text-graphite transition hover:bg-[#ebff93]"
-                href="#build"
-              >
-                {copy.heroCtaPrimary}
-              </a>
               <Link
-                className="inline-flex min-h-12 items-center justify-center rounded-full border border-white/14 bg-white/5 px-7 py-3 font-medium text-soft transition hover:bg-white/10"
+                className="inline-flex min-h-12 items-center justify-center rounded-full bg-lime px-7 py-3 font-medium text-graphite transition hover:bg-[#ebff93]"
                 href={`/dashboard?lang=${language}`}
               >
+                {copy.heroCtaPrimary}
+              </Link>
+              <Link
+                className="inline-flex min-h-12 items-center justify-center rounded-full border border-white/14 bg-white/5 px-7 py-3 font-medium text-soft transition hover:bg-white/10"
+                href={`/map?lang=${language}`}
+              >
                 {copy.heroCtaSecondary}
+              </Link>
+            </div>
+            <div className="mt-5 flex flex-wrap gap-3 text-sm text-soft/68">
+              <Link className="inline-flex items-center rounded-full border border-white/10 bg-white/[0.03] px-4 py-2 transition hover:bg-white/[0.08] hover:text-soft" href={`/about?lang=${language}`}>
+                {copy.openAbout}
+              </Link>
+              <Link className="inline-flex items-center rounded-full border border-white/10 bg-white/[0.03] px-4 py-2 transition hover:bg-white/[0.08] hover:text-soft" href={`/about?lang=${language}#advanced`}>
+                {copy.aboutTechnicalLabel}
               </Link>
             </div>
             <div className="mt-10 grid max-w-3xl gap-4 md:grid-cols-2">
@@ -238,34 +252,35 @@ export default async function LandingPage({ searchParams }: LandingPageProps) {
           </div>
 
           <div className="grid gap-4 lg:grid-cols-2">
-            <article className="glass-panel rounded-[1.9rem] p-6 shadow-atmosphere">
-              <p className="eyebrow text-soft/55">{copy.aboutTechnicalLabel}</p>
-              <h3 className="mt-4 max-w-[14ch] text-3xl font-medium tracking-[-0.03em] text-soft">{copy.modelTitle}</h3>
-              <p className="mt-4 text-base leading-7 text-soft/74">{copy.modelSubtitle}</p>
-              <Link
-                className="mt-8 inline-flex min-h-11 items-center justify-center rounded-full border border-white/14 bg-white/5 px-5 py-2.5 font-medium text-soft transition hover:bg-white/10"
-                href={`/model?lang=${language}`}
-              >
-                {copy.openModel}
-              </Link>
-            </article>
-
-            <article className="glass-panel rounded-[1.9rem] p-6 shadow-atmosphere">
-              <p className="eyebrow text-soft/55">{copy.aboutTechnicalLabel}</p>
-              <h3 className="mt-4 max-w-[14ch] text-3xl font-medium tracking-[-0.03em] text-soft">{copy.methodologyTitle}</h3>
-              <p className="mt-4 text-base leading-7 text-soft/74">{copy.methodologySubtitle}</p>
-              <div className="mt-8 flex flex-col gap-3 sm:flex-row">
+            {publicRoutes.map((route) => (
+              <article key={route.href} className="glass-panel rounded-[1.9rem] p-6 shadow-atmosphere transition hover:bg-white/10">
+                <p className="eyebrow text-soft/55">{copy.aboutLiveLabel}</p>
+                <h3 className="mt-4 max-w-[14ch] text-3xl font-medium tracking-[-0.03em] text-soft">{route.title}</h3>
+                <p className="mt-4 text-base leading-7 text-soft/74">{route.description}</p>
                 <Link
-                  className="inline-flex min-h-11 items-center justify-center rounded-full border border-white/14 bg-white/5 px-5 py-2.5 font-medium text-soft transition hover:bg-white/10"
-                  href={`/methodology?lang=${language}`}
+                  className="mt-8 inline-flex min-h-11 items-center justify-center rounded-full border border-white/14 bg-white/5 px-5 py-2.5 font-medium text-soft transition hover:bg-white/10"
+                  href={route.href}
                 >
-                  {copy.openMethodology}
+                  {route.title}
                 </Link>
+              </article>
+            ))}
+            <article className="glass-panel rounded-[1.9rem] border border-white/10 p-6 shadow-atmosphere lg:col-span-2">
+              <p className="eyebrow text-soft/55">{copy.aboutTechnicalLabel}</p>
+              <h3 className="mt-4 text-3xl font-medium tracking-[-0.03em] text-soft">{copy.aboutTitle}</h3>
+              <p className="mt-4 text-base leading-7 text-soft/74">{copy.aboutTechnicalRoutesBody}</p>
+              <div className="mt-8 flex flex-col gap-3 sm:flex-row">
                 <Link
                   className="inline-flex min-h-11 items-center justify-center rounded-full border border-white/14 bg-white/5 px-5 py-2.5 font-medium text-soft transition hover:bg-white/10"
                   href={`/about?lang=${language}`}
                 >
                   {copy.openAbout}
+                </Link>
+                <Link
+                  className="inline-flex min-h-11 items-center justify-center rounded-full border border-white/14 bg-white/5 px-5 py-2.5 font-medium text-soft transition hover:bg-white/10"
+                  href={`/about?lang=${language}#advanced`}
+                >
+                  {copy.aboutTechnicalLabel}
                 </Link>
               </div>
             </article>
