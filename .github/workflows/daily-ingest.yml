@@ -1,0 +1,36 @@
+name: Daily Air Quality Ingest
+
+on:
+  schedule:
+    # Run at 01:00 UTC every day (data is published early morning Madrid time)
+    - cron: "0 1 * * *"
+  workflow_dispatch:
+    inputs:
+      reason:
+        description: "Reason for manual trigger"
+        required: false
+        default: "Manual run"
+
+jobs:
+  ingest:
+    name: Ingest current-day air quality data
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Trigger ingest job on Vercel
+        env:
+          VERCEL_URL: ${{ secrets.MADRID_AIRE_VERCEL_URL }}
+          JOB_TOKEN: ${{ secrets.MADRID_AIRE_JOB_SECRET }}
+        run: |
+          echo "Triggering ingest at ${VERCEL_URL}/api/jobs/ingest-air-quality"
+          curl --fail --silent --show-error \
+            --max-time 120 \
+            -X POST "${VERCEL_URL}/api/jobs/ingest-air-quality" \
+            -H "x-job-token: ${JOB_TOKEN}" \
+            -H "Content-Type: application/json" \
+            | tee /tmp/ingest_response.json
+
+      - name: Print response
+        if: always()
+        run: cat /tmp/ingest_response.json 2>/dev/null || echo "(no response file)"
