@@ -24,6 +24,12 @@ type Copy = {
   cycleLabel: string;
   cycleTitle: string;
   cycleFocus: [string, string, string];
+  landingMapPreviewEyebrow: string;
+  landingDeepDiveEyebrow: string;
+  landingDeepDiveTitle: string;
+  landingDeepDiveBody: string;
+  landingFooterTitle: string;
+  landingFooterBody: string;
   principles: [string, string, string];
   dashboardTitle: string;
   dashboardSubtitle: string;
@@ -196,6 +202,14 @@ export const copyByLanguage: Record<Language, Copy> = {
       "Localizar estaciones y comparar zonas de la ciudad",
       "Consultar la previsión y ampliar contexto cuando lo necesites",
     ],
+    landingMapPreviewEyebrow: "Vista previa del mapa",
+    landingDeepDiveEyebrow: "Qué hay detrás",
+    landingDeepDiveTitle: "Del vistazo rápido al contexto técnico, sin salirte del hilo.",
+    landingDeepDiveBody:
+      "La portada te deja entrar por lo esencial. Cuando quieras entender cómo se construye la previsión o qué límites tiene, aquí tienes el siguiente paso.",
+    landingFooterTitle: "Seguir Madrid Aire",
+    landingFooterBody:
+      "Consulta la señal actual, explora el mapa o profundiza en el método desde una navegación única y clara.",
     principles: [
       "Mediciones oficiales para leer la situación actual",
       "Previsiones a corto plazo para anticipar cambios",
@@ -398,6 +412,14 @@ export const copyByLanguage: Record<Language, Copy> = {
       "Locate stations and compare areas across the city",
       "Check the forecast and go deeper when you need more context",
     ],
+    landingMapPreviewEyebrow: "Map preview",
+    landingDeepDiveEyebrow: "What sits behind it",
+    landingDeepDiveTitle: "Move from a quick read to the technical context without losing the thread.",
+    landingDeepDiveBody:
+      "The landing page gives you the essentials first. When you want to understand how the forecast is built or where its limits are, this is the next step.",
+    landingFooterTitle: "Keep reading Madrid Aire",
+    landingFooterBody:
+      "Check the current signal, explore the map, or go deeper into the method from one clear navigation layer.",
     principles: [
       "Official measurements to understand current conditions",
       "Short-term forecasts to anticipate change",
