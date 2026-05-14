@@ -1,0 +1,368 @@
+{
+  "status": "model_v1_ready",
+  "source": "local_model_v1_artifact",
+  "target": "NO2",
+  "horizon_hours": 24,
+  "selected_baseline": "hist_gradient_boosting_v1",
+  "generated_at": "2026-05-13T23:13:37.753142+00:00",
+  "split": {
+    "train": {
+      "start": "2025-01-08T00:00:00",
+      "end": "2025-12-31T23:00:00"
+    },
+    "valid": {
+      "start": null,
+      "end": null
+    },
+    "test": {
+      "start": "2026-01-01T00:00:00",
+      "end": "2026-04-29T19:00:00"
+    }
+  },
+  "input_files": [
+    "E:\\Proyectos\\VisualStudio\\Alfon_personal\\madrid_aire\\data\\sample_real\\community_current_day_2026-05-13.normalized.csv",
+    "E:\\Proyectos\\VisualStudio\\Alfon_personal\\madrid_aire\\data\\sample_real\\community_historical_2025.normalized.csv",
+    "E:\\Proyectos\\VisualStudio\\Alfon_personal\\madrid_aire\\data\\sample_real\\community_historical_2026.normalized.csv"
+  ],
+  "row_count": 314024,
+  "station_count": 28,
+  "items": [
+    {
+      "baseline_name": "persistence",
+      "split_name": "test",
+      "mae": 8.321515939393164,
+      "rmse": 14.06835113041212,
+      "r2": 0.20530959445880548,
+      "sample_count": 78077
+    },
+    {
+      "baseline_name": "same_hour_yesterday",
+      "split_name": "test",
+      "mae": 9.915455255709107,
+      "rmse": 16.26050740535803,
+      "r2": -0.061646074357344816,
+      "sample_count": 78077
+    },
+    {
+      "baseline_name": "hist_gradient_boosting_v1",
+      "split_name": "test",
+      "mae": 7.854008008093857,
+      "rmse": 11.957928129116826,
+      "r2": 0.4258525387144414,
+      "sample_count": 78077
+    }
+  ],
+  "baseline_reference": {
+    "baseline_name": "persistence",
+    "split_name": "test",
+    "mae": 8.321515939393164,
+    "rmse": 14.06835113041212,
+    "r2": 0.20530959445880548,
+    "sample_count": 78077
+  },
+  "improvement_pct_vs_best_baseline": 5.618062077922304,
+  "error_by_station": [
+    {
+      "station_id": "28_074_007",
+      "mae": 13.4186778550507,
+      "sample_count": 2806
+    },
+    {
+      "station_id": "28_049_003",
+      "mae": 13.033254970141622,
+      "sample_count": 2814
+    },
+    {
+      "station_id": "28_065_014",
+      "mae": 12.8088382871923,
+      "sample_count": 2787
+    },
+    {
+      "station_id": "28_006_004",
+      "mae": 12.230438528815144,
+      "sample_count": 2515
+    },
+    {
+      "station_id": "28_106_001",
+      "mae": 11.60720544500169,
+      "sample_count": 2766
+    },
+    {
+      "station_id": "28_058_004",
+      "mae": 10.990202136060054,
+      "sample_count": 2801
+    },
+    {
+      "station_id": "28_047_002",
+      "mae": 10.811316091174119,
+      "sample_count": 2808
+    },
+    {
+      "station_id": "28_007_004",
+      "mae": 10.806886704987464,
+      "sample_count": 2794
+    },
+    {
+      "station_id": "28_005_002",
+      "mae": 10.670327292122783,
+      "sample_count": 2807
+    },
+    {
+      "station_id": "28_092_005",
+      "mae": 10.193240684731073,
+      "sample_count": 2767
+    },
+    {
+      "station_id": "28_123_002",
+      "mae": 9.826708218966138,
+      "sample_count": 2799
+    },
+    {
+      "station_id": "28_148_004",
+      "mae": 9.488806087931502,
+      "sample_count": 2750
+    },
+    {
+      "station_id": "28_161_001",
+      "mae": 8.911812175584,
+      "sample_count": 2800
+    },
+    {
+      "station_id": "28_080_003",
+      "mae": 8.515228018729669,
+      "sample_count": 2810
+    },
+    {
+      "station_id": "28_115_003",
+      "mae": 8.138297895776612,
+      "sample_count": 2813
+    },
+    {
+      "station_id": "28_045_002",
+      "mae": 8.094927753391403,
+      "sample_count": 2813
+    },
+    {
+      "station_id": "28_127_004",
+      "mae": 7.98888335479729,
+      "sample_count": 2750
+    },
+    {
+      "station_id": "28_009_001",
+      "mae": 6.192443159639671,
+      "sample_count": 2824
+    },
+    {
+      "station_id": "28_014_002",
+      "mae": 6.181050816826225,
+      "sample_count": 2800
+    },
+    {
+      "station_id": "28_180_001",
+      "mae": 5.729192993713384,
+      "sample_count": 2810
+    },
+    {
+      "station_id": "28_013_002",
+      "mae": 5.598302074541851,
+      "sample_count": 2799
+    },
+    {
+      "station_id": "28_134_002",
+      "mae": 5.093057259194053,
+      "sample_count": 2822
+    },
+    {
+      "station_id": "28_067_001",
+      "mae": 3.9025039641291324,
+      "sample_count": 2818
+    },
+    {
+      "station_id": "28_133_002",
+      "mae": 3.2719953293131216,
+      "sample_count": 2809
+    },
+    {
+      "station_id": "28_016_001",
+      "mae": 2.3110215655601185,
+      "sample_count": 2763
+    },
+    {
+      "station_id": "28_171_001",
+      "mae": 2.015380291661051,
+      "sample_count": 2791
+    },
+    {
+      "station_id": "28_102_001",
+      "mae": 1.619286053103867,
+      "sample_count": 2818
+    },
+    {
+      "station_id": "28_120_001",
+      "mae": 1.0705849020729519,
+      "sample_count": 2823
+    }
+  ],
+  "error_by_hour": [
+    {
+      "hour": 0,
+      "mae": 8.218883006366026,
+      "sample_count": 3303
+    },
+    {
+      "hour": 1,
+      "mae": 7.47270000794935,
+      "sample_count": 3303
+    },
+    {
+      "hour": 2,
+      "mae": 7.049401219259073,
+      "sample_count": 3278
+    },
+    {
+      "hour": 3,
+      "mae": 6.896772233714027,
+      "sample_count": 3303
+    },
+    {
+      "hour": 4,
+      "mae": 7.3796291540289936,
+      "sample_count": 3303
+    },
+    {
+      "hour": 5,
+      "mae": 8.229850497708762,
+      "sample_count": 3276
+    },
+    {
+      "hour": 6,
+      "mae": 8.97619179199559,
+      "sample_count": 3191
+    },
+    {
+      "hour": 7,
+      "mae": 8.640002731239365,
+      "sample_count": 3151
+    },
+    {
+      "hour": 8,
+      "mae": 7.706305816727558,
+      "sample_count": 3142
+    },
+    {
+      "hour": 9,
+      "mae": 6.505340733839007,
+      "sample_count": 3139
+    },
+    {
+      "hour": 10,
+      "mae": 5.528000729160476,
+      "sample_count": 3137
+    },
+    {
+      "hour": 11,
+      "mae": 4.837857288307765,
+      "sample_count": 3162
+    },
+    {
+      "hour": 12,
+      "mae": 4.616631804533601,
+      "sample_count": 3209
+    },
+    {
+      "hour": 13,
+      "mae": 4.588227037988077,
+      "sample_count": 3262
+    },
+    {
+      "hour": 14,
+      "mae": 4.807473047913402,
+      "sample_count": 3301
+    },
+    {
+      "hour": 15,
+      "mae": 5.253641174913853,
+      "sample_count": 3308
+    },
+    {
+      "hour": 16,
+      "mae": 6.138397332918438,
+      "sample_count": 3306
+    },
+    {
+      "hour": 17,
+      "mae": 7.870918703734361,
+      "sample_count": 3301
+    },
+    {
+      "hour": 18,
+      "mae": 10.360744200486298,
+      "sample_count": 3297
+    },
+    {
+      "hour": 19,
+      "mae": 12.434692518503013,
+      "sample_count": 3293
+    },
+    {
+      "hour": 20,
+      "mae": 12.614864603940578,
+      "sample_count": 3279
+    },
+    {
+      "hour": 21,
+      "mae": 11.665220047283626,
+      "sample_count": 3278
+    },
+    {
+      "hour": 22,
+      "mae": 10.773497181078707,
+      "sample_count": 3278
+    },
+    {
+      "hour": 23,
+      "mae": 9.671592380292353,
+      "sample_count": 3277
+    }
+  ],
+  "error_by_month": [
+    {
+      "month": 1,
+      "mae": 9.455267325397301,
+      "sample_count": 20516
+    },
+    {
+      "month": 2,
+      "mae": 8.230334722303898,
+      "sample_count": 18474
+    },
+    {
+      "month": 3,
+      "mae": 7.530820319299932,
+      "sample_count": 20098
+    },
+    {
+      "month": 4,
+      "mae": 6.09992566027494,
+      "sample_count": 18989
+    }
+  ],
+  "feature_columns": [
+    "station_code",
+    "hour",
+    "day_of_week",
+    "month",
+    "is_weekend",
+    "value",
+    "value_lag_1h",
+    "value_lag_3h",
+    "value_lag_6h",
+    "value_lag_24h",
+    "value_lag_168h",
+    "rolling_mean_3h",
+    "rolling_mean_6h",
+    "rolling_mean_24h"
+  ],
+  "model_name": "hist_gradient_boosting_v1",
+  "model_bundle": "E:\\Proyectos\\VisualStudio\\Alfon_personal\\madrid_aire\\data\\artifacts\\no2_model_v1_bundle_20260513T231337Z.joblib"
+}

@@ -1,0 +1,276 @@
+{
+  "status": "model_v1_ready",
+  "source": "local_model_v1_artifact",
+  "target": "NO2",
+  "horizon_hours": 24,
+  "selected_baseline": "hist_gradient_boosting_v1",
+  "generated_at": "2026-05-13T23:10:32.248833+00:00",
+  "split": {
+    "train": {
+      "start": "2025-01-08T00:00:00",
+      "end": "2025-09-09T03:00:00"
+    },
+    "valid": {
+      "start": "2025-09-09T03:00:00",
+      "end": "2025-10-31T04:00:00"
+    },
+    "test": {
+      "start": "2025-10-31T04:00:00",
+      "end": "2025-12-31T03:00:00"
+    }
+  },
+  "input_files": [
+    "E:\\Proyectos\\VisualStudio\\Alfon_personal\\madrid_aire\\data\\sample_real\\community_current_day_2026-05-13.normalized.csv",
+    "E:\\Proyectos\\VisualStudio\\Alfon_personal\\madrid_aire\\data\\sample_real\\community_historical_2025.normalized.csv",
+    "E:\\Proyectos\\VisualStudio\\Alfon_personal\\madrid_aire\\data\\sample_real\\community_historical_2026.normalized.csv"
+  ],
+  "row_count": 48673,
+  "station_count": 28,
+  "items": [
+    {
+      "baseline_name": "persistence",
+      "split_name": "test",
+      "mae": 9.74209012464046,
+      "rmse": 14.79019598498769,
+      "r2": 0.0051487496702016244,
+      "sample_count": 7301
+    },
+    {
+      "baseline_name": "same_hour_yesterday",
+      "split_name": "test",
+      "mae": 11.903026982605123,
+      "rmse": 17.45833869299107,
+      "r2": -0.3861688064855331,
+      "sample_count": 7301
+    },
+    {
+      "baseline_name": "rolling_mean_24h",
+      "split_name": "test",
+      "mae": 13.642061887492085,
+      "rmse": 19.01264786600225,
+      "r2": -0.6439761084072948,
+      "sample_count": 7301
+    },
+    {
+      "baseline_name": "hist_gradient_boosting_v1",
+      "split_name": "test",
+      "mae": 9.07230631899022,
+      "rmse": 12.784369997926799,
+      "r2": 0.2566917469435025,
+      "sample_count": 7301
+    }
+  ],
+  "baseline_reference": {
+    "baseline_name": "persistence",
+    "split_name": "test",
+    "mae": 9.74209012464046,
+    "rmse": 14.79019598498769,
+    "r2": 0.0051487496702016244,
+    "sample_count": 7301
+  },
+  "improvement_pct_vs_best_baseline": 6.875155095888208,
+  "error_by_station": [
+    {
+      "station_id": "28_065_014",
+      "mae": 16.87967674394895,
+      "sample_count": 261
+    },
+    {
+      "station_id": "28_074_007",
+      "mae": 16.631334663546735,
+      "sample_count": 261
+    },
+    {
+      "station_id": "28_106_001",
+      "mae": 16.36171889736229,
+      "sample_count": 260
+    },
+    {
+      "station_id": "28_058_004",
+      "mae": 16.118018031064075,
+      "sample_count": 261
+    },
+    {
+      "station_id": "28_092_005",
+      "mae": 14.092110887835311,
+      "sample_count": 261
+    },
+    {
+      "station_id": "28_007_004",
+      "mae": 13.134777908957197,
+      "sample_count": 261
+    },
+    {
+      "station_id": "28_049_003",
+      "mae": 12.050631258234631,
+      "sample_count": 261
+    },
+    {
+      "station_id": "28_161_001",
+      "mae": 11.59934791378165,
+      "sample_count": 261
+    },
+    {
+      "station_id": "28_006_004",
+      "mae": 10.905911378690224,
+      "sample_count": 261
+    },
+    {
+      "station_id": "28_080_003",
+      "mae": 10.706547762503563,
+      "sample_count": 261
+    },
+    {
+      "station_id": "28_123_002",
+      "mae": 10.015565545198085,
+      "sample_count": 261
+    },
+    {
+      "station_id": "28_127_004",
+      "mae": 9.870278146902882,
+      "sample_count": 262
+    },
+    {
+      "station_id": "28_005_002",
+      "mae": 9.665587780909798,
+      "sample_count": 261
+    },
+    {
+      "station_id": "28_047_002",
+      "mae": 9.552273909001341,
+      "sample_count": 261
+    },
+    {
+      "station_id": "28_148_004",
+      "mae": 9.523507780491782,
+      "sample_count": 261
+    },
+    {
+      "station_id": "28_045_002",
+      "mae": 8.314523285460675,
+      "sample_count": 261
+    },
+    {
+      "station_id": "28_009_001",
+      "mae": 7.597851294270635,
+      "sample_count": 261
+    },
+    {
+      "station_id": "28_014_002",
+      "mae": 6.996872393869354,
+      "sample_count": 261
+    },
+    {
+      "station_id": "28_115_003",
+      "mae": 6.994469614107949,
+      "sample_count": 261
+    },
+    {
+      "station_id": "28_180_001",
+      "mae": 5.853040912689772,
+      "sample_count": 257
+    },
+    {
+      "station_id": "28_134_002",
+      "mae": 5.539945616357839,
+      "sample_count": 261
+    },
+    {
+      "station_id": "28_013_002",
+      "mae": 5.297317003093178,
+      "sample_count": 261
+    },
+    {
+      "station_id": "28_067_001",
+      "mae": 4.609361123253384,
+      "sample_count": 256
+    },
+    {
+      "station_id": "28_133_002",
+      "mae": 4.345178003218903,
+      "sample_count": 261
+    },
+    {
+      "station_id": "28_016_001",
+      "mae": 4.052189154751029,
+      "sample_count": 261
+    },
+    {
+      "station_id": "28_171_001",
+      "mae": 3.4499151903857648,
+      "sample_count": 261
+    },
+    {
+      "station_id": "28_102_001",
+      "mae": 2.945611546451681,
+      "sample_count": 263
+    },
+    {
+      "station_id": "28_120_001",
+      "mae": 0.8579980232865576,
+      "sample_count": 261
+    }
+  ],
+  "error_by_hour": [
+    {
+      "hour": 0,
+      "mae": 10.495462466079212,
+      "sample_count": 1706
+    },
+    {
+      "hour": 1,
+      "mae": 9.386241734871739,
+      "sample_count": 1706
+    },
+    {
+      "hour": 2,
+      "mae": 8.534182768214256,
+      "sample_count": 1705
+    },
+    {
+      "hour": 3,
+      "mae": 8.405508046270143,
+      "sample_count": 1705
+    },
+    {
+      "hour": 4,
+      "mae": 7.174422190875532,
+      "sample_count": 479
+    }
+  ],
+  "error_by_month": [
+    {
+      "month": 10,
+      "mae": 0.8150884440062947,
+      "sample_count": 2
+    },
+    {
+      "month": 11,
+      "mae": 9.004553351553897,
+      "sample_count": 3833
+    },
+    {
+      "month": 12,
+      "mae": 9.151998055843482,
+      "sample_count": 3466
+    }
+  ],
+  "feature_columns": [
+    "station_code",
+    "hour",
+    "day_of_week",
+    "month",
+    "is_weekend",
+    "value",
+    "value_lag_1h",
+    "value_lag_3h",
+    "value_lag_6h",
+    "value_lag_24h",
+    "value_lag_168h",
+    "rolling_mean_3h",
+    "rolling_mean_6h",
+    "rolling_mean_24h"
+  ],
+  "model_name": "hist_gradient_boosting_v1",
+  "model_bundle": "E:\\Proyectos\\VisualStudio\\Alfon_personal\\madrid_aire\\data\\artifacts\\no2_model_v1_bundle_20260513T231032Z.joblib"
+}

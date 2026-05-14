@@ -1,0 +1,268 @@
+import Link from "next/link";
+import { notFound } from "next/navigation";
+
+import { HistoryForecastChart } from "@/components/HistoryForecastChart";
+import { LanguageSelector } from "@/components/LanguageSelector";
+import { MobileBottomNav, type MobileBottomNavItem } from "@/components/MobileBottomNav";
+import { MadridAireWordmark } from "@/components/branding/MadridAireWordmark";
+import { getDashboardPayload, getHistoryPayload, getModelMetricsPayload, getPredictionsPayload } from "@/lib/api";
+import { copyByLanguage, resolveLanguage } from "@/lib/i18n";
+
+type StationDetailPageProps = {
+  params: Promise<{ id: string }>;
+  searchParams?: Promise<{ lang?: string | string[] }>;
+};
+
+type FreshnessKey = "fresh" | "delayed" | "stale" | "unknown";
+
+function toFreshnessBucket(measuredAt: string | null | undefined): FreshnessKey {
+  if (!measuredAt) {
+    return "unknown";
+  }
+
+  const timestamp = new Date(measuredAt);
+  if (Number.isNaN(timestamp.getTime())) {
+    return "unknown";
+  }
+
+  const ageHours = (Date.now() - timestamp.getTime()) / 3_600_000;
+  if (ageHours < 3) {
+    return "fresh";
+  }
+  if (ageHours < 12) {
+    return "delayed";
+  }
+  return "stale";
+}
+
+function formatCoordinates(latitude: number | null, longitude: number | null) {
+  if (latitude == null || longitude == null) {
+    return "-";
+  }
+
+  return `${latitude.toFixed(4)}, ${longitude.toFixed(4)}`;
+}
+
+export default async function StationDetailPage({ params, searchParams }: StationDetailPageProps) {
+  const resolvedParams = await params;
+  const resolvedSearchParams = searchParams ? await searchParams : undefined;
+  const language = resolveLanguage(resolvedSearchParams?.lang);
+  const copy = copyByLanguage[language];
+  const locale = language === "es" ? "es-ES" : "en-GB";
+  const stationId = resolvedParams.id;
+  const dashboard = await getDashboardPayload();
+  const station = dashboard.stations?.items.find((item) => item.station_id === stationId) ?? null;
+
+  if (!station) {
+    notFound();
+  }
+
+  const [history, predictions, metrics] = await Promise.all([
+    getHistoryPayload(stationId, "NO2", 24),
+    getPredictionsPayload(stationId),
+    getModelMetricsPayload(),
+  ]);
+
+  const currentValues = (dashboard.latest?.items ?? [])
+    .filter((item) => item.station_id === stationId)
+    .sort((left, right) => {
+      if (left.pollutant_code === "NO2") {
+        return -1;
+      }
+      if (right.pollutant_code === "NO2") {
+        return 1;
+      }
+      return left.pollutant_code.localeCompare(right.pollutant_code);
+    });
+  const no2Current = currentValues.find((item) => item.pollutant_code === "NO2") ?? null;
+  const freshnessKey = toFreshnessBucket(no2Current?.measured_at ?? currentValues[0]?.measured_at);
+  const observed = (history?.items ?? []).map((item) => ({ timestamp: item.measured_at, value: item.value }));
+  const predicted = (predictions?.items ?? []).map((item) => ({ timestamp: item.predicted_for, value: item.predicted_value }));
+  const pollutants = [...new Set(currentValues.map((item) => item.pollutant_code))];
+  const selectedMetric =
+    metrics?.items.find((item) => item.baseline_name === metrics.selected_baseline && item.split_name === "test") ??
+    metrics?.items[0] ??
+    null;
+  const mobileNavItems: MobileBottomNavItem[] = [
+    { key: "dashboard", href: `/dashboard?lang=${language}`, label: copy.mobileNavDashboard },
+    { key: "map", href: `/map?lang=${language}`, label: copy.mobileNavMap },
+    { key: "stations", href: `/stations?lang=${language}`, label: copy.mobileNavStations },
+    { key: "predictions", href: `/predictions?lang=${language}`, label: copy.mobileNavPredictions },
+    { key: "system", href: `/system?lang=${language}`, label: copy.mobileNavSystem },
+  ];
+
+  return (
+    <main className="min-h-screen bg-graphite px-5 py-5 pb-28 text-soft sm:px-7 md:pb-5 lg:px-10 3xl:px-14">
+      <section className="mx-auto flex w-full max-w-[1800px] flex-col gap-8">
+        <header className="flex flex-wrap items-center justify-between gap-4">
+          <div className="glass-panel rounded-full px-4 py-3 shadow-atmosphere">
+            <MadridAireWordmark className="items-center" size="compact" />
+          </div>
+          <div className="flex items-center gap-3">
+            <div className="hidden flex-wrap items-center gap-3 md:flex">
+            <Link className="glass-panel rounded-full px-4 py-3 text-sm text-soft/80 shadow-atmosphere hover:bg-white/10" href={`/stations?lang=${language}`}>
+              {copy.stationBackToExplorer}
+            </Link>
+            <Link className="glass-panel rounded-full px-4 py-3 text-sm text-soft/80 shadow-atmosphere hover:bg-white/10" href={`/map?lang=${language}`}>
+              {copy.openMap}
+            </Link>
+            <Link className="glass-panel rounded-full px-4 py-3 text-sm text-soft/80 shadow-atmosphere hover:bg-white/10" href={`/predictions?lang=${language}`}>
+              {copy.openPredictions}
+            </Link>
+            <Link className="glass-panel rounded-full px-4 py-3 text-sm text-soft/80 shadow-atmosphere hover:bg-white/10" href={`/model?lang=${language}`}>
+              {copy.openModel}
+            </Link>
+            </div>
+            <LanguageSelector currentLanguage={language} pathname={`/stations/${stationId}`} />
+          </div>
+        </header>
+
+        <div className="grid gap-10 xl:grid-cols-[0.95fr_1.05fr]">
+          <div>
+            <p className="eyebrow text-soft/55">{copy.stationDetailTitle}</p>
+            <h1 className="mt-4 text-4xl font-medium tracking-[-0.04em] text-soft sm:text-5xl lg:text-6xl">
+              {station.name ?? station.municipality ?? station.station_id}
+            </h1>
+            <p className="mt-4 font-data text-lg text-soft/62">{station.station_id}</p>
+            <p className="mt-6 max-w-2xl text-lg leading-8 text-soft/74">{copy.stationDetailSubtitle}</p>
+          </div>
+          <div className="grid gap-4 md:grid-cols-2">
+            <div className="glass-panel rounded-[1.75rem] p-5 shadow-atmosphere">
+              <p className="eyebrow text-soft/55">{copy.stationLatestNo2}</p>
+              <p className="mt-4 font-data text-3xl text-bone">
+                {no2Current?.value == null ? "-" : no2Current.value.toLocaleString(locale, { maximumFractionDigits: 1 })}
+              </p>
+            </div>
+            <div className="glass-panel rounded-[1.75rem] p-5 shadow-atmosphere">
+              <p className="eyebrow text-soft/55">{copy.stationsTableFreshness}</p>
+              <p className="mt-4 font-data text-3xl text-bone">{copy.freshness[freshnessKey]}</p>
+            </div>
+            <div className="glass-panel rounded-[1.75rem] p-5 shadow-atmosphere">
+              <p className="eyebrow text-soft/55">{copy.pollutantCoverage}</p>
+              <p className="mt-4 font-data text-3xl text-bone">{pollutants.length}</p>
+            </div>
+            <div className="glass-panel rounded-[1.75rem] p-5 shadow-atmosphere">
+              <p className="eyebrow text-soft/55">{copy.stationCoordinates}</p>
+              <p className="mt-4 font-data text-sm text-bone">{formatCoordinates(station.latitude, station.longitude)}</p>
+            </div>
+          </div>
+        </div>
+
+        <div className="grid gap-6 xl:grid-cols-[1.15fr_0.85fr]">
+          <section className="glass-panel rounded-[2rem] p-5 shadow-atmosphere">
+            <div className="flex flex-wrap items-center justify-between gap-3">
+              <p className="eyebrow text-soft/60">{copy.stationHistoryForecastTitle}</p>
+              <p className="font-data text-sm text-soft/55">NO2 · 24h observed + 24h predicted</p>
+            </div>
+            <div className="mt-5">
+              {observed.length > 0 || predicted.length > 0 ? (
+                <HistoryForecastChart observed={observed} predicted={predicted} observedLabel={copy.observedLabel} predictedLabel={copy.predictedLabel} />
+              ) : (
+                <div className="rounded-[1.75rem] border border-white/10 bg-white/[0.03] p-5 text-sm text-soft/72">
+                  {copy.stationNoHistory}
+                </div>
+              )}
+            </div>
+            {predicted.length === 0 ? <p className="mt-5 text-sm text-soft/68">{copy.stationNoPredictions}</p> : null}
+          </section>
+
+          <section className="glass-panel rounded-[2rem] p-5 shadow-atmosphere">
+            <div className="flex flex-wrap items-center justify-between gap-3">
+              <p className="eyebrow text-soft/60">{copy.stationCurrentValuesTitle}</p>
+              <p className="font-data text-sm text-soft/55">{currentValues[0]?.measured_at ? new Intl.DateTimeFormat(locale, { dateStyle: "short", timeStyle: "short", timeZone: "Europe/Madrid" }).format(new Date(currentValues[0].measured_at)) : "-"}</p>
+            </div>
+            <div className="mt-5 grid gap-3 sm:grid-cols-2">
+              {currentValues.map((item) => (
+                <div key={`${item.station_id}-${item.pollutant_code}`} className="rounded-[1.5rem] border border-white/10 bg-white/[0.03] p-4">
+                  <div className="flex items-start justify-between gap-4">
+                    <div>
+                      <p className="font-data text-sm text-bone">{item.pollutant_code}</p>
+                      <p className="mt-2 text-xs uppercase tracking-[0.18em] text-soft/52">{item.risk_level ?? "unknown"}</p>
+                    </div>
+                    <p className="font-data text-xl text-bone">{item.value.toLocaleString(locale, { maximumFractionDigits: 1 })}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </section>
+        </div>
+
+        <div className="grid gap-6 xl:grid-cols-[0.8fr_1.2fr]">
+          <section className="glass-panel rounded-[2rem] p-5 shadow-atmosphere">
+            <div className="flex flex-wrap items-center justify-between gap-3">
+              <p className="eyebrow text-soft/60">{copy.stationModelErrorTitle}</p>
+              <p className="font-data text-sm text-soft/55">{metrics?.selected_baseline ?? "-"}</p>
+            </div>
+            <div className="mt-5 grid gap-3 sm:grid-cols-3 xl:grid-cols-1">
+              <div className="rounded-[1.5rem] border border-white/10 bg-white/[0.03] p-4">
+                <p className="eyebrow text-soft/55">{copy.metricMae}</p>
+                <p className="mt-3 font-data text-2xl text-bone">{selectedMetric?.mae == null ? "-" : selectedMetric.mae.toFixed(2)}</p>
+              </div>
+              <div className="rounded-[1.5rem] border border-white/10 bg-white/[0.03] p-4">
+                <p className="eyebrow text-soft/55">{copy.metricRmse}</p>
+                <p className="mt-3 font-data text-2xl text-bone">{selectedMetric?.rmse == null ? "-" : selectedMetric.rmse.toFixed(2)}</p>
+              </div>
+              <div className="rounded-[1.5rem] border border-white/10 bg-white/[0.03] p-4">
+                <p className="eyebrow text-soft/55">{copy.metricR2}</p>
+                <p className="mt-3 font-data text-2xl text-bone">{selectedMetric?.r2 == null ? "-" : selectedMetric.r2.toFixed(3)}</p>
+              </div>
+            </div>
+            <p className="mt-5 text-sm leading-6 text-soft/70">{copy.stationGlobalErrorNote}</p>
+          </section>
+
+          <section className="grid gap-6 lg:grid-cols-2">
+            <div className="glass-panel rounded-[2rem] p-5 shadow-atmosphere">
+              <p className="eyebrow text-soft/60">{copy.stationAvailablePollutantsTitle}</p>
+              <div className="mt-5 flex flex-wrap gap-3">
+                {pollutants.map((pollutant) => (
+                  <span key={pollutant} className="rounded-full border border-white/10 bg-white/[0.03] px-4 py-2 font-data text-sm text-bone">
+                    {pollutant}
+                  </span>
+                ))}
+              </div>
+            </div>
+
+            <div className="glass-panel rounded-[2rem] p-5 shadow-atmosphere">
+              <p className="eyebrow text-soft/60">{copy.stationOfficialContextTitle}</p>
+              <div className="mt-5 grid gap-4 text-sm text-soft/74">
+                <div>
+                  <p className="eyebrow text-soft/50">{copy.stationMunicipality}</p>
+                  <p className="mt-2">{station.municipality ?? "-"}</p>
+                </div>
+                <div>
+                  <p className="eyebrow text-soft/50">{copy.stationAddress}</p>
+                  <p className="mt-2">{station.postal_address ?? "-"}</p>
+                </div>
+                <div>
+                  <p className="eyebrow text-soft/50">{copy.stationZone}</p>
+                  <p className="mt-2">{station.zone_description ?? "-"}</p>
+                </div>
+                <div>
+                  <p className="eyebrow text-soft/50">{copy.stationAreaType}</p>
+                  <p className="mt-2">{station.area_type ?? "-"}</p>
+                </div>
+                <div>
+                  <p className="eyebrow text-soft/50">{copy.stationStationType}</p>
+                  <p className="mt-2">{station.station_type ?? "-"}</p>
+                </div>
+                <div>
+                  <p className="eyebrow text-soft/50">{copy.stationAltitude}</p>
+                  <p className="mt-2">{station.altitude_meters == null ? "-" : `${station.altitude_meters.toFixed(0)} m`}</p>
+                </div>
+                <div>
+                  <p className="eyebrow text-soft/50">{copy.stationCoordinates}</p>
+                  <p className="mt-2">{formatCoordinates(station.latitude, station.longitude)}</p>
+                </div>
+                <div>
+                  <p className="eyebrow text-soft/50">{copy.stationGlobalErrorReference}</p>
+                  <p className="mt-2">{metrics?.selected_baseline ?? "-"}</p>
+                </div>
+              </div>
+            </div>
+          </section>
+        </div>
+      </section>
+      <MobileBottomNav currentLanguage={language} currentPage="stations" ariaLabel={copy.mobileNavAriaLabel} items={mobileNavItems} />
+    </main>
+  );
+}

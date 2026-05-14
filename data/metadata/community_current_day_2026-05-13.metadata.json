@@ -1,0 +1,18 @@
+{
+  "dataset_key": "current-day",
+  "dataset_slug": "calidad_aire_datos_dia",
+  "dataset_title": "Red de Calidad del Aire. Datos del d\u00eda en curso",
+  "dataset_description": "Official current-day air-quality observations from Comunidad de Madrid",
+  "resource_id": "ee75d31c-8042-4067-bbd7-739bb3eb8059",
+  "resource_name": "Red de Calidad del Aire. Datos del d\u00eda en curso",
+  "resource_format": "CSV",
+  "resource_url": "https://datos.comunidad.madrid/dataset/3dacd589-ecca-485c-81b9-a61606b7199f/resource/ee75d31c-8042-4067-bbd7-739bb3eb8059/download/calidad_aire_datos_dia.csv",
+  "license_title": "Creative Commons Attribution",
+  "license_url": "https://creativecommons.org/licenses/by/4.0/legalcode.es",
+  "downloaded_at_utc": "2026-05-13T20:54:58.839097+00:00",
+  "source_metadata_modified": "2026-05-13T20:20:26.080147",
+  "source_last_modified": "2026-05-13T20:20:26.067219",
+  "bytes": 25381,
+  "sha256": "16e6b83d553d57073516eb77b0f8b2bdc674db9bfd646e5ff3e64fc82379e9cc",
+  "local_file": "sample_real\\community_current_day_2026-05-13.csv"
+}

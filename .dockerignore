@@ -1,0 +1,12 @@
+.git
+.next
+.qodo
+.venv
+node_modules
+apps/web/.next
+apps/web/node_modules
+__pycache__
+*.pyc
+*.pyo
+*.pyd
+*.log

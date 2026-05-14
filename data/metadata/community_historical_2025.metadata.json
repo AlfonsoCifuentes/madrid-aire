@@ -1,0 +1,18 @@
+{
+  "dataset_key": "historical",
+  "dataset_slug": "calidad_aire_datos_historico",
+  "dataset_title": "Red de Calidad del Aire. Datos horarios desde 2005",
+  "dataset_description": "Official historical hourly air-quality data from Comunidad de Madrid",
+  "resource_id": "3887b64f-5140-40eb-b4ba-afc20581ccd5",
+  "resource_name": "2025",
+  "resource_format": "CSV",
+  "resource_url": "https://datos.comunidad.madrid/dataset/f18aa765-7432-4b39-8b6e-c41799c1c3e0/resource/3887b64f-5140-40eb-b4ba-afc20581ccd5/download/2025.csv",
+  "license_title": "Creative Commons Attribution",
+  "license_url": "https://creativecommons.org/licenses/by/4.0/legalcode.es",
+  "downloaded_at_utc": "2026-05-13T21:30:42.951216+00:00",
+  "source_metadata_modified": "2026-05-04T09:38:11.425166",
+  "source_last_modified": "2026-05-04T09:38:02.547677",
+  "bytes": 9805640,
+  "sha256": "bc81cf2a6750108c4a852bd411535e3e790703b5843d26a628194dddac75a863",
+  "local_file": "sample_real\\community_historical_2025.csv"
+}

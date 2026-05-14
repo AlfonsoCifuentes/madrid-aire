@@ -1,0 +1,18 @@
+{
+  "dataset_key": "stations",
+  "dataset_slug": "calidad_aire_estaciones",
+  "dataset_title": "Red de Calidad del Aire. Estaciones",
+  "dataset_description": "Official air-quality station metadata from Comunidad de Madrid",
+  "resource_id": "c05f6436-783e-4b04-b0d2-47848daea984",
+  "resource_name": "Red de Calidad del Aire. Estaciones",
+  "resource_format": "CSV",
+  "resource_url": "https://datos.comunidad.madrid/dataset/4cd076a3-e602-48da-b834-58de39d3125c/resource/c05f6436-783e-4b04-b0d2-47848daea984/download/calidad_aire_estaciones.csv",
+  "license_title": "Creative Commons Attribution",
+  "license_url": "https://creativecommons.org/licenses/by/4.0/legalcode.es",
+  "downloaded_at_utc": "2026-05-13T22:37:13.941365+00:00",
+  "source_metadata_modified": "2026-02-12T12:40:05.606146",
+  "source_last_modified": "2025-09-30T10:51:40.995444",
+  "bytes": 7703,
+  "sha256": "573bc5c1bcef9bdf958ff96cfbf6df6d1ab131ebd02caa82aa937e18cfa47c13",
+  "local_file": "sample_real\\stations_from_official_source_2025-09-30.csv"
+}

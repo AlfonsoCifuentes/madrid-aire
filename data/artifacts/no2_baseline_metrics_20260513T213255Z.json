@@ -1,0 +1,47 @@
+{
+  "status": "baseline_ready",
+  "source": "local_baseline_artifact",
+  "target": "NO2",
+  "horizon_hours": 24,
+  "selected_baseline": "persistence",
+  "generated_at": "2026-05-13T21:32:55.458339+00:00",
+  "split": {
+    "train": {
+      "start": "2025-01-01T00:00:00",
+      "end": "2025-12-31T23:00:00"
+    },
+    "valid": {
+      "start": null,
+      "end": null
+    },
+    "test": {
+      "start": "2026-01-01T00:00:00",
+      "end": "2026-04-30T19:00:00"
+    }
+  },
+  "input_files": [
+    "E:\\Proyectos\\VisualStudio\\Alfon_personal\\madrid_aire\\data\\sample_real\\community_current_day_2026-05-13.normalized.csv",
+    "E:\\Proyectos\\VisualStudio\\Alfon_personal\\madrid_aire\\data\\sample_real\\community_historical_2025.normalized.csv",
+    "E:\\Proyectos\\VisualStudio\\Alfon_personal\\madrid_aire\\data\\sample_real\\community_historical_2026.normalized.csv"
+  ],
+  "row_count": 319400,
+  "station_count": 28,
+  "items": [
+    {
+      "baseline_name": "persistence",
+      "split_name": "test",
+      "mae": 8.31105156890881,
+      "rmse": 14.058081166743348,
+      "r2": 0.20405757193431784,
+      "sample_count": 78749
+    },
+    {
+      "baseline_name": "same_hour_yesterday",
+      "split_name": "test",
+      "mae": 9.894068496107888,
+      "rmse": 16.23592864963151,
+      "r2": -0.06165603013004084,
+      "sample_count": 78749
+    }
+  ]
+}

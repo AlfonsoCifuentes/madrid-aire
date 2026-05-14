@@ -1,0 +1,13 @@
+node_modules/
+.venv/
+apps/web/.next/
+apps/web/out/
+apps/web/coverage/
+apps/web/.vercel/
+apps/api/.venv/
+apps/api/.vercel/
+apps/api/__pycache__/
+apps/api/.pytest_cache/
+*.pyc
+.env
+.env.local
