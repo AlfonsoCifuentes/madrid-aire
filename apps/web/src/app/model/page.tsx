@@ -38,6 +38,92 @@ function formatModelName(value: string | null | undefined, language: "es" | "en"
   return value?.replaceAll("_", " ") ?? "-";
 }
 
+function buildModelSections(language: "es" | "en") {
+  if (language === "es") {
+    return {
+      featuresTitle: "Características del modelo",
+      features: [
+        {
+          title: "Aprendizaje supervisado",
+          body: "Se entrena con observaciones reales de la red oficial, no con datos sintéticos ni simulados.",
+        },
+        {
+          title: "Horizonte de 24 horas",
+          body: "Genera previsiones en pasos horarios para las próximas 24 horas desde el momento de generación.",
+        },
+        {
+          title: "Variables meteorológicas y temporales",
+          body: "Incluye hora del día, día de la semana y temperatura como variables explicativas principales.",
+        },
+        {
+          title: "Comparación con referencias simples",
+          body: "Cada ejecución se evalúa contra la tendencia reciente, la hora de ayer y la media de 24 h para validar la mejora real.",
+        },
+      ],
+      limitationsTitle: "Límites del modelo v1",
+      limitations: [
+        {
+          title: "Sin episodios extremos validados",
+          body: "Los datos de entrenamiento no cubren episodios de contaminación severa o eventos meteorológicos excepcionales.",
+        },
+        {
+          title: "Sin cobertura espacial completa",
+          body: "El modelo produce una previsión única para la red, no valores individuales para cada estación.",
+        },
+        {
+          title: "Sin actualización en tiempo real",
+          body: "Las previsiones se regeneran en ciclos programados, no con cada nueva lectura oficial.",
+        },
+        {
+          title: "Orientativo, no regulatorio",
+          body: "Esta previsión es una referencia técnica interna. No sustituye avisos oficiales de calidad del aire.",
+        },
+      ],
+    };
+  }
+
+  return {
+    featuresTitle: "Model features",
+    features: [
+      {
+        title: "Supervised learning",
+        body: "Trained on real readings from the official network, not on synthetic or simulated data.",
+      },
+      {
+        title: "24-hour horizon",
+        body: "Produces hourly forecasts for the next 24 hours from the moment of generation.",
+      },
+      {
+        title: "Meteorological and temporal variables",
+        body: "Includes time of day, day of week, and temperature as the main explanatory variables.",
+      },
+      {
+        title: "Comparison against simple baselines",
+        body: "Each run is evaluated against the recent trend, the same hour yesterday, and the 24-hour average to validate genuine improvement.",
+      },
+    ],
+    limitationsTitle: "Model v1 limits",
+    limitations: [
+      {
+        title: "No validated extreme episodes",
+        body: "Training data does not cover severe pollution episodes or exceptional meteorological events.",
+      },
+      {
+        title: "No full spatial coverage",
+        body: "The model produces a single network-wide forecast, not individual values per station.",
+      },
+      {
+        title: "No real-time updates",
+        body: "Forecasts are regenerated on scheduled cycles, not with each new official reading.",
+      },
+      {
+        title: "Indicative, not regulatory",
+        body: "This forecast is an internal technical reference. It does not replace official air quality warnings.",
+      },
+    ],
+  };
+}
+
 function buildMetricNotes(language: "es" | "en") {
   if (language === "es") {
     return [
@@ -60,6 +146,7 @@ export default async function ModelPage({ searchParams }: ModelPageProps) {
   const copy = copyByLanguage[language];
   const metrics = await getModelMetricsPayload();
   const metricNotes = buildMetricNotes(language);
+  const modelSections = buildModelSections(language);
   const mobileNavItems: MobileBottomNavItem[] = [
     { key: "dashboard", href: `/dashboard?lang=${language}`, label: copy.mobileNavDashboard },
     { key: "model", href: `/model?lang=${language}`, label: copy.mobileNavModel },
@@ -152,6 +239,30 @@ export default async function ModelPage({ searchParams }: ModelPageProps) {
             <MetricBars items={metrics?.items ?? []} maeLabel={copy.metricMae} rmseLabel={copy.metricRmse} r2Label={copy.metricR2} />
           </div>
           <p className="mt-5 text-sm leading-6 text-soft/70">{copy.notOfficialForecast}</p>
+        </section>
+
+        <section>
+          <p className="eyebrow mb-5 text-soft/55">{modelSections.featuresTitle}</p>
+          <div className="grid gap-4 md:grid-cols-2">
+            {modelSections.features.map((item) => (
+              <div key={item.title} className="glass-panel rounded-[1.75rem] p-5 shadow-atmosphere">
+                <p className="eyebrow text-soft/55">{item.title}</p>
+                <p className="mt-4 text-sm leading-6 text-soft/74">{item.body}</p>
+              </div>
+            ))}
+          </div>
+        </section>
+
+        <section>
+          <p className="eyebrow mb-5 text-soft/55">{modelSections.limitationsTitle}</p>
+          <div className="grid gap-4 md:grid-cols-2">
+            {modelSections.limitations.map((item) => (
+              <div key={item.title} className="glass-panel rounded-[1.75rem] p-5 shadow-atmosphere">
+                <p className="eyebrow text-soft/55">{item.title}</p>
+                <p className="mt-4 text-sm leading-6 text-soft/74">{item.body}</p>
+              </div>
+            ))}
+          </div>
         </section>
       </section>
       <MobileBottomNav currentLanguage={language} currentPage="model" ariaLabel={copy.mobileNavAriaLabel} items={mobileNavItems} />

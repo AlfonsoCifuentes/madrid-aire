@@ -1,4 +1,4 @@
-type StationPulseNode = {
+export type StationPulseNode = {
   station_id: string;
   label: string;
   latitude: number;

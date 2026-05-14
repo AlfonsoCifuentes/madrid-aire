@@ -166,6 +166,14 @@ type Copy = {
   aboutMethodologyDesc: string;
   aboutReportsDesc: string;
   aboutSystemDesc: string;
+  dashboardHistoryTitle: string;
+  dashboardForecastTrendTitle: string;
+  dashboardForecastTrendBody: string;
+  dashboardForecastTrendReady: string;
+  dashboardModelStatusTitle: string;
+  dashboardModelImprovementLabel: string;
+  dashboardDominantPollutant: string;
+  dashboardAverageNo2Label: string;
   freshness: Record<string, string>;
 };
 
@@ -372,6 +380,15 @@ export const copyByLanguage: Record<Language, Copy> = {
       "Resúmenes e interpretación para contextualizar el estado del sistema y del modelo.",
     aboutSystemDesc:
       "Estado operativo del proyecto: actualizaciones de datos, alertas y señales de mantenimiento.",
+    dashboardHistoryTitle: "NO2 · últimas 24 h",
+    dashboardForecastTrendTitle: "Tendencia prevista",
+    dashboardForecastTrendBody:
+      "Las previsiones de NO2 para las próximas horas ya están listas. Consulta la evolución esperada y compárala con lo observado.",
+    dashboardForecastTrendReady: "Previsión disponible",
+    dashboardModelStatusTitle: "Estado del modelo",
+    dashboardModelImprovementLabel: "Mejora vs. referencia",
+    dashboardDominantPollutant: "Contaminante dominante",
+    dashboardAverageNo2Label: "Promedio NO2 · red",
     freshness: {
       fresh: "fresco",
       delayed: "retrasado",
@@ -582,6 +599,15 @@ export const copyByLanguage: Record<Language, Copy> = {
       "Editorial summaries that add context to the state of the system and the model.",
     aboutSystemDesc:
       "Operational project status: data updates, alerts, and maintenance signals.",
+    dashboardHistoryTitle: "NO2 · last 24 h",
+    dashboardForecastTrendTitle: "Forecast trend",
+    dashboardForecastTrendBody:
+      "NO2 forecasts for the next few hours are ready. Check the expected evolution and compare it with what has been observed.",
+    dashboardForecastTrendReady: "Forecast available",
+    dashboardModelStatusTitle: "Model status",
+    dashboardModelImprovementLabel: "Improvement vs. baseline",
+    dashboardDominantPollutant: "Dominant pollutant",
+    dashboardAverageNo2Label: "Average NO2 · network",
     freshness: {
       fresh: "fresh",
       delayed: "delayed",

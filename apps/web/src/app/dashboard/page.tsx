@@ -1,27 +1,97 @@
 import Link from "next/link";
 
+import { FreshnessIndicator } from "@/components/FreshnessIndicator";
+import { HistoryForecastChart } from "@/components/HistoryForecastChart";
 import { LanguageSelector } from "@/components/LanguageSelector";
 import { MobileBottomNav, type MobileBottomNavItem } from "@/components/MobileBottomNav";
 import { ObservationTable } from "@/components/ObservationTable";
+import { StationPulseField, type StationPulseNode } from "@/components/StationPulseField";
 import { MadridAireWordmark } from "@/components/branding/MadridAireWordmark";
-import { getDashboardPayload } from "@/lib/api";
+import { getDashboardPayload, getHistoryPayload, getSystemStatusPayload } from "@/lib/api";
+import type { LatestObservationItem, StationSummary } from "@/lib/api";
 import { copyByLanguage, resolveLanguage } from "@/lib/i18n";
 
 type DashboardPageProps = {
   searchParams?: Promise<{ lang?: string | string[] }>;
 };
 
+function buildStationNodes(
+  stations: StationSummary[],
+  latestItems: LatestObservationItem[],
+  worstStationId: string | null,
+): StationPulseNode[] {
+  const no2Map = new Map<string, LatestObservationItem>();
+
+  for (const item of latestItems) {
+    if (item.pollutant_code === "NO2" && item.valid !== false) {
+      const existing = no2Map.get(item.station_id);
+      if (!existing || item.measured_at > existing.measured_at) {
+        no2Map.set(item.station_id, item);
+      }
+    }
+  }
+
+  const now = Date.now();
+
+  return stations
+    .filter((s) => s.latitude != null && s.longitude != null)
+    .map((s) => {
+      const obs = no2Map.get(s.station_id);
+      let freshness: StationPulseNode["freshness"] = "unknown";
+      if (obs) {
+        const ageH = (now - new Date(obs.measured_at).getTime()) / (1000 * 3600);
+        freshness = ageH < 2 ? "fresh" : ageH < 8 ? "delayed" : "stale";
+      }
+      return {
+        station_id: s.station_id,
+        label: s.name ?? s.station_id,
+        latitude: s.latitude!,
+        longitude: s.longitude!,
+        value: obs?.value ?? 0,
+        risk_level: obs?.risk_level ?? null,
+        freshness,
+        highlight: s.station_id === worstStationId,
+      };
+    });
+}
+
+function resolveModelName(value: string | null | undefined, language: "es" | "en") {
+  const normalized = (value ?? "").toLowerCase();
+  if (normalized.includes("hist_gradient_boosting")) {
+    return language === "es" ? "Modelo NO2 v1" : "NO2 model v1";
+  }
+  return value?.replaceAll("_", " ") || "-";
+}
+
 export default async function DashboardPage({ searchParams }: DashboardPageProps) {
   const params = searchParams ? await searchParams : undefined;
   const language = resolveLanguage(params?.lang);
   const copy = copyByLanguage[language];
-  const payload = await getDashboardPayload();
+  const [payload, system] = await Promise.all([getDashboardPayload(), getSystemStatusPayload()]);
   const summary = payload.summary;
   const latest = payload.latest?.items ?? [];
+  const stations = payload.stations?.items ?? [];
+  const worstStationId = summary?.worst_station_id ?? null;
+  const history = worstStationId ? await getHistoryPayload(worstStationId, "NO2", 24) : null;
   const topRows = latest
     .filter((item) => item.pollutant_code === "NO2")
     .sort((left, right) => right.value - left.value)
     .slice(0, 8);
+  const stationNodes = buildStationNodes(stations, latest, worstStationId);
+  const historyObserved = (history?.items ?? []).map((item) => ({
+    timestamp: item.measured_at,
+    value: item.value,
+  }));
+  const no2Values = latest
+    .filter((item) => item.pollutant_code === "NO2" && item.valid !== false)
+    .map((item) => item.value);
+  const averageNo2 =
+    no2Values.length > 0 ? no2Values.reduce((a, b) => a + b, 0) / no2Values.length : null;
+  const dominantPollutant = summary?.worst_pollutant_code ?? "NO2";
+  const improvement = system?.model?.improvement_pct_vs_best_baseline;
+  const modelImprovementLabel =
+    improvement != null ? `${improvement >= 0 ? "+" : ""}${improvement.toFixed(1)}%` : "-";
+  const modelDisplayName = resolveModelName(system?.model?.selected_model, language);
   const locale = language === "es" ? "es-ES" : "en-GB";
   const mobileNavItems: MobileBottomNavItem[] = [
     { key: "dashboard", href: `/dashboard?lang=${language}`, label: copy.mobileNavDashboard },
@@ -116,19 +186,84 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
 
           <aside className="grid gap-4">
             <div className="glass-panel rounded-[2rem] p-5 shadow-atmosphere">
-              <p className="eyebrow text-soft/60">{copy.mapStatusTitle}</p>
-              <p className="mt-4 font-data text-2xl text-bone">{copy.pendingCoords}</p>
-              <p className="mt-4 text-sm leading-6 text-soft/72">{copy.mapStatusBody}</p>
-            </div>
-            <div className="glass-panel rounded-[2rem] p-5 shadow-atmosphere">
-              <p className="eyebrow text-soft/60">{copy.openAbout}</p>
-              <p className="mt-4 text-2xl font-medium text-bone">{copy.aboutTechnicalRoutesTitle}</p>
-              <p className="mt-4 text-sm leading-6 text-soft/72">{copy.aboutTechnicalRoutesBody}</p>
-              <Link className="mt-5 inline-flex min-h-11 items-center justify-center rounded-full border border-white/12 bg-white/6 px-5 py-2.5 text-sm font-medium text-soft transition hover:bg-white/10" href={`/about?lang=${language}`}>
-                {copy.openAbout}
+              <div className="flex flex-wrap items-center justify-between gap-3">
+                <p className="eyebrow text-soft/60">{copy.mapStatusTitle}</p>
+                <FreshnessIndicator
+                  freshness={summary?.freshness ?? "unknown"}
+                  label={copy.freshness[summary?.freshness ?? "unknown"]}
+                />
+              </div>
+              <div className="mt-4">
+                {stationNodes.length > 0 ? (
+                  <StationPulseField nodes={stationNodes} />
+                ) : (
+                  <p className="font-data text-2xl text-bone">{copy.pendingCoords}</p>
+                )}
+              </div>
+              <Link
+                className="mt-4 inline-flex text-sm text-soft/60 hover:text-soft"
+                href={`/map?lang=${language}`}
+              >
+                {copy.openMap} →
               </Link>
             </div>
           </aside>
+        </div>
+
+        {historyObserved.length > 0 && (
+          <section className="glass-panel rounded-[2rem] p-5 shadow-atmosphere">
+            <div className="flex flex-wrap items-center justify-between gap-3">
+              <p className="eyebrow text-soft/60">{copy.dashboardHistoryTitle}</p>
+              <p className="font-data text-sm text-soft/55">{worstStationId ?? ""}</p>
+            </div>
+            <div className="mt-5">
+              <HistoryForecastChart
+                observed={historyObserved}
+                predicted={[]}
+                observedLabel={copy.observedLabel}
+                predictedLabel={copy.predictedLabel}
+              />
+            </div>
+          </section>
+        )}
+
+        <div className="grid gap-4 md:grid-cols-3">
+          <div className="glass-panel rounded-[1.75rem] p-5 shadow-atmosphere">
+            <p className="eyebrow text-soft/55">{copy.dashboardDominantPollutant}</p>
+            <p className="mt-4 font-data text-3xl text-bone">{dominantPollutant}</p>
+            {averageNo2 != null && (
+              <p className="mt-3 text-sm text-soft/70">
+                {copy.dashboardAverageNo2Label} ·{" "}
+                {averageNo2.toLocaleString(locale, { maximumFractionDigits: 1 })} µg/m³
+              </p>
+            )}
+          </div>
+          <div className="glass-panel rounded-[1.75rem] p-5 shadow-atmosphere">
+            <p className="eyebrow text-soft/55">{copy.dashboardForecastTrendTitle}</p>
+            {summary?.predictions_ready ? (
+              <p className="mt-4 font-data text-xl text-bone">{copy.dashboardForecastTrendReady}</p>
+            ) : null}
+            <p className="mt-3 text-sm leading-6 text-soft/70">{copy.dashboardForecastTrendBody}</p>
+            <Link
+              className="mt-4 inline-flex text-sm text-soft/60 hover:text-soft"
+              href={`/predictions?lang=${language}`}
+            >
+              {copy.openPredictions} →
+            </Link>
+          </div>
+          <div className="glass-panel rounded-[1.75rem] p-5 shadow-atmosphere">
+            <p className="eyebrow text-soft/55">{copy.dashboardModelStatusTitle}</p>
+            <p className="mt-4 font-data text-2xl text-bone">{modelDisplayName}</p>
+            <p className="mt-3 text-sm text-soft/70">
+              {copy.dashboardModelImprovementLabel} · {modelImprovementLabel}
+            </p>
+            <Link
+              className="mt-4 inline-flex text-sm text-soft/60 hover:text-soft"
+              href={`/model?lang=${language}`}
+            >
+              {copy.openModel} →
+            </Link>
+          </div>
         </div>
       </section>
       <MobileBottomNav currentLanguage={language} currentPage="dashboard" ariaLabel={copy.mobileNavAriaLabel} items={mobileNavItems} />
