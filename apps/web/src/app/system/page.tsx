@@ -2,6 +2,7 @@ import Link from "next/link";
 
 import { LanguageSelector } from "@/components/LanguageSelector";
 import { MobileBottomNav, type MobileBottomNavItem } from "@/components/MobileBottomNav";
+import { PipelineTimeline } from "@/components/PipelineTimeline";
 import { MadridAireWordmark } from "@/components/branding/MadridAireWordmark";
 import { AlertItem, getAlertsPayload, getSystemStatusPayload } from "@/lib/api";
 import { copyByLanguage, resolveLanguage } from "@/lib/i18n";
@@ -130,6 +131,14 @@ export default async function SystemPage({ searchParams }: SystemPageProps) {
             </div>
           </div>
         </div>
+
+        <section className="glass-panel rounded-[2rem] p-5 shadow-atmosphere">
+          <div className="flex flex-wrap items-center justify-between gap-3 mb-5">
+            <h2 className="text-2xl font-medium text-bone">{language === "es" ? "Estado del pipeline" : "Pipeline status"}</h2>
+            <p className="font-data text-xs uppercase tracking-[0.24em] text-soft/55">{system?.environment ?? "-"}</p>
+          </div>
+          <PipelineTimeline system={system} language={language} />
+        </section>
 
         <div className="grid gap-5 xl:grid-cols-2">
           <section className="glass-panel rounded-[2rem] p-5 shadow-atmosphere">

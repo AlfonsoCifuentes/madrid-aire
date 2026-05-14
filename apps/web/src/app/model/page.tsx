@@ -2,6 +2,7 @@ import Link from "next/link";
 
 import { LanguageSelector } from "@/components/LanguageSelector";
 import { MetricBars } from "@/components/MetricBars";
+import { ModelErrorChart } from "@/components/ModelErrorChart";
 import { MobileBottomNav, type MobileBottomNavItem } from "@/components/MobileBottomNav";
 import { MadridAireWordmark } from "@/components/branding/MadridAireWordmark";
 import { getModelMetricsPayload } from "@/lib/api";
@@ -239,6 +240,19 @@ export default async function ModelPage({ searchParams }: ModelPageProps) {
             <MetricBars items={metrics?.items ?? []} maeLabel={copy.metricMae} rmseLabel={copy.metricRmse} r2Label={copy.metricR2} />
           </div>
           <p className="mt-5 text-sm leading-6 text-soft/70">{copy.notOfficialForecast}</p>
+        </section>
+
+        <section className="glass-panel rounded-[2rem] p-5 shadow-atmosphere">
+          <div className="flex flex-wrap items-center justify-between gap-3 mb-5">
+            <p className="eyebrow text-soft/60">NO2 · {language === "es" ? "error visual por modelo" : "error chart by model"}</p>
+            <p className="font-data text-sm text-soft/55">{language === "es" ? "MAE y RMSE comparados" : "MAE & RMSE compared"}</p>
+          </div>
+          <ModelErrorChart
+            items={metrics?.items ?? []}
+            maeLabel={copy.metricMae}
+            rmseLabel={copy.metricRmse}
+            selectedBaseline={metrics?.selected_baseline}
+          />
         </section>
 
         <section>

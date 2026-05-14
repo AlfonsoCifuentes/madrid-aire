@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 
 import { DataTimestamp } from "@/components/DataTimestamp";
 import { HistoryForecastChart } from "@/components/HistoryForecastChart";
+import { HourlyHeatmap } from "@/components/HourlyHeatmap";
 import { LanguageSelector } from "@/components/LanguageSelector";
 import { MobileBottomNav, type MobileBottomNavItem } from "@/components/MobileBottomNav";
 import { Sparkline } from "@/components/Sparkline";
@@ -101,6 +102,18 @@ export default async function StationDetailPage({ params, searchParams }: Statio
   const predicted = (predictions?.items ?? []).map((item) => ({ timestamp: item.predicted_for, value: item.predicted_value }));
   const no2SparklineData = observed.map((o) => o.value);
   const pollutants = [...new Set(currentValues.map((item) => item.pollutant_code))];
+
+  // Build hourly heatmap data: one value per hour (0–23)
+  const hourlyHeatmapData = Object.values(
+    (history?.items ?? []).reduce<Record<number, { hour: number; value: number }>>(
+      (acc, item) => {
+        const hour = new Date(item.measured_at).getHours();
+        acc[hour] = { hour, value: item.value };
+        return acc;
+      },
+      {}
+    )
+  );
   const selectedMetric =
     metrics?.items.find((item) => item.baseline_name === metrics.selected_baseline && item.split_name === "test") ??
     metrics?.items[0] ??
@@ -293,6 +306,21 @@ export default async function StationDetailPage({ params, searchParams }: Statio
           </section>
         </div>
       </section>
+
+        {hourlyHeatmapData.length > 0 && (
+          <section className="glass-panel rounded-[2rem] p-5 shadow-atmosphere">
+            <div className="flex flex-wrap items-center justify-between gap-3 mb-4">
+              <p className="eyebrow text-soft/60">{language === "es" ? "Patrón horario NO2" : "NO2 hourly pattern"}</p>
+              <p className="font-data text-sm text-soft/55">{language === "es" ? "últimas 24 h" : "last 24h"}</p>
+            </div>
+            <HourlyHeatmap
+              data={hourlyHeatmapData}
+              hourLabel="h"
+              unit="µg/m³"
+            />
+          </section>
+        )}
+
       <MobileBottomNav currentLanguage={language} currentPage="stations" ariaLabel={copy.mobileNavAriaLabel} items={mobileNavItems} />
     </main>
   );
