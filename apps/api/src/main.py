@@ -12,6 +12,21 @@ app = FastAPI(
     redoc_url="/redoc",
 )
 
+
+def api_index() -> dict[str, str]:
+    return {
+        "status": "ok",
+        "service": settings.project_name,
+        "docs_url": "/docs",
+        "health_url": f"{settings.api_prefix}/health",
+        "summary_url": f"{settings.api_prefix}/summary",
+        "system_status_url": f"{settings.api_prefix}/system-status",
+    }
+
+
+app.add_api_route("/", api_index, methods=["GET"], tags=["index"])
+app.add_api_route(settings.api_prefix, api_index, methods=["GET"], tags=["index"])
+
 app.include_router(health.router, prefix=settings.api_prefix, tags=["health"])
 app.include_router(stations.router, prefix=settings.api_prefix, tags=["stations"])
 app.include_router(pollutants.router, prefix=settings.api_prefix, tags=["pollutants"])

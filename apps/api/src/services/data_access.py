@@ -69,6 +69,33 @@ def _empty_station_metadata_frame() -> pd.DataFrame:
     return pd.DataFrame(columns=STATION_METADATA_COLUMNS)
 
 
+def _is_git_lfs_pointer(file_path: Path) -> bool:
+    try:
+        with file_path.open("r", encoding="utf-8") as handle:
+            return handle.readline().strip() == "version https://git-lfs.github.com/spec/v1"
+    except OSError:
+        return False
+
+
+def _load_local_observation_file(file_path: Path) -> pd.DataFrame | None:
+    if _is_git_lfs_pointer(file_path):
+        print(f"Skipping Git LFS pointer file for local observations: {file_path}")
+        return None
+
+    try:
+        frame = pd.read_csv(file_path)
+    except Exception as exc:
+        print(f"Local observation file load failed for {file_path}: {exc}")
+        return None
+
+    if "measured_at" not in frame.columns:
+        print(f"Skipping local observation file without measured_at column: {file_path}")
+        return None
+
+    frame["measured_at"] = pd.to_datetime(frame["measured_at"], errors="coerce")
+    return frame
+
+
 def _station_id_from_official_code(value: Any) -> str | None:
     digits = re.sub(r"\D", "", str(value))
     if len(digits) != 8:
@@ -271,7 +298,10 @@ def load_local_observations() -> tuple[pd.DataFrame, str, str | None]:
     if not file_paths:
         return _empty_frame(), "local_file_missing", None
 
-    frames = [pd.read_csv(file_path, parse_dates=["measured_at"]) for file_path in file_paths]
+    frames = [frame for file_path in file_paths if (frame := _load_local_observation_file(file_path)) is not None]
+    if not frames:
+        return _empty_frame(), "local_file_invalid", "; ".join(str(path) for path in file_paths)
+
     frame = pd.concat(frames, ignore_index=True)
     frame["measured_at"] = pd.to_datetime(frame["measured_at"], errors="coerce")
     frame = frame.sort_values(["station_id", "pollutant_code", "measured_at"]).drop_duplicates(

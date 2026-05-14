@@ -204,11 +204,15 @@ export type DashboardPayload = {
 };
 
 function getApiBaseUrl() {
-  // VERCEL_URL is auto-injected by Vercel at runtime (no config needed)
+  if (process.env.NEXT_PUBLIC_API_BASE_URL) {
+    return process.env.NEXT_PUBLIC_API_BASE_URL;
+  }
+
   if (process.env.VERCEL_URL) {
     return `https://${process.env.VERCEL_URL}`;
   }
-  return process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://127.0.0.1:8000";
+
+  return "http://127.0.0.1:8000";
 }
 
 async function fetchJson<T>(path: string): Promise<T | null> {
