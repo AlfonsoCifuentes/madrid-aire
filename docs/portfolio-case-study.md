@@ -25,6 +25,6 @@ The product now ships real dashboard, map, stations, predictions, model, methodo
 
 ## Next milestones
 
-- Persist runs, artifacts, and reports in Supabase.
+- Persist runs, artifacts, and reports in Cloudflare D1.
 - Add weather-aware model features.
 - Expose station-level model error and longitudinal model reporting.

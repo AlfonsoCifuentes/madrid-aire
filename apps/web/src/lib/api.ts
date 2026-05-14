@@ -182,7 +182,7 @@ export type ModelProductionStatus = {
 export type CronStatus = {
   status: string;
   jobs_configured: boolean;
-  supabase_configured: boolean;
+  cloudflare_d1_configured: boolean;
   protected_jobs: string[];
 };
 

@@ -5,10 +5,20 @@ from src.services.data_access import load_local_predictions_frame
 def list_predictions(station_id: str | None = None) -> PredictionEnvelope:
     frame, file_path = load_local_predictions_frame()
     if frame.empty:
-        return PredictionEnvelope(items=[], status="baseline_pending", source="ml_not_ready")
+        return PredictionEnvelope(items=[], status="baseline_pending", source="ml_not_ready", local_file=file_path)
 
     if station_id:
         frame = frame[frame["station_id"] == station_id].copy()
+
+    if frame.empty:
+        return PredictionEnvelope(
+            items=[],
+            status="station_prediction_missing",
+            source="local_prediction_artifact",
+            local_file=file_path,
+            target="NO2",
+            generated_at=None,
+        )
 
     items = [
         PredictionItem(

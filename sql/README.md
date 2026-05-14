@@ -1,3 +1,3 @@
 # SQL workspace
 
-This directory will contain the Supabase schema, indexes, views, policies, and cron definitions described in the bible.
+This directory contains the Cloudflare D1 schema and the SQL assets needed to bootstrap the free-tier database described in the bible.

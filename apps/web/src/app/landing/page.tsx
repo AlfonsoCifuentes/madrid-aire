@@ -86,10 +86,10 @@ export default async function LandingPage({ searchParams }: LandingPageProps) {
         </header>
 
         <div className="relative flex flex-1 flex-col justify-center py-12 lg:py-20">
-          <div className="grid gap-14 xl:grid-cols-[minmax(0,1.1fr)_360px] xl:gap-10">
-            <div className="max-w-[980px]">
+          <div className="grid gap-14 2xl:grid-cols-[minmax(0,3fr)_minmax(320px,1fr)] 2xl:gap-10">
+            <div className="min-w-0 max-w-full 2xl:max-w-[75vw] 2xl:pr-6">
               <p className="eyebrow mb-6 text-soft/70">{copy.heroEyebrow}</p>
-              <MadridAireWordmark size="hero" />
+              <MadridAireWordmark className="max-w-full" size="landing" />
               <p className="mt-8 max-w-2xl text-balance text-xl leading-8 text-soft/78 sm:text-2xl sm:leading-9 lg:text-[2rem] lg:leading-[1.35]">
                 {copy.heroClaim}
               </p>
@@ -109,7 +109,7 @@ export default async function LandingPage({ searchParams }: LandingPageProps) {
               </div>
             </div>
 
-            <aside className="grid gap-4 self-end xl:pb-12">
+            <aside className="grid gap-4 self-end 2xl:min-w-0 2xl:pb-12">
               <div className="glass-panel rounded-[2rem] p-5 shadow-atmosphere">
                 <p className="eyebrow text-soft/60">{copy.signalTitle}</p>
                 <p className="mt-3 font-data text-3xl text-bone">{signalCopy.headline}</p>

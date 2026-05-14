@@ -2,12 +2,13 @@ from __future__ import annotations
 
 from functools import lru_cache
 from pathlib import Path
+
 import re
 from typing import Any
 
 import pandas as pd
 
-from src.db.supabase_client import get_supabase_client
+from src.db.cloudflare_d1_client import get_cloudflare_d1_client
 from src.settings import get_settings
 
 
@@ -50,7 +51,16 @@ def _normalize_boolean_columns(frame: pd.DataFrame) -> pd.DataFrame:
 
     for column in ("valid", "invalid_value"):
         if column in normalized.columns:
-            normalized[column] = normalized[column].astype(str).str.lower().eq("true")
+            series = normalized[column]
+
+            if pd.api.types.is_bool_dtype(series):
+                continue
+
+            if pd.api.types.is_numeric_dtype(series):
+                normalized[column] = series.fillna(0).astype(int).ne(0)
+                continue
+
+            normalized[column] = series.astype(str).str.strip().str.lower().isin({"true", "1", "t", "yes"})
 
     return normalized
 
@@ -151,31 +161,108 @@ def resolve_local_station_metadata_file() -> Path | None:
     return candidates[0] if candidates else None
 
 
-def load_supabase_observations() -> tuple[pd.DataFrame, str] | None:
-    client = get_supabase_client()
+def load_cloudflare_d1_observations() -> tuple[pd.DataFrame, str] | None:
+    client = get_cloudflare_d1_client()
     if client is None:
         return None
 
+    compact_query = """
+    SELECT
+      station_id,
+      pollutant_code,
+      measured_at,
+      value,
+      valid,
+      invalid_value,
+      CASE risk_code
+        WHEN 1 THEN 'good'
+        WHEN 2 THEN 'acceptable'
+        WHEN 3 THEN 'moderate'
+        WHEN 4 THEN 'poor'
+        ELSE 'unknown'
+      END AS risk_level,
+      CASE source_code
+        WHEN 1 THEN 'community_current_day'
+        WHEN 2 THEN 'community_historical_2025'
+        WHEN 3 THEN 'community_historical_2026'
+        ELSE 'cloudflare_d1'
+      END AS source
+    FROM air_quality_observations
+    ORDER BY measured_at DESC
+    LIMIT 20000
+    """
+    legacy_query = """
+    SELECT
+      station_id,
+      pollutant_code,
+      measured_at,
+      value,
+      valid,
+      invalid_value,
+      risk_level,
+      source
+    FROM air_quality_observations
+    ORDER BY measured_at DESC
+    LIMIT 20000
+    """
+
     try:
-        response = (
-            client.table("air_quality_observations")
-            .select("station_id,pollutant_code,measured_at,value,valid,source,risk_level")
-            .order("measured_at", desc=True)
-            .limit(20000)
-            .execute()
-        )
-    except Exception:
+        try:
+            records = client.query(compact_query)
+        except Exception:
+            records = client.query(legacy_query)
+    except Exception as exc:
+        print(f"Cloudflare D1 observation load failed: {exc}")
         return None
 
-    records = response.data or []
     if not records:
-        return _empty_frame(), "supabase"
+        return _empty_frame(), "cloudflare_d1"
 
     frame = pd.DataFrame(records)
     if "invalid_value" not in frame.columns:
         frame["invalid_value"] = False
     frame["measured_at"] = pd.to_datetime(frame["measured_at"], errors="coerce")
-    return _normalize_boolean_columns(frame), "supabase"
+    return _normalize_boolean_columns(frame), "cloudflare_d1"
+
+
+def load_cloudflare_d1_station_metadata() -> tuple[pd.DataFrame, str] | None:
+    client = get_cloudflare_d1_client()
+    if client is None:
+        return None
+
+    try:
+        records = client.query(
+            """
+            SELECT
+              station_id,
+              official_name AS name,
+              municipality_name AS municipality,
+              postal_address,
+              zone_description,
+              area_type,
+              station_type,
+              altitude_meters,
+              latitude,
+              longitude
+            FROM stations
+            ORDER BY station_id ASC
+            """
+        )
+    except Exception:
+        return None
+
+    if not records:
+        return _empty_station_metadata_frame(), "cloudflare_d1"
+
+    frame = pd.DataFrame(records)
+    for column in STATION_METADATA_COLUMNS:
+        if column not in frame.columns:
+            frame[column] = None
+
+    for numeric_column in ("altitude_meters", "latitude", "longitude"):
+        frame[numeric_column] = pd.to_numeric(frame[numeric_column], errors="coerce")
+
+    return frame[STATION_METADATA_COLUMNS].drop_duplicates("station_id", keep="first"), "cloudflare_d1"
 
 
 @lru_cache(maxsize=1)
@@ -215,10 +302,20 @@ def load_local_station_metadata() -> tuple[pd.DataFrame, str | None]:
     return frame, str(file_path)
 
 
+def get_station_metadata_frame() -> tuple[pd.DataFrame, str, str | None]:
+    cloudflare_result = load_cloudflare_d1_station_metadata()
+    if cloudflare_result is not None:
+        frame, source = cloudflare_result
+        return frame, source, None
+
+    frame, file_path = load_local_station_metadata()
+    return frame, "official_station_metadata", file_path
+
+
 def get_observation_frame() -> tuple[pd.DataFrame, str, str | None]:
-    supabase_result = load_supabase_observations()
-    if supabase_result is not None:
-        frame, source = supabase_result
+    cloudflare_result = load_cloudflare_d1_observations()
+    if cloudflare_result is not None:
+        frame, source = cloudflare_result
         return frame, source, None
 
     return load_local_observations()

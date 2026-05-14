@@ -14,14 +14,14 @@ def list_alerts() -> AlertEnvelope:
 
     items: list[AlertItem] = []
 
-    if not settings.supabase_url or not settings.supabase_key:
+    if not settings.cloudflare_account_id or not settings.cloudflare_d1_database_id or not settings.cloudflare_api_token:
         items.append(
             AlertItem(
-                id="supabase-not-configured",
+                id="cloudflare-d1-not-configured",
                 category="operational",
                 severity="warning",
-                title="Supabase no configurado",
-                body="La build actual sigue funcionando en modo local-first; la persistencia y el cron remoto todavía no están conectados.",
+                title="Cloudflare D1 no configurado",
+                body="La build actual sigue funcionando en modo local-first; la persistencia remota en Cloudflare D1 todavía no está conectada.",
                 source="system_configuration",
             )
         )

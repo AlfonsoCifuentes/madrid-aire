@@ -35,7 +35,11 @@ def get_system_status() -> SystemStatusEnvelope:
         status="observations_ready" if observations_ready else "foundation_ready",
         source=observations_source,
         latest_timestamp=_to_pydatetime(latest_timestamp),
-        local_file=str(local_observations_file) if local_observations_file else None,
+        local_file=(
+            str(local_observations_file)
+            if local_observations_file and observations_source != "cloudflare_d1"
+            else None
+        ),
     )
 
     data_quality = DataQualityStatus(
@@ -75,7 +79,9 @@ def get_system_status() -> SystemStatusEnvelope:
     cron = CronStatus(
         status="cron_ready" if settings.job_secret else "cron_pending_secret",
         jobs_configured=bool(settings.job_secret),
-        supabase_configured=bool(settings.supabase_url and settings.supabase_key),
+        cloudflare_d1_configured=bool(
+            settings.cloudflare_account_id and settings.cloudflare_d1_database_id and settings.cloudflare_api_token
+        ),
         protected_jobs=PROTECTED_JOBS,
     )
 

@@ -15,8 +15,9 @@ class Settings(BaseSettings):
     project_name: str = "MADRID Aire API"
     api_prefix: str = "/api"
     environment: str = "local"
-    supabase_url: str | None = Field(default=None, alias="MADRID_AIRE_SUPABASE_URL")
-    supabase_key: str | None = Field(default=None, alias="MADRID_AIRE_SUPABASE_KEY")
+    cloudflare_account_id: str | None = Field(default=None, alias="MADRID_AIRE_CLOUDFLARE_ACCOUNT_ID")
+    cloudflare_d1_database_id: str | None = Field(default=None, alias="MADRID_AIRE_CLOUDFLARE_D1_DATABASE_ID")
+    cloudflare_api_token: str | None = Field(default=None, alias="MADRID_AIRE_CLOUDFLARE_API_TOKEN")
     job_secret: str | None = Field(default=None, alias="MADRID_AIRE_JOB_SECRET")
     local_normalized_observations_file: str | None = Field(
         default=None,

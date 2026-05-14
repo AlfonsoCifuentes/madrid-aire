@@ -30,7 +30,7 @@
 
 ## Current gaps
 
-- No persisted model registry in Supabase yet.
+- No persisted model registry in Cloudflare D1 yet.
 - No station-level error exposed publicly.
 - No weekly or longitudinal evaluation history stored yet.
 - Weather features and richer feature stores are not integrated yet.

@@ -1,10 +1,10 @@
 from src.schemas.station import StationCollection, StationSummary
-from src.services.data_access import get_latest_valid_observations, load_local_station_metadata
+from src.services.data_access import get_latest_valid_observations, get_station_metadata_frame
 
 
 def list_stations() -> StationCollection:
     latest, source, file_path = get_latest_valid_observations()
-    station_metadata, metadata_file = load_local_station_metadata()
+    station_metadata, metadata_source, metadata_file = get_station_metadata_frame()
     metadata_by_station = station_metadata.set_index("station_id") if not station_metadata.empty else None
 
     if latest.empty and station_metadata.empty:
@@ -30,7 +30,7 @@ def list_stations() -> StationCollection:
 
     return StationCollection(
         items=items,
-        source="official_station_metadata" if metadata_file else source,
+        source=metadata_source if not station_metadata.empty else source,
         status=status,
         local_file=metadata_file or file_path,
     )

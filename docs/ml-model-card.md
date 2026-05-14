@@ -62,9 +62,9 @@ HistGradientBoostingRegressor v1.
 ## Known limitations
 
 - Station-level error is computed in the artifact, but the public API still exposes only global model metrics.
-- The production data path is still local-first; artifacts are not yet persisted to Supabase tables.
+- Production observations are now served from Cloudflare D1; model artifacts are still not persisted to Cloudflare D1 tables.
 - Weather features are not yet integrated into v1.
-- Predictions are precomputed locally and not yet persisted in Supabase.
+- Predictions are precomputed locally and not yet persisted in Cloudflare D1.
 
 ## Disclaimer
 

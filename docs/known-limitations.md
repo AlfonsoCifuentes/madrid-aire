@@ -2,7 +2,7 @@
 
 ## Data and platform
 
-- Supabase is not yet the live source of truth for observations, artifacts, alerts, or reports.
+- Cloudflare D1 is the live production source of truth for observations, but artifacts, alerts, and reports are not fully persisted there yet.
 - Cron automation is represented structurally but not fully operational.
 - The frontend depends on the API being available locally or through a configured deployment.
 
@@ -19,4 +19,4 @@
 
 ## Product scope
 
-- Methodology and reports are implemented, but they are still backed by the current local-first pipeline rather than a production-grade data platform.
+- Methodology and reports are implemented, but reporting and model artifacts are still backed by the local-first pipeline rather than fully persisted platform tables.

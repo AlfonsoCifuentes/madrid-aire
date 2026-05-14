@@ -1,0 +1,7 @@
+name = "madrid-aire-d1"
+compatibility_date = "2026-05-14"
+
+[[d1_databases]]
+binding = "madrid_aire_prod"
+database_name = "madrid-aire-prod"
+database_id = "6c0c7bae-169a-40a4-a607-d485e1af180d"

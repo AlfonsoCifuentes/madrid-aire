@@ -1,11 +1,12 @@
 # MADRID Aire — Ultimate Product, Design & Engineering Bible v6.0
+
 ## Especificación definitiva ultra-premium para crear un producto profesional, sublime y técnicamente impecable
 
 **Producto:** MADRID Aire / Madrid Air Intelligence  
 **Versión:** 6.0 final acumulativa  
 **Uso previsto:** entregar este documento a GitHub Copilot Agent en Visual Studio Code como especificación absoluta de construcción.  
 **Objetivo:** construir una plataforma premium, funcional, robusta, visualmente extraordinaria y técnicamente defendible para análisis, visualización y predicción de calidad del aire en Madrid.  
-**Stack principal:** Next.js, React, TypeScript, Tailwind CSS, Framer Motion, MapLibre GL, Python, FastAPI, pandas, NumPy, scikit-learn, Supabase Pro, Vercel.  
+**Stack principal:** Next.js, React, TypeScript, Tailwind CSS, Framer Motion, MapLibre GL, Python, FastAPI, pandas, NumPy, scikit-learn, Cloudflare D1 free tier, Vercel.  
 **Filosofía:** no hacer una web. Crear un producto. No hacer un dashboard. Crear un observatorio atmosférico interactivo. No hacer una demo. Crear una demostración de genialidad técnica y visual.
 
 ---
@@ -28,13 +29,14 @@ Este documento es la fuente de verdad. Si hay conflicto entre una decisión ráp
 9. El ETL debe estar escrito con pandas y NumPy de forma reproducible.
 10. El ML debe empezar con baseline, split temporal y métricas honestas.
 11. Las predicciones deben estar precalculadas y guardadas en base de datos.
-12. Supabase Pro es el núcleo de datos, logs, storage, cron, métricas y predicciones.
-13. Vercel es frontend y API ligera, no servidor pesado de entrenamiento.
-14. OpenClaw, si se usa, es supervisor MLOps, no dependencia crítica.
-15. Todo debe estar documentado.
-16. Todo debe ser defendible en una entrevista técnica.
-17. Todo debe tener intención visual.
-18. Nada debe parecer plantilla genérica de IA.
+12. Cloudflare D1 free tier es la base de datos remota prevista para observaciones, predicciones, métricas y estado persistente.
+13. Para que la capa gratuita sea viable, `air_quality_observations` debe usar un esquema compacto SQLite: clave primaria compuesta, `WITHOUT ROWID` y códigos enteros para campos repetitivos como fuente y riesgo.
+14. Vercel es frontend y API ligera, no servidor pesado de entrenamiento.
+15. OpenClaw, si se usa, es supervisor MLOps, no dependencia crítica.
+16. Todo debe estar documentado.
+17. Todo debe ser defendible en una entrevista técnica.
+18. Todo debe tener intención visual.
+19. Nada debe parecer plantilla genérica de IA.
 ```
 
 ## 0.2 Definición de excelencia
@@ -114,8 +116,8 @@ Data analysis.
 UX/UI premium.
 Frontend avanzado.
 Backend Python.
-SQL/PostgreSQL.
-Supabase.
+SQL/SQLite.
+Cloudflare D1.
 ETL con pandas y NumPy.
 Machine learning aplicado.
 Model evaluation.
@@ -1152,7 +1154,7 @@ apps/api/src/
 ├── main.py
 ├── settings.py
 ├── db/
-│   └── supabase_client.py
+│   └── cloudflare_d1_client.py
 ├── routes/
 │   ├── health.py
 │   ├── stations.py
@@ -1185,7 +1187,6 @@ uvicorn
 pydantic
 pydantic-settings
 python-dotenv
-supabase
 requests
 pandas
 numpy
@@ -1201,7 +1202,6 @@ API-light requirements:
   uvicorn
   pydantic
   pydantic-settings
-  supabase
   requests
 
 Jobs/ML requirements:
@@ -1438,7 +1438,7 @@ Document that risk bands are product categories unless tied to a specific offici
 
 ---
 
-# 16. Supabase schema
+# 16. Cloudflare D1 schema
 
 Tables:
 
@@ -1465,13 +1465,11 @@ Create SQL files:
 
 ```text
 sql/schema.sql
-sql/indexes.sql
-sql/views.sql
-sql/policies.sql
-sql/cron.sql
 ```
 
-Use UUIDs only where helpful. Use natural station IDs from source where possible.
+Use SQLite-compatible SQL for Cloudflare D1. Use text IDs for portable keys and natural station IDs from source where possible.
+
+For the free tier, `air_quality_observations` must stay compact enough to keep the full official bundle under the D1 size ceiling. Prefer composite keys over surrogate IDs, avoid repeated text fields inside high-volume tables, use integer-coded enums where semantics are finite, and use `WITHOUT ROWID` when the natural primary key is stable.
 
 ---
 
@@ -1624,9 +1622,9 @@ No frontend ML.
 
 ---
 
-# 19. Supabase Cron
+# 19. Cloudflare operational scheduling
 
-Use Supabase Cron + pg_net to call protected endpoints.
+The free tier starts without mandatory managed scheduling. Protected jobs can be launched manually, from GitHub Actions, or from Cloudflare scheduled execution later if needed.
 
 Jobs:
 
@@ -1638,23 +1636,13 @@ daily-generate-predictions
 weekly-model-evaluation-report
 ```
 
-Example:
+Reference pattern:
 
 ```sql
-select cron.schedule(
-  'daily-ingest-air-quality',
-  '10 4 * * *',
-  $$
-  select net.http_post(
-    url := 'https://YOUR_DOMAIN/api/jobs/ingest-air-quality',
-    headers := jsonb_build_object(
-      'Content-Type', 'application/json',
-      'x-job-token', 'YOUR_SECRET'
-    ),
-    body := jsonb_build_object('source', 'supabase_cron')
-  );
-  $$
-);
+curl -X POST https://YOUR_DOMAIN/api/jobs/ingest-air-quality \
+  -H "x-job-token: YOUR_SECRET" \
+  -H "Content-Type: application/json" \
+  -d '{"source":"manual_or_scheduler"}'
 ```
 
 ---
@@ -1923,7 +1911,7 @@ docs/portfolio-case-study.md
 4. Landing fullscreen.
 5. Data source downloader.
 6. Real snapshot cache.
-7. Supabase schema.
+7. Cloudflare D1 schema.
 8. ETL normalization.
 9. API health/stations/latest.
 10. Frontend data layer.
@@ -1953,7 +1941,7 @@ It has no synthetic mock data.
 It has a premium landing.
 It has a correct wordmark.
 It has a real ETL pipeline.
-It has Supabase schema.
+It has Cloudflare D1 schema.
 It has FastAPI endpoints.
 It has a custom map.
 It has custom charts.
@@ -1975,7 +1963,7 @@ When finished, MADRID Aire must be describable as:
 ```text
 MADRID Aire is a premium full-stack atmospheric intelligence platform for Madrid.
 It ingests official open data, transforms it with Python, pandas and NumPy,
-stores it in Supabase Pro, exposes it through a lightweight FastAPI backend,
+persists operational state in Cloudflare D1 free tier when configured, exposes it through a lightweight FastAPI backend,
 visualizes it in a custom Next.js/React interface and produces evaluated,
 precomputed machine learning forecasts for urban air quality.
 ```

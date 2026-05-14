@@ -256,8 +256,8 @@ export default async function SystemPage({ searchParams }: SystemPageProps) {
                 <p className="mt-2 font-data text-sm text-bone">{system?.cron.jobs_configured ? copy.systemBooleanYes : copy.systemBooleanNo}</p>
               </div>
               <div>
-                <p className="eyebrow text-soft/55">{copy.systemSupabaseConfiguredLabel}</p>
-                <p className="mt-2 font-data text-sm text-bone">{system?.cron.supabase_configured ? copy.systemBooleanYes : copy.systemBooleanNo}</p>
+                <p className="eyebrow text-soft/55">{copy.systemCloudflareConfiguredLabel}</p>
+                <p className="mt-2 font-data text-sm text-bone">{system?.cron.cloudflare_d1_configured ? copy.systemBooleanYes : copy.systemBooleanNo}</p>
               </div>
               <div>
                 <p className="eyebrow text-soft/55">{copy.systemProtectedJobsLabel}</p>

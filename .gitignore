@@ -1,5 +1,6 @@
 node_modules/
 .venv/
+.wrangler/
 apps/web/.next/
 apps/web/out/
 apps/web/coverage/

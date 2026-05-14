@@ -57,7 +57,7 @@ function buildSections(language: "es" | "en", stationCount: number, pollutantCou
       splitNote: "La validación local actual es train 2025 / test 2026; todavía no existe una ventana intermedia persistida.",
       limitations: [
         "La API pública todavía no expone error por estación aunque el artefacto sí lo calcula.",
-        "La ruta operativa sigue siendo local-first; Supabase y cron remoto aún no gobiernan el flujo real.",
+        "La ruta operativa sigue siendo local-first; Cloudflare D1 y el cron remoto aún no gobiernan el flujo real.",
         "No hay features meteorológicas en el modelo v1 actual.",
         "Los reports longitudinales todavía no tienen persistencia semanal histórica.",
       ],
@@ -100,7 +100,7 @@ function buildSections(language: "es" | "en", stationCount: number, pollutantCou
     splitNote: "The current local validation uses train 2025 / test 2026; an intermediate persisted validation window does not exist yet.",
     limitations: [
       "The public API still does not expose station-level error even though the artifact computes it.",
-      "The operational path remains local-first; Supabase and remote cron do not govern the live flow yet.",
+      "The operational path remains local-first; Cloudflare D1 and remote cron do not govern the live flow yet.",
       "Weather features are not part of the current v1 model.",
       "Longitudinal reports still lack persisted weekly history.",
     ],

@@ -8,7 +8,7 @@ apps/
   web/   -> Next.js app router frontend
 data/    -> official snapshots, normalized bundles, ML artifacts
 docs/    -> project and portfolio documentation
-sql/     -> database schema and future Supabase SQL
+sql/     -> Cloudflare D1 schema and bootstrap SQL
 ```
 
 ## Runtime flow
@@ -37,7 +37,7 @@ Protected job endpoints exist for ingestion, prediction generation, aggregate re
 
 ## Current operational mode
 
-- Observations: local-first bundle, with optional Supabase path if configured.
+- Observations: local-first bundle, with optional Cloudflare D1 path if configured.
 - Predictions: local precomputed artifacts.
 - Cron: documented and partially wired through protected endpoints, but not yet operational in production.
 

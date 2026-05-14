@@ -11,7 +11,7 @@ MADRID Aire is a premium atmospheric intelligence product for Madrid built from 
 ## Stack
 
 - Frontend: Next.js, React, TypeScript, Tailwind CSS
-- Backend: FastAPI, Pydantic Settings, Supabase client hooks
+- Backend: FastAPI, Pydantic Settings, Cloudflare D1 hooks
 - Data and ML: pandas, NumPy, scikit-learn, joblib
 
 ## Repository layout
@@ -74,7 +74,7 @@ docker run --rm -p 8000:8000 --env-file .env madrid-aire-api
 
 ## Environment
 
-Copy values from `.env.example` into your local environment before wiring Supabase or frontend API calls.
+Copy values from `.env.example` into your local environment before wiring Cloudflare D1 or frontend API calls.
 
 ## Rules carried into code
 

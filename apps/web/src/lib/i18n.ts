@@ -124,7 +124,7 @@ type Copy = {
   systemGeneratedAtLabel: string;
   systemImprovementLabel: string;
   systemJobsConfiguredLabel: string;
-  systemSupabaseConfiguredLabel: string;
+  systemCloudflareConfiguredLabel: string;
   systemProtectedJobsLabel: string;
   systemBooleanYes: string;
   systemBooleanNo: string;
@@ -291,7 +291,7 @@ export const copyByLanguage: Record<Language, Copy> = {
     systemGeneratedAtLabel: "Generado a las",
     systemImprovementLabel: "Mejora vs baseline",
     systemJobsConfiguredLabel: "Jobs protegidos",
-    systemSupabaseConfiguredLabel: "Supabase listo",
+    systemCloudflareConfiguredLabel: "Cloudflare D1 listo",
     systemProtectedJobsLabel: "Endpoints protegidos",
     systemBooleanYes: "sí",
     systemBooleanNo: "no",
@@ -462,7 +462,7 @@ export const copyByLanguage: Record<Language, Copy> = {
     systemGeneratedAtLabel: "Generated at",
     systemImprovementLabel: "Improvement vs baseline",
     systemJobsConfiguredLabel: "Protected jobs",
-    systemSupabaseConfiguredLabel: "Supabase ready",
+    systemCloudflareConfiguredLabel: "Cloudflare D1 ready",
     systemProtectedJobsLabel: "Protected endpoints",
     systemBooleanYes: "yes",
     systemBooleanNo: "no",

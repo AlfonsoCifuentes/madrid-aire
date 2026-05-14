@@ -44,7 +44,7 @@ class ModelProductionStatus(BaseModel):
 class CronStatus(BaseModel):
     status: str
     jobs_configured: bool
-    supabase_configured: bool
+    cloudflare_d1_configured: bool
     protected_jobs: list[str]
 
 
