@@ -78,11 +78,11 @@ export default async function LandingPage({ searchParams }: LandingPageProps) {
       </div>
 
       <section className="relative mx-auto flex min-h-screen w-full max-w-[1800px] flex-col px-5 pb-16 pt-5 sm:px-7 lg:px-10 3xl:px-14">
-        <header className="flex items-start justify-between gap-6">
+        <header className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between sm:gap-6">
           <a className="glass-panel rounded-full px-4 py-3 shadow-atmosphere" href="#build">
             <MadridAireWordmark className="items-center" size="compact" />
           </a>
-          <div className="flex flex-wrap items-center justify-end gap-3">
+          <div className="flex flex-wrap items-center gap-3 sm:justify-end">
             <div className="glass-panel flex items-center gap-3 rounded-full px-4 py-3 shadow-atmosphere">
               <span className="status-dot" />
               <span className="eyebrow text-soft/80">{copy.headerStatus}</span>
@@ -95,13 +95,15 @@ export default async function LandingPage({ searchParams }: LandingPageProps) {
         </header>
 
         <div className="relative flex flex-1 flex-col justify-center py-12 lg:py-20">
-          <div className="max-w-full">
+          <div className="max-w-[72rem]">
             <p className="eyebrow mb-6 text-soft/70">{copy.heroEyebrow}</p>
-            <MadridAireWordmark className="max-w-full" size="landing" />
+            <div className="max-w-[min(100%,66rem)] pb-2">
+              <MadridAireWordmark className="max-w-full" size="landing" />
+            </div>
             <p className="mt-8 max-w-2xl text-balance text-xl leading-8 text-soft/78 sm:text-2xl sm:leading-9 lg:text-[2rem] lg:leading-[1.35]">
               {copy.heroClaim}
             </p>
-            <div className="mt-10 flex flex-col gap-4 sm:flex-row">
+            <div className="mt-10 flex max-w-2xl flex-col gap-4 sm:flex-row">
               <a
                 className="inline-flex min-h-12 items-center justify-center rounded-full bg-lime px-7 py-3 font-medium text-graphite transition hover:bg-[#ebff93]"
                 href="#build"
@@ -115,7 +117,7 @@ export default async function LandingPage({ searchParams }: LandingPageProps) {
                 {copy.heroCtaSecondary}
               </Link>
             </div>
-            <div className="mt-8 grid max-w-2xl gap-4 sm:grid-cols-2">
+            <div className="mt-10 grid max-w-3xl gap-4 md:grid-cols-2">
               <div className="glass-panel rounded-[2rem] p-5 shadow-atmosphere">
                 <p className="eyebrow text-soft/60">{copy.signalTitle}</p>
                 <p className="mt-3 font-data text-2xl text-bone">{signalCopy.headline}</p>

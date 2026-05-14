@@ -34,6 +34,10 @@ export const metadata: Metadata = {
   description:
     "A living atmospheric atlas of Madrid built on official observations, honest modeling, and premium editorial design.",
   applicationName: "MADRID Aire",
+  icons: {
+    icon: "/icon.svg",
+    shortcut: "/icon.svg",
+  },
 };
 
 export const viewport: Viewport = {
