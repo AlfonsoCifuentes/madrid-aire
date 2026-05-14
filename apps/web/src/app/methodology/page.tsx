@@ -19,6 +19,41 @@ function formatWindow(start: string | null, end: string | null) {
   return `${start.slice(0, 10)} → ${end.slice(0, 10)}`;
 }
 
+function formatModelName(value: string | null | undefined, language: "es" | "en") {
+  const normalized = (value ?? "").toLowerCase();
+
+  if (normalized.includes("hist_gradient_boosting")) {
+    return language === "es" ? "Modelo NO2 v1" : "NO2 model v1";
+  }
+  if (normalized === "persistence") {
+    return language === "es" ? "Tendencia reciente" : "Recent trend reference";
+  }
+  if (normalized === "same_hour_yesterday") {
+    return language === "es" ? "Ayer a esta hora" : "Same time yesterday";
+  }
+  if (normalized === "rolling_mean_24h") {
+    return language === "es" ? "Media reciente" : "Recent average";
+  }
+
+  return value?.replaceAll("_", " ") ?? "-";
+}
+
+function buildIntro(language: "es" | "en") {
+  if (language === "es") {
+    return {
+      title: "Antes del detalle técnico",
+      body: "Si solo quieres interpretar la situación actual, empieza por el resumen, el mapa o la previsión. Esta página entra en el proceso completo: datos, preparación, validación y límites.",
+      cta: "Ir a Acerca de",
+    };
+  }
+
+  return {
+    title: "Before the technical detail",
+    body: "If you only want to interpret current conditions, start with the overview, the map, or the forecast. This page goes through the full process: data, preparation, validation, and limits.",
+    cta: "Go to About",
+  };
+}
+
 function buildSections(language: "es" | "en", stationCount: number, pollutantCount: number) {
   if (language === "es") {
     return {
@@ -128,6 +163,7 @@ export default async function MethodologyPage({ searchParams }: MethodologyPageP
   const copy = copyByLanguage[language];
   const [system, metrics] = await Promise.all([getSystemStatusPayload(), getModelMetricsPayload()]);
   const sections = buildSections(language, system?.data_quality.station_count ?? 0, system?.data_quality.pollutant_count ?? 0);
+  const intro = buildIntro(language);
   const mobileNavItems: MobileBottomNavItem[] = [
     { key: "dashboard", href: `/dashboard?lang=${language}`, label: copy.mobileNavDashboard },
     { key: "model", href: `/model?lang=${language}`, label: copy.mobileNavModel },
@@ -148,6 +184,9 @@ export default async function MethodologyPage({ searchParams }: MethodologyPageP
             <Link className="glass-panel rounded-full px-4 py-3 text-sm text-soft/80 shadow-atmosphere hover:bg-white/10" href={`/landing?lang=${language}`}>
               {copy.backHome}
             </Link>
+            <Link className="glass-panel rounded-full px-4 py-3 text-sm text-soft/80 shadow-atmosphere hover:bg-white/10" href={`/about?lang=${language}`}>
+              {copy.openAbout}
+            </Link>
             <Link className="glass-panel rounded-full px-4 py-3 text-sm text-soft/80 shadow-atmosphere hover:bg-white/10" href={`/model?lang=${language}`}>
               {copy.openModel}
             </Link>
@@ -164,7 +203,7 @@ export default async function MethodologyPage({ searchParams }: MethodologyPageP
 
         <div className="grid gap-10 xl:grid-cols-[0.95fr_1.05fr]">
           <div>
-            <p className="eyebrow text-soft/55">{copy.openMethodology}</p>
+            <p className="eyebrow text-soft/55">{copy.aboutTechnicalLabel}</p>
             <h1 className="mt-4 max-w-[12ch] text-4xl font-medium tracking-[-0.04em] text-soft sm:text-5xl lg:text-6xl">
               {copy.methodologyTitle}
             </h1>
@@ -173,7 +212,7 @@ export default async function MethodologyPage({ searchParams }: MethodologyPageP
           <div className="grid gap-4 md:grid-cols-2">
             <div className="glass-panel rounded-[1.75rem] p-5 shadow-atmosphere">
               <p className="eyebrow text-soft/55">{copy.selectedBaseline}</p>
-              <p className="mt-4 font-data text-3xl text-bone">{metrics?.selected_baseline ?? "-"}</p>
+              <p className="mt-4 font-data text-3xl text-bone">{formatModelName(metrics?.selected_baseline, language)}</p>
             </div>
             <div className="glass-panel rounded-[1.75rem] p-5 shadow-atmosphere">
               <p className="eyebrow text-soft/55">{copy.horizonLabel}</p>
@@ -189,6 +228,14 @@ export default async function MethodologyPage({ searchParams }: MethodologyPageP
             </div>
           </div>
         </div>
+
+        <section className="glass-panel rounded-[2rem] p-5 shadow-atmosphere">
+          <h2 className="text-2xl font-medium text-bone">{intro.title}</h2>
+          <p className="mt-4 max-w-3xl text-sm leading-6 text-soft/74">{intro.body}</p>
+          <Link className="mt-5 inline-flex min-h-11 items-center justify-center rounded-full border border-white/12 bg-white/6 px-5 py-2.5 text-sm font-medium text-soft transition hover:bg-white/10" href={`/about?lang=${language}`}>
+            {intro.cta}
+          </Link>
+        </section>
 
         <div className="grid gap-5 xl:grid-cols-2">
           <DetailCard title={sections.sourcesTitle} items={sections.sources} />

@@ -23,6 +23,33 @@ function formatMoment(value: string | null, locale: string) {
   }).format(new Date(value));
 }
 
+function formatWindow(start: string | null | undefined, end: string | null | undefined) {
+  if (!start || !end) {
+    return "-";
+  }
+
+  return `${start.slice(0, 10)} → ${end.slice(0, 10)}`;
+}
+
+function formatModelName(value: string | null | undefined, language: "es" | "en") {
+  const normalized = (value ?? "").toLowerCase();
+
+  if (normalized.includes("hist_gradient_boosting")) {
+    return language === "es" ? "Modelo NO2 v1" : "NO2 model v1";
+  }
+  if (normalized === "persistence") {
+    return language === "es" ? "Tendencia reciente" : "Recent trend reference";
+  }
+  if (normalized === "same_hour_yesterday") {
+    return language === "es" ? "Ayer a esta hora" : "Same time yesterday";
+  }
+  if (normalized === "rolling_mean_24h") {
+    return language === "es" ? "Media reciente" : "Recent average";
+  }
+
+  return value?.replaceAll("_", " ") ?? "-";
+}
+
 function severityClasses(severity: string) {
   if (severity === "critical") {
     return "border-[#ff7b7b]/30 bg-[#ff7b7b]/10 text-[#ffd1d1]";
@@ -40,14 +67,14 @@ function buildCopy(language: "es" | "en") {
       weeklyTitle: "Weekly model report",
       freshnessTitle: "Data freshness",
       issuesTitle: "Known issues",
-      dailyNote: "Resumen directo de la señal diaria servida por `/api/summary` y el dashboard local-first.",
-      weeklyNote: "Todavía no existe histórico semanal persistido; este bloque usa el modelo registrado actualmente como referencia operativa honesta.",
-      freshnessNote: "La frescura combina la última observación válida con el estado operativo del pipeline y las rutas locales activas.",
+      dailyNote: "Resumen rápido de la situación del día: estación más presionada, momento de actualización y alcance actual de la red.",
+      weeklyNote: "Lectura breve del modelo actual y de las métricas más útiles para seguir su comportamiento.",
+      freshnessNote: "Este bloque resume si la señal y la previsión se están actualizando con normalidad.",
       issuesEmpty: "No hay incidencias activas adicionales más allá del estado operativo ya resumido arriba.",
       worstStationLabel: "Peor estación del día",
       activeAlertsLabel: "Alertas activas",
-      predictorLabel: "Predictor vigente",
-      overallNote: "No es un parte oficial; es una capa editorial de reporting sobre datos oficiales y artefactos ML internos.",
+      predictorLabel: "Modelo actual",
+      overallNote: "No es un parte oficial; es una lectura editorial construida sobre datos oficiales y el estado actual del proyecto.",
     };
   }
 
@@ -56,14 +83,14 @@ function buildCopy(language: "es" | "en") {
     weeklyTitle: "Weekly model report",
     freshnessTitle: "Data freshness",
     issuesTitle: "Known issues",
-    dailyNote: "Direct summary of the daily signal served by `/api/summary` and the local-first dashboard.",
-    weeklyNote: "Persisted week-over-week history does not exist yet; this block uses the currently registered model as the honest operational reference.",
-    freshnessNote: "Freshness combines the latest valid observation with the operational pipeline state and active local routes.",
+    dailyNote: "A quick summary of the day: most pressured station, latest update time, and current network coverage.",
+    weeklyNote: "A short reading of the current model and the metrics that matter most when tracking its behaviour.",
+    freshnessNote: "This block summarises whether the signal and the forecast are updating normally.",
     issuesEmpty: "There are no extra active issues beyond the operational state already summarized above.",
     worstStationLabel: "Worst station today",
     activeAlertsLabel: "Active alerts",
-    predictorLabel: "Current predictor",
-    overallNote: "This is not an official bulletin; it is an editorial reporting layer built on official data and internal ML artifacts.",
+    predictorLabel: "Current model",
+    overallNote: "This is not an official bulletin; it is an editorial reading built on official data and the current state of the project.",
   };
 }
 
@@ -99,6 +126,9 @@ export default async function ReportsPage({ searchParams }: ReportsPageProps) {
             <Link className="glass-panel rounded-full px-4 py-3 text-sm text-soft/80 shadow-atmosphere hover:bg-white/10" href={`/landing?lang=${language}`}>
               {copy.backHome}
             </Link>
+            <Link className="glass-panel rounded-full px-4 py-3 text-sm text-soft/80 shadow-atmosphere hover:bg-white/10" href={`/about?lang=${language}`}>
+              {copy.openAbout}
+            </Link>
             <Link className="glass-panel rounded-full px-4 py-3 text-sm text-soft/80 shadow-atmosphere hover:bg-white/10" href={`/methodology?lang=${language}`}>
               {copy.openMethodology}
             </Link>
@@ -115,7 +145,7 @@ export default async function ReportsPage({ searchParams }: ReportsPageProps) {
 
         <div className="grid gap-10 xl:grid-cols-[0.95fr_1.05fr]">
           <div>
-            <p className="eyebrow text-soft/55">{copy.openReports}</p>
+            <p className="eyebrow text-soft/55">{copy.aboutLiveLabel}</p>
             <h1 className="mt-4 max-w-[12ch] text-4xl font-medium tracking-[-0.04em] text-soft sm:text-5xl lg:text-6xl">
               {copy.reportsTitle}
             </h1>
@@ -136,7 +166,7 @@ export default async function ReportsPage({ searchParams }: ReportsPageProps) {
             </div>
             <div className="glass-panel rounded-[1.75rem] p-5 shadow-atmosphere">
               <p className="eyebrow text-soft/55">{pageCopy.predictorLabel}</p>
-              <p className="mt-4 font-data text-sm text-bone">{metrics?.selected_baseline ?? "-"}</p>
+              <p className="mt-4 font-data text-sm text-bone">{formatModelName(metrics?.selected_baseline, language)}</p>
             </div>
           </div>
         </div>
@@ -147,12 +177,12 @@ export default async function ReportsPage({ searchParams }: ReportsPageProps) {
             <p className="mt-4 text-sm leading-6 text-soft/74">{pageCopy.dailyNote}</p>
             <div className="mt-5 grid gap-4 md:grid-cols-2">
               <div>
-                <p className="eyebrow text-soft/55">{copy.sourceLabel}</p>
-                <p className="mt-2 font-data text-sm text-bone">{dashboard.summary?.source ?? "-"}</p>
+                <p className="eyebrow text-soft/55">{copy.latestTimestamp}</p>
+                <p className="mt-2 font-data text-sm text-bone">{formatMoment(dashboard.summary?.latest_timestamp ?? null, locale)}</p>
               </div>
               <div>
-                <p className="eyebrow text-soft/55">{copy.localFileLabel}</p>
-                <p className="mt-2 break-all font-data text-sm text-bone">{dashboard.summary?.local_file ?? "-"}</p>
+                <p className="eyebrow text-soft/55">{copy.mapNodeFreshness}</p>
+                <p className="mt-2 font-data text-sm text-bone">{copy.freshness[dashboard.summary?.freshness ?? "pending"] ?? copy.freshness.pending}</p>
               </div>
               <div>
                 <p className="eyebrow text-soft/55">{copy.stationsOnline}</p>
@@ -171,15 +201,15 @@ export default async function ReportsPage({ searchParams }: ReportsPageProps) {
             <div className="mt-5 grid gap-4 md:grid-cols-3">
               <div>
                 <p className="eyebrow text-soft/55">{copy.selectedBaseline}</p>
-                <p className="mt-2 font-data text-sm text-bone">{metrics?.selected_baseline ?? "-"}</p>
+                <p className="mt-2 font-data text-sm text-bone">{formatModelName(metrics?.selected_baseline, language)}</p>
               </div>
               <div>
                 <p className="eyebrow text-soft/55">{copy.horizonLabel}</p>
                 <p className="mt-2 font-data text-sm text-bone">{metrics?.horizon_hours ? `${metrics.horizon_hours}h` : "-"}</p>
               </div>
               <div>
-                <p className="eyebrow text-soft/55">{copy.sourceLabel}</p>
-                <p className="mt-2 font-data text-sm text-bone">{metrics?.source ?? "-"}</p>
+                <p className="eyebrow text-soft/55">{copy.testWindow}</p>
+                <p className="mt-2 font-data text-sm text-bone">{formatWindow(metrics?.test_period_start ?? null, metrics?.test_period_end ?? null)}</p>
               </div>
             </div>
             <div className="mt-5">

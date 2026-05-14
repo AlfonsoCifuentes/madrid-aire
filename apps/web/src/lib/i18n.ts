@@ -35,6 +35,7 @@ type Copy = {
   openSystem: string;
   openMethodology: string;
   openReports: string;
+  openAbout: string;
   mobileNavAriaLabel: string;
   mobileNavDashboard: string;
   mobileNavMap: string;
@@ -44,6 +45,7 @@ type Copy = {
   mobileNavMethodology: string;
   mobileNavReports: string;
   mobileNavSystem: string;
+  mobileNavAbout: string;
   dashboardMetricsTitle: string;
   worstStation: string;
   latestTimestamp: string;
@@ -141,6 +143,23 @@ type Copy = {
   validationWindow: string;
   testWindow: string;
   notOfficialForecast: string;
+  aboutEyebrow: string;
+  aboutTitle: string;
+  aboutSubtitle: string;
+  aboutPublicRoutesTitle: string;
+  aboutPublicRoutesBody: string;
+  aboutTechnicalRoutesTitle: string;
+  aboutTechnicalRoutesBody: string;
+  aboutLiveLabel: string;
+  aboutTechnicalLabel: string;
+  aboutDashboardDesc: string;
+  aboutMapDesc: string;
+  aboutStationsDesc: string;
+  aboutPredictionsDesc: string;
+  aboutModelDesc: string;
+  aboutMethodologyDesc: string;
+  aboutReportsDesc: string;
+  aboutSystemDesc: string;
   freshness: Record<string, string>;
 };
 
@@ -149,41 +168,42 @@ export const copyByLanguage: Record<Language, Copy> = {
     languageLabel: "Idioma",
     spanishLabel: "ES",
     englishLabel: "EN",
-    headerStatus: "Build local · datos oficiales",
+    headerStatus: "Datos oficiales en seguimiento",
     heroEyebrow: "Inteligencia atmosférica viva para Madrid",
     heroClaim:
-      "Un atlas atmosférico vivo de Madrid construido con datos abiertos oficiales, ingeniería disciplinada y una superficie de producto que rechaza el dashboard genérico.",
+      "Una guía viva para seguir la calidad del aire en Madrid con datos oficiales, previsiones a corto plazo y contexto claro para cualquier persona.",
     heroCtaPrimary: "Seguir",
     heroCtaSecondary: "Abrir dashboard",
     signalTitle: "Estado de la señal",
     signalReady: "Observaciones oficiales activas",
     signalPending: "A la espera de ingestión oficial",
     signalReadyBody:
-      "El shell premium ya está conectado al flujo oficial y el atlas geoespacial ya opera con coordenadas reales de estación de la Comunidad de Madrid.",
+      "La red de estaciones ya está aportando lecturas oficiales y la web resume dónde está la peor situación, cuándo se actualizó y cómo se reparte por Madrid.",
     signalPendingBody:
-      "La primera capa visual está lista. Las observaciones reales aparecerán cuando el API pueda leer un CSV oficial normalizado.",
-    forecastPolicy: "Política de forecast",
-    forecastBody: "El modelo v1 ya está entrenado con split temporal honesto y las predicciones siguen sirviéndose como artefactos precalculados, nunca desde el frontend.",
-    currentSignal: "Señal actual",
-    noSyntheticMetrics: "Sin métricas sintéticas",
+      "La primera capa visual está lista. Las mediciones aparecerán en cuanto llegue la siguiente actualización oficial.",
+    forecastPolicy: "Previsión a corto plazo",
+    forecastBody:
+      "La previsión resume lo que puede pasar con el NO2 durante las próximas 24 horas y se muestra junto a la evolución observada recientemente.",
+    currentSignal: "Situación actual",
+    noSyntheticMetrics: "Solo datos observados",
     constraintLabel: "Condición",
-    workspaceBuild: "Build del workspace",
-    buildTimestampBody: "Esta marca temporal refleja el build local del shell de producto, no una marca de frescura observacional.",
-    cycleLabel: "Ciclo 01",
-    cycleTitle: "Fundación antes de la señal atmosférica.",
+    workspaceBuild: "Momento de esta consulta",
+    buildTimestampBody: "Esta hora corresponde a la versión local de la web, no al momento exacto de la última medición oficial.",
+    cycleLabel: "Qué puedes hacer aquí",
+    cycleTitle: "Mirar el aire de Madrid con contexto, no solo con cifras.",
     cycleFocus: [
-      "Fundación del monorepo y sistema visual",
-      "Skeleton de FastAPI con estados honestos",
-      "Ingesta real y ETL conectados en el siguiente slice",
+      "Seguir las mediciones oficiales más recientes",
+      "Localizar estaciones y comparar zonas de la ciudad",
+      "Consultar la previsión y ampliar contexto cuando lo necesites",
     ],
     principles: [
-      "Solo observaciones oficiales",
-      "Predicciones precalculadas tras baselines honestos",
-      "Layouts premium y adaptativos para cada pantalla",
+      "Mediciones oficiales para leer la situación actual",
+      "Previsiones a corto plazo para anticipar cambios",
+      "Diseño claro en móvil y escritorio",
     ],
-    dashboardTitle: "Dashboard de observación real",
+    dashboardTitle: "Resumen del aire",
     dashboardSubtitle:
-      "La vista operativa usa el CSV oficial normalizado y enlaza ya con un mapa de nodos reales construido sobre coordenadas oficiales de estación.",
+      "Aquí puedes ver qué estación preocupa más ahora, cuándo se actualizó la última lectura y cómo se reparte la señal reciente por la ciudad.",
     backHome: "Volver a portada",
     openMap: "Abrir mapa",
     openPredictions: "Abrir predicciones",
@@ -191,7 +211,8 @@ export const copyByLanguage: Record<Language, Copy> = {
     openStations: "Abrir estaciones",
     openSystem: "Abrir sistema",
     openMethodology: "Abrir metodología",
-    openReports: "Abrir reports",
+    openReports: "Abrir informes",
+    openAbout: "Acerca de",
     mobileNavAriaLabel: "Navegación inferior",
     mobileNavDashboard: "Panel",
     mobileNavMap: "Mapa",
@@ -199,8 +220,9 @@ export const copyByLanguage: Record<Language, Copy> = {
     mobileNavPredictions: "Forecast",
     mobileNavModel: "Modelo",
     mobileNavMethodology: "Método",
-    mobileNavReports: "Reports",
+    mobileNavReports: "Informes",
     mobileNavSystem: "Estado",
+    mobileNavAbout: "Acerca",
     dashboardMetricsTitle: "Métricas actuales",
     worstStation: "Peor estación",
     latestTimestamp: "Última marca temporal",
@@ -211,28 +233,28 @@ export const copyByLanguage: Record<Language, Copy> = {
     tablePollutant: "Contaminante",
     tableValue: "Valor",
     tableMeasuredAt: "Medido a las",
-    mapStatusTitle: "Estado del atlas geoespacial",
+    mapStatusTitle: "Mapa de mediciones",
     mapStatusBody:
-      "La API ya sirve nombres, direcciones y coordenadas oficiales de estación, y el mapa dibuja nodos reales sin geometría inventada.",
-    pendingCoords: "Nodos geoespaciales activos",
+      "Este mapa reúne las estaciones con lectura reciente para que puedas ver de un vistazo dónde se concentra el aire más cargado.",
+    pendingCoords: "Puntos con lectura reciente",
     sourceLabel: "Fuente",
     localFileLabel: "Archivo local",
-    mapPageTitle: "Preparación del mapa atmosférico",
+    mapPageTitle: "El aire, punto por punto",
     mapPageSubtitle:
-      "El atlas geoespacial ya usa coordenadas oficiales de la Comunidad de Madrid y dibuja nodos reales sin recurrir a bases cartográficas genéricas.",
-    mapStationsReady: "Estaciones con señal",
-    mapCoordinatesReady: "Coordenadas oficiales listas",
+      "Explora dónde se mide la calidad del aire en Madrid y compara rápidamente las estaciones con más presión en este momento.",
+    mapStationsReady: "Estaciones visibles",
+    mapCoordinatesReady: "Puntos situados en el mapa",
     mapMetadataStatus: "Estado del metadato",
-    mapRosterTitle: "Roster oficial disponible",
-    mapLegendTitle: "Leyenda del nodo",
-    mapNodeSize: "Tamaño = NO2 relativo",
-    mapNodeColor: "Color = riesgo actual",
-    mapNodeFreshness: "Opacidad = frescura",
-    mapPriorityStations: "Estaciones prioritarias",
-    mapStationContext: "Contexto oficial de estación",
-    stationsPageTitle: "Explorer de estaciones",
+    mapRosterTitle: "Mapa actual",
+    mapLegendTitle: "Cómo leer el mapa",
+    mapNodeSize: "El tamaño refleja el nivel relativo de NO2.",
+    mapNodeColor: "El color resume el nivel de riesgo en ese punto.",
+    mapNodeFreshness: "La intensidad ayuda a distinguir si la lectura es más reciente o más antigua.",
+    mapPriorityStations: "Puntos a vigilar",
+    mapStationContext: "Lugares destacados",
+    stationsPageTitle: "Estaciones de medida",
     stationsPageSubtitle:
-      "La vista de estaciones cruza metadatos oficiales con la última señal observada para ofrecer tabla premium en desktop y tarjetas táctiles en mobile.",
+      "Consulta la red de estaciones de Madrid, ordena las que ahora muestran más NO2 y entra al detalle de cada punto.",
     stationsTableMunicipality: "Municipio",
     stationsTableAreaType: "Área",
     stationsTableStationType: "Tipo",
@@ -241,10 +263,10 @@ export const copyByLanguage: Record<Language, Copy> = {
     stationsOpenDetail: "Abrir detalle",
     stationDetailTitle: "Detalle de estación",
     stationDetailSubtitle:
-      "La ficha reúne valores actuales, histórico observado, forecast del modelo v1 y contexto oficial de la estación sin introducir datos sintéticos.",
+      "Aquí puedes ver la situación actual de esta estación, su evolución reciente y una referencia orientativa para las próximas horas.",
     stationCurrentValuesTitle: "Valores actuales",
     stationHistoryForecastTitle: "Histórico y forecast",
-    stationModelErrorTitle: "Error de modelo",
+    stationModelErrorTitle: "Cómo de bien suele acertar la previsión",
     stationAvailablePollutantsTitle: "Contaminantes disponibles",
     stationOfficialContextTitle: "Contexto oficial",
     stationMunicipality: "Municipio",
@@ -255,37 +277,37 @@ export const copyByLanguage: Record<Language, Copy> = {
     stationAltitude: "Altitud",
     stationCoordinates: "Coordenadas",
     stationLatestNo2: "NO2 actual",
-    stationGlobalErrorReference: "Referencia global del modelo",
+    stationGlobalErrorReference: "Referencia general del modelo",
     stationGlobalErrorNote:
-      "La API todavía no expone error por estación; esta referencia usa las métricas globales del modelo seleccionado sobre la ventana de test.",
+      "Todavía no mostramos un acierto específico para cada estación. Esta referencia resume el comportamiento general del modelo con datos recientes.",
     stationBackToExplorer: "Volver al explorer",
     stationNoHistory: "No hay histórico reciente disponible para esta estación y contaminante.",
-    stationNoPredictions: "No hay forecast precalculado disponible todavía para esta estación.",
-    predictionsTitle: "Forecast modelo v1 NO2 24h",
+    stationNoPredictions: "Todavía no hay previsión disponible para esta estación.",
+    predictionsTitle: "Previsión de NO2 para las próximas 24 horas",
     predictionsSubtitle:
-      "Las predicciones están precalculadas fuera del frontend a partir del predictor seleccionado y se muestran junto al histórico observado de la estación prioritaria.",
+      "Esta vista combina lo observado recientemente con una previsión orientativa para ayudarte a anticipar cambios de las próximas horas.",
     modelTitle: "Modelo v1 y métricas",
     modelSubtitle:
-      "Este slice documenta el modelo v1 NO2 a 24 horas con `HistGradientBoostingRegressor`, split temporal honesto y comparación contra los baselines de referencia.",
+      "Aquí resumimos qué modelo de previsión usamos, con qué datos se ha comprobado y cómo interpretar sus errores sin perder la trazabilidad técnica.",
     methodologyTitle: "Metodología y trazabilidad",
     methodologySubtitle:
-      "Esta superficie documenta fuentes, ETL, validación, feature engineering, split temporal, evaluación y limitaciones con el mismo criterio honesto que gobierna el producto.",
-    reportsTitle: "Reports operativos",
+      "Aquí explicamos de dónde salen los datos, cómo se preparan y qué límites tiene el sistema antes de convertirlos en previsiones.",
+    reportsTitle: "Informes y contexto",
     reportsSubtitle:
-      "Daily summary, lectura del modelo vigente, frescura del dato y known issues en una capa editorial construida sobre APIs y artefactos reales.",
+      "Una lectura editorial del día: qué está pasando, cómo responde el modelo y qué puntos conviene vigilar en el estado general del proyecto.",
     systemTitle: "Estado operativo del sistema",
     systemSubtitle:
-      "La superficie de sistema resume runs de pipeline, calidad del dato, forecast, alertas activas, modelo en producción y preparación de cron sin maquillar el estado real del stack.",
-    systemOperationalLabel: "Superficie operativa",
+      "Panel para revisar actualizaciones de datos, salud del sistema, alertas y automatización, sin ocultar el estado real del proyecto.",
+    systemOperationalLabel: "Seguimiento operativo",
     systemEnvironmentLabel: "Entorno",
     systemGlobalStatusLabel: "Estado global",
     systemAlertsLabel: "Alertas activas",
-    systemPipelineRunsTitle: "Pipeline runs",
-    systemDataQualityTitle: "Data quality checks",
-    systemPredictionRunsTitle: "Prediction runs",
+    systemPipelineRunsTitle: "Actualizaciones de datos",
+    systemDataQualityTitle: "Salud del dato",
+    systemPredictionRunsTitle: "Actualización de previsiones",
     systemActiveAlertsTitle: "Active alerts",
-    systemModelProductionTitle: "Model production",
-    systemCronStatusTitle: "Cron status",
+    systemModelProductionTitle: "Modelo actual",
+    systemCronStatusTitle: "Automatización",
     systemQualityStatusLabel: "Estado de calidad",
     systemPredictionRowsLabel: "Filas de forecast",
     systemGeneratedAtLabel: "Generado a las",
@@ -299,7 +321,7 @@ export const copyByLanguage: Record<Language, Copy> = {
     historyLabel: "Histórico observado",
     observedLabel: "Observado",
     predictedLabel: "Predicho",
-    selectedBaseline: "Predictor seleccionado",
+    selectedBaseline: "Modelo de previsión",
     horizonLabel: "Horizonte",
     metricMae: "MAE",
     metricRmse: "RMSE",
@@ -307,7 +329,35 @@ export const copyByLanguage: Record<Language, Copy> = {
     trainingWindow: "Ventana de entrenamiento",
     validationWindow: "Ventana de validación",
     testWindow: "Ventana de test",
-    notOfficialForecast: "No es un forecast oficial. Es una referencia ML/baseline interna precalculada para evaluación de producto.",
+    notOfficialForecast: "Es una previsión orientativa basada en patrones recientes. No sustituye a los avisos oficiales.",
+    aboutEyebrow: "Cómo leer MADRID Aire",
+    aboutTitle: "Una guía clara para entender qué ves y dónde profundizar.",
+    aboutSubtitle:
+      "Esta web reúne mediciones oficiales, previsiones a corto plazo y contexto para seguir la calidad del aire en Madrid sin perderse en tecnicismos. Aquí tienes el punto de partida y, si quieres más detalle, también el acceso a la parte técnica.",
+    aboutPublicRoutesTitle: "Para seguir el aire de Madrid",
+    aboutPublicRoutesBody:
+      "Empieza por estas vistas si quieres ver qué pasa ahora, dónde se concentra el problema y qué se espera para las próximas horas.",
+    aboutTechnicalRoutesTitle: "Para entender cómo funciona",
+    aboutTechnicalRoutesBody:
+      "Estas páginas reúnen la explicación metodológica, las métricas del modelo y el estado operativo del proyecto.",
+    aboutLiveLabel: "Lectura pública",
+    aboutTechnicalLabel: "Lectura técnica",
+    aboutDashboardDesc:
+      "Resumen general con las estaciones más comprometidas, la hora de actualización y la señal más reciente.",
+    aboutMapDesc:
+      "Mapa de puntos de medición para ver la distribución espacial del aire en la ciudad.",
+    aboutStationsDesc:
+      "Explorador por estaciones con detalle de ubicación, valores actuales e histórico reciente.",
+    aboutPredictionsDesc:
+      "Previsión de NO2 para las próximas horas, con evolución del riesgo y comparación con lo observado.",
+    aboutModelDesc:
+      "Página para revisar la precisión del modelo y entender qué significan sus métricas.",
+    aboutMethodologyDesc:
+      "Explicación paso a paso de las fuentes, la preparación de datos y los límites de la metodología.",
+    aboutReportsDesc:
+      "Resúmenes e interpretación para contextualizar el estado del sistema y del modelo.",
+    aboutSystemDesc:
+      "Estado operativo del proyecto: actualizaciones de datos, alertas y señales de mantenimiento.",
     freshness: {
       fresh: "fresco",
       delayed: "retrasado",
@@ -320,41 +370,42 @@ export const copyByLanguage: Record<Language, Copy> = {
     languageLabel: "Language",
     spanishLabel: "ES",
     englishLabel: "EN",
-    headerStatus: "Local build · official data",
+    headerStatus: "Official data in view",
     heroEyebrow: "Living atmospheric intelligence for Madrid",
     heroClaim:
-      "A living atmospheric atlas of Madrid built on official open data, disciplined engineering, and a product surface that refuses generic dashboards.",
+      "A living guide to Madrid's air quality built with official data, short-term forecasts, and clear context for any reader.",
     heroCtaPrimary: "Continue",
     heroCtaSecondary: "Open dashboard",
     signalTitle: "Signal state",
     signalReady: "Official observations active",
     signalPending: "Awaiting official ingestion",
     signalReadyBody:
-      "The premium shell is now wired to the official data flow, and the geospatial atlas already runs on real Comunidad de Madrid station coordinates.",
+      "The station network is already providing official readings, and the site highlights where pressure is highest, when it was updated, and how it is distributed across Madrid.",
     signalPendingBody:
-      "The first visual layer is ready. Real observations will appear once the API can read an official normalized CSV.",
-    forecastPolicy: "Forecast policy",
-    forecastBody: "Model v1 is now trained with an honest temporal split, and forecasts are still served strictly as precomputed artifacts, never from the frontend.",
-    currentSignal: "Current signal",
-    noSyntheticMetrics: "No synthetic metrics",
+      "The first visual layer is ready. Measurements will appear as soon as the next official update arrives.",
+    forecastPolicy: "Short-term forecast",
+    forecastBody:
+      "The forecast summarises what may happen with NO2 over the next 24 hours and is shown together with the most recent observed trend.",
+    currentSignal: "Current situation",
+    noSyntheticMetrics: "Observed data only",
     constraintLabel: "Constraint",
-    workspaceBuild: "Workspace build",
-    buildTimestampBody: "This timestamp reflects the local build of the product shell, not an observation freshness marker.",
-    cycleLabel: "Cycle 01",
-    cycleTitle: "Foundation before the atmospheric signal.",
+    workspaceBuild: "Moment of this view",
+    buildTimestampBody: "This time belongs to the local version of the site, not to the exact moment of the latest official measurement.",
+    cycleLabel: "What you can do here",
+    cycleTitle: "Read Madrid's air quality with context, not just raw numbers.",
     cycleFocus: [
-      "Monorepo foundation and visual system",
-      "FastAPI skeleton with honest states",
-      "Real ingestion and ETL connected in the next slice",
+      "Follow the latest official measurements",
+      "Locate stations and compare areas across the city",
+      "Check the forecast and go deeper when you need more context",
     ],
     principles: [
-      "Official observations only",
-      "Precomputed predictions after honest baselines",
-      "Responsive premium layouts for every screen type",
+      "Official measurements to understand current conditions",
+      "Short-term forecasts to anticipate change",
+      "Clear design on mobile and desktop",
     ],
-    dashboardTitle: "Real-observation dashboard",
+    dashboardTitle: "Air quality overview",
     dashboardSubtitle:
-      "This operational view uses the normalized official CSV and now links to a real-node map built on official station coordinates.",
+      "See which station is under the most pressure now, when the latest reading arrived, and how the recent signal is spread across the city.",
     backHome: "Back to landing",
     openMap: "Open map",
     openPredictions: "Open predictions",
@@ -363,6 +414,7 @@ export const copyByLanguage: Record<Language, Copy> = {
     openSystem: "Open system",
     openMethodology: "Open methodology",
     openReports: "Open reports",
+    openAbout: "About",
     mobileNavAriaLabel: "Bottom navigation",
     mobileNavDashboard: "Board",
     mobileNavMap: "Map",
@@ -372,6 +424,7 @@ export const copyByLanguage: Record<Language, Copy> = {
     mobileNavMethodology: "Method",
     mobileNavReports: "Reports",
     mobileNavSystem: "System",
+    mobileNavAbout: "About",
     dashboardMetricsTitle: "Current metrics",
     worstStation: "Worst station",
     latestTimestamp: "Latest timestamp",
@@ -382,28 +435,28 @@ export const copyByLanguage: Record<Language, Copy> = {
     tablePollutant: "Pollutant",
     tableValue: "Value",
     tableMeasuredAt: "Measured at",
-    mapStatusTitle: "Geospatial atlas status",
+    mapStatusTitle: "Measurement map",
     mapStatusBody:
-      "The API now serves official station names, addresses, and coordinates, and the map draws real nodes without invented geometry.",
-    pendingCoords: "Geospatial nodes active",
+      "This map gathers the stations with recent readings so you can quickly see where air quality is under the most pressure.",
+    pendingCoords: "Points with recent readings",
     sourceLabel: "Source",
     localFileLabel: "Local file",
-    mapPageTitle: "Atmospheric map readiness",
+    mapPageTitle: "Air quality, point by point",
     mapPageSubtitle:
-      "The geospatial atlas now uses official Comunidad de Madrid coordinates and draws real station nodes without falling back to generic basemaps.",
-    mapStationsReady: "Stations with signal",
-    mapCoordinatesReady: "Official coordinates ready",
+      "Explore where air quality is measured across Madrid and compare the stations currently under the most pressure.",
+    mapStationsReady: "Visible stations",
+    mapCoordinatesReady: "Mapped points",
     mapMetadataStatus: "Metadata status",
-    mapRosterTitle: "Available official roster",
-    mapLegendTitle: "Node legend",
-    mapNodeSize: "Size = relative NO2",
-    mapNodeColor: "Color = current risk",
-    mapNodeFreshness: "Opacity = freshness",
-    mapPriorityStations: "Priority stations",
-    mapStationContext: "Official station context",
-    stationsPageTitle: "Stations explorer",
+    mapRosterTitle: "Current map",
+    mapLegendTitle: "How to read the map",
+    mapNodeSize: "Size reflects the relative NO2 level.",
+    mapNodeColor: "Color summarises the risk level at each point.",
+    mapNodeFreshness: "Intensity helps distinguish fresher and older readings.",
+    mapPriorityStations: "Points to watch",
+    mapStationContext: "Highlighted locations",
+    stationsPageTitle: "Measurement stations",
     stationsPageSubtitle:
-      "The station surface blends official metadata with the latest observed signal to provide a premium desktop table and touch-first mobile cards.",
+      "Browse Madrid's station network, sort the places currently showing more NO2, and open the detail view for each point.",
     stationsTableMunicipality: "Municipality",
     stationsTableAreaType: "Area",
     stationsTableStationType: "Type",
@@ -412,10 +465,10 @@ export const copyByLanguage: Record<Language, Copy> = {
     stationsOpenDetail: "Open detail",
     stationDetailTitle: "Station detail",
     stationDetailSubtitle:
-      "This view combines current values, observed history, model-v1 forecast, and official station context without introducing synthetic data.",
+      "See the current situation at this station, its recent trend, and an indicative reference for the next few hours.",
     stationCurrentValuesTitle: "Current values",
     stationHistoryForecastTitle: "History and forecast",
-    stationModelErrorTitle: "Model error",
+    stationModelErrorTitle: "How well the forecast usually performs",
     stationAvailablePollutantsTitle: "Available pollutants",
     stationOfficialContextTitle: "Official context",
     stationMunicipality: "Municipality",
@@ -426,37 +479,37 @@ export const copyByLanguage: Record<Language, Copy> = {
     stationAltitude: "Altitude",
     stationCoordinates: "Coordinates",
     stationLatestNo2: "Current NO2",
-    stationGlobalErrorReference: "Global model reference",
+    stationGlobalErrorReference: "General model reference",
     stationGlobalErrorNote:
-      "The API does not expose station-level error yet; this reference uses the selected model global metrics over the test window.",
+      "We do not yet show a station-specific accuracy score. This reference summarises the model's overall behaviour on recent data.",
     stationBackToExplorer: "Back to explorer",
     stationNoHistory: "No recent history is available for this station and pollutant.",
-    stationNoPredictions: "No precomputed forecast is available yet for this station.",
-    predictionsTitle: "NO2 24h model-v1 forecast",
+    stationNoPredictions: "There is no forecast available yet for this station.",
+    predictionsTitle: "NO2 forecast for the next 24 hours",
     predictionsSubtitle:
-      "Predictions are precomputed outside the frontend from the selected predictor and shown together with the observed history of the priority station.",
+      "This view combines recent observations with an indicative forecast to help you anticipate how the next few hours may evolve.",
     modelTitle: "Model v1 and metrics",
     modelSubtitle:
-      "This slice documents the NO2 24h model v1 with `HistGradientBoostingRegressor`, an honest temporal split, and direct comparison against reference baselines.",
+      "This page explains which forecast model we use, which data it was checked against, and how to interpret its errors without losing the technical traceability.",
     methodologyTitle: "Methodology and traceability",
     methodologySubtitle:
-      "This surface documents sources, ETL, validation, feature engineering, temporal split, evaluation, and limitations with the same honest standard that governs the product.",
-    reportsTitle: "Operational reports",
+      "This page explains where the data comes from, how it is prepared, and which limits shape the forecast before it reaches the site.",
+    reportsTitle: "Reports and context",
     reportsSubtitle:
-      "Daily summary, the current model readout, data freshness, and known issues in an editorial layer built on real APIs and artifacts.",
+      "An editorial reading of the day: what is happening, how the model is responding, and which points deserve attention in the overall project status.",
     systemTitle: "System operational status",
     systemSubtitle:
-      "The system surface summarizes pipeline runs, data quality, forecast readiness, active alerts, the production model, and cron preparation without hiding the real state of the stack.",
-    systemOperationalLabel: "Operational surface",
+      "A panel for reviewing data updates, system health, alerts, and automation without hiding the real state of the project.",
+    systemOperationalLabel: "Operational monitoring",
     systemEnvironmentLabel: "Environment",
     systemGlobalStatusLabel: "Global status",
     systemAlertsLabel: "Active alerts",
-    systemPipelineRunsTitle: "Pipeline runs",
-    systemDataQualityTitle: "Data quality checks",
-    systemPredictionRunsTitle: "Prediction runs",
+    systemPipelineRunsTitle: "Data updates",
+    systemDataQualityTitle: "Data health",
+    systemPredictionRunsTitle: "Forecast updates",
     systemActiveAlertsTitle: "Active alerts",
-    systemModelProductionTitle: "Model production",
-    systemCronStatusTitle: "Cron status",
+    systemModelProductionTitle: "Current model",
+    systemCronStatusTitle: "Automation",
     systemQualityStatusLabel: "Quality status",
     systemPredictionRowsLabel: "Forecast rows",
     systemGeneratedAtLabel: "Generated at",
@@ -470,7 +523,7 @@ export const copyByLanguage: Record<Language, Copy> = {
     historyLabel: "Observed history",
     observedLabel: "Observed",
     predictedLabel: "Predicted",
-    selectedBaseline: "Selected predictor",
+    selectedBaseline: "Forecast model",
     horizonLabel: "Horizon",
     metricMae: "MAE",
     metricRmse: "RMSE",
@@ -478,7 +531,35 @@ export const copyByLanguage: Record<Language, Copy> = {
     trainingWindow: "Training window",
     validationWindow: "Validation window",
     testWindow: "Test window",
-    notOfficialForecast: "This is not an official forecast. It is a precomputed internal ML/baseline reference for product evaluation.",
+    notOfficialForecast: "This is an indicative forecast based on recent patterns. It does not replace official public warnings.",
+    aboutEyebrow: "How to read MADRID Aire",
+    aboutTitle: "A clear guide to what you are seeing and where to go deeper.",
+    aboutSubtitle:
+      "This site brings together official measurements, short-term forecasts, and context so people can follow Madrid's air quality without getting lost in technical language. Start here, and then go deeper if you want the technical view.",
+    aboutPublicRoutesTitle: "To follow Madrid's air quality",
+    aboutPublicRoutesBody:
+      "Start with these views if you want to see what is happening now, where the pressure is strongest, and what is expected over the next few hours.",
+    aboutTechnicalRoutesTitle: "To understand how it works",
+    aboutTechnicalRoutesBody:
+      "These pages gather the methodological explanation, model metrics, and operational status of the project.",
+    aboutLiveLabel: "Public view",
+    aboutTechnicalLabel: "Technical view",
+    aboutDashboardDesc:
+      "A quick overview of the most affected stations, the last update time, and the latest signal.",
+    aboutMapDesc:
+      "A measurement-point map to see how air quality is distributed across the city.",
+    aboutStationsDesc:
+      "A station explorer with location details, current values, and recent history.",
+    aboutPredictionsDesc:
+      "NO2 forecast for the next few hours, with risk evolution and comparison against what has been observed.",
+    aboutModelDesc:
+      "A page to review model accuracy and understand what its metrics mean.",
+    aboutMethodologyDesc:
+      "A step-by-step explanation of sources, data preparation, and the limits of the methodology.",
+    aboutReportsDesc:
+      "Editorial summaries that add context to the state of the system and the model.",
+    aboutSystemDesc:
+      "Operational project status: data updates, alerts, and maintenance signals.",
     freshness: {
       fresh: "fresh",
       delayed: "delayed",

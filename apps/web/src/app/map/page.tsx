@@ -49,7 +49,7 @@ export default async function MapPage({ searchParams }: MapPageProps) {
     { key: "map", href: `/map?lang=${language}`, label: copy.mobileNavMap },
     { key: "stations", href: `/stations?lang=${language}`, label: copy.mobileNavStations },
     { key: "predictions", href: `/predictions?lang=${language}`, label: copy.mobileNavPredictions },
-    { key: "system", href: `/system?lang=${language}`, label: copy.mobileNavSystem },
+    { key: "about", href: `/about?lang=${language}`, label: copy.mobileNavAbout },
   ];
 
   return (
@@ -69,6 +69,9 @@ export default async function MapPage({ searchParams }: MapPageProps) {
             </Link>
             <Link className="glass-panel rounded-full px-4 py-3 text-sm text-soft/80 shadow-atmosphere hover:bg-white/10" href={`/stations?lang=${language}`}>
               {copy.openStations}
+            </Link>
+            <Link className="glass-panel rounded-full px-4 py-3 text-sm text-soft/80 shadow-atmosphere hover:bg-white/10" href={`/about?lang=${language}`}>
+              {copy.openAbout}
             </Link>
             </div>
             <LanguageSelector currentLanguage={language} pathname="/map" />
@@ -92,12 +95,12 @@ export default async function MapPage({ searchParams }: MapPageProps) {
             <div className="glass-panel rounded-[1.75rem] p-5 shadow-atmosphere">
               <p className="eyebrow text-soft/55">{copy.mapCoordinatesReady}</p>
               <p className="mt-4 font-data text-3xl text-bone">{coordinatesReady.length}</p>
-              <p className="mt-3 text-sm text-soft/70">{copy.sourceLabel}: {payload.stations?.source ?? "-"}</p>
+              <p className="mt-3 text-sm text-soft/70">{copy.freshness[payload.summary?.freshness ?? "unknown"] ?? copy.freshness.unknown}</p>
             </div>
             <div className="glass-panel rounded-[1.75rem] p-5 shadow-atmosphere md:col-span-2">
-              <p className="eyebrow text-soft/55">{copy.mapMetadataStatus}</p>
-              <p className="mt-4 font-data text-2xl text-bone">{payload.stations?.status ?? "api_unavailable"}</p>
-              <p className="mt-3 text-sm text-soft/70">{copy.localFileLabel}: {payload.stations?.local_file ?? "-"}</p>
+              <p className="eyebrow text-soft/55">{copy.worstStation}</p>
+              <p className="mt-4 font-data text-2xl text-bone">{payload.summary?.worst_station_id ?? "-"}</p>
+              <p className="mt-3 text-sm text-soft/70">{priorityStations[0] ? `${priorityStations[0].label} · ${priorityStations[0].value.toFixed(1)}` : "-"}</p>
             </div>
           </div>
         </div>
@@ -106,7 +109,7 @@ export default async function MapPage({ searchParams }: MapPageProps) {
           <div className="glass-panel rounded-[2rem] p-5 shadow-atmosphere">
             <div className="flex flex-wrap items-center justify-between gap-3">
               <p className="eyebrow text-soft/60">{copy.mapRosterTitle}</p>
-              <p className="font-data text-sm text-soft/55">NO2 · latest value · risk</p>
+              <p className="font-data text-sm text-soft/55">{language === "es" ? "NO2 · lectura actual · nivel" : "NO2 · latest reading · level"}</p>
             </div>
             <div className="mt-5">
               <StationPulseField nodes={pulseNodes} />
@@ -126,7 +129,7 @@ export default async function MapPage({ searchParams }: MapPageProps) {
             <section className="glass-panel rounded-[2rem] p-5 shadow-atmosphere">
               <div className="flex flex-wrap items-center justify-between gap-3">
                 <p className="eyebrow text-soft/60">{copy.mapPriorityStations}</p>
-                <p className="font-data text-sm text-soft/55">{payload.summary?.freshness ?? "unknown"}</p>
+                <p className="font-data text-sm text-soft/55">{copy.freshness[payload.summary?.freshness ?? "unknown"] ?? copy.freshness.unknown}</p>
               </div>
               <div className="mt-5 grid gap-3">
                 {priorityStations.map((station) => {

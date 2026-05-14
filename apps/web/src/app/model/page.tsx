@@ -19,11 +19,47 @@ function formatWindow(start: string | null, end: string | null) {
   return `${start.slice(0, 10)} → ${end.slice(0, 10)}`;
 }
 
+function formatModelName(value: string | null | undefined, language: "es" | "en") {
+  const normalized = (value ?? "").toLowerCase();
+
+  if (normalized.includes("hist_gradient_boosting")) {
+    return language === "es" ? "Modelo NO2 v1" : "NO2 model v1";
+  }
+  if (normalized === "persistence") {
+    return language === "es" ? "Tendencia reciente" : "Recent trend reference";
+  }
+  if (normalized === "same_hour_yesterday") {
+    return language === "es" ? "Ayer a esta hora" : "Same time yesterday";
+  }
+  if (normalized === "rolling_mean_24h") {
+    return language === "es" ? "Media reciente" : "Recent average";
+  }
+
+  return value?.replaceAll("_", " ") ?? "-";
+}
+
+function buildMetricNotes(language: "es" | "en") {
+  if (language === "es") {
+    return [
+      { title: "MAE", body: "Error medio esperado entre la previsión y la medición real." },
+      { title: "RMSE", body: "Cómo de grandes pueden ser los fallos cuando la situación cambia más de lo habitual." },
+      { title: "R²", body: "Cuánta parte de la variación real consigue explicar el modelo." },
+    ];
+  }
+
+  return [
+    { title: "MAE", body: "Average expected gap between the forecast and the real measurement." },
+    { title: "RMSE", body: "How large the misses can become when conditions shift more sharply." },
+    { title: "R²", body: "How much of the real-world variation the model is able to explain." },
+  ];
+}
+
 export default async function ModelPage({ searchParams }: ModelPageProps) {
   const params = searchParams ? await searchParams : undefined;
   const language = resolveLanguage(params?.lang);
   const copy = copyByLanguage[language];
   const metrics = await getModelMetricsPayload();
+  const metricNotes = buildMetricNotes(language);
   const mobileNavItems: MobileBottomNavItem[] = [
     { key: "dashboard", href: `/dashboard?lang=${language}`, label: copy.mobileNavDashboard },
     { key: "model", href: `/model?lang=${language}`, label: copy.mobileNavModel },
@@ -43,6 +79,9 @@ export default async function ModelPage({ searchParams }: ModelPageProps) {
             <div className="hidden flex-wrap items-center gap-3 md:flex">
             <Link className="glass-panel rounded-full px-4 py-3 text-sm text-soft/80 shadow-atmosphere hover:bg-white/10" href={`/landing?lang=${language}`}>
               {copy.backHome}
+            </Link>
+            <Link className="glass-panel rounded-full px-4 py-3 text-sm text-soft/80 shadow-atmosphere hover:bg-white/10" href={`/about?lang=${language}`}>
+              {copy.openAbout}
             </Link>
             <Link className="glass-panel rounded-full px-4 py-3 text-sm text-soft/80 shadow-atmosphere hover:bg-white/10" href={`/dashboard?lang=${language}`}>
               {copy.dashboardTitle}
@@ -69,7 +108,7 @@ export default async function ModelPage({ searchParams }: ModelPageProps) {
 
         <div className="grid gap-10 xl:grid-cols-[0.95fr_1.05fr]">
           <div>
-            <p className="eyebrow text-soft/55">{copy.selectedBaseline}</p>
+            <p className="eyebrow text-soft/55">{copy.aboutTechnicalLabel}</p>
             <h1 className="mt-4 max-w-[12ch] text-4xl font-medium tracking-[-0.04em] text-soft sm:text-5xl lg:text-6xl">
               {copy.modelTitle}
             </h1>
@@ -78,7 +117,7 @@ export default async function ModelPage({ searchParams }: ModelPageProps) {
           <div className="grid gap-4 md:grid-cols-2">
             <div className="glass-panel rounded-[1.75rem] p-5 shadow-atmosphere">
               <p className="eyebrow text-soft/55">{copy.selectedBaseline}</p>
-              <p className="mt-4 font-data text-3xl text-bone">{metrics?.selected_baseline ?? "-"}</p>
+              <p className="mt-4 font-data text-3xl text-bone">{formatModelName(metrics?.selected_baseline, language)}</p>
             </div>
             <div className="glass-panel rounded-[1.75rem] p-5 shadow-atmosphere">
               <p className="eyebrow text-soft/55">{copy.horizonLabel}</p>
@@ -95,10 +134,19 @@ export default async function ModelPage({ searchParams }: ModelPageProps) {
           </div>
         </div>
 
+        <section className="grid gap-4 md:grid-cols-3">
+          {metricNotes.map((item) => (
+            <div key={item.title} className="glass-panel rounded-[1.75rem] p-5 shadow-atmosphere">
+              <p className="eyebrow text-soft/55">{item.title}</p>
+              <p className="mt-4 text-sm leading-6 text-soft/74">{item.body}</p>
+            </div>
+          ))}
+        </section>
+
         <section className="glass-panel rounded-[2rem] p-5 shadow-atmosphere">
           <div className="flex flex-wrap items-center justify-between gap-3">
             <p className="eyebrow text-soft/60">NO2 · 24h</p>
-            <p className="font-data text-sm text-soft/55">{metrics?.source ?? "ml_not_ready"}</p>
+            <p className="font-data text-sm text-soft/55">{language === "es" ? "métricas comparadas" : "compared metrics"}</p>
           </div>
           <div className="mt-5">
             <MetricBars items={metrics?.items ?? []} maeLabel={copy.metricMae} rmseLabel={copy.metricRmse} r2Label={copy.metricR2} />

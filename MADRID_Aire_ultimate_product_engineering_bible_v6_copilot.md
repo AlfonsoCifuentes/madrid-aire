@@ -167,12 +167,22 @@ Debe ser:
 ```text
 Preciso.
 Sobrio.
-Técnico.
-Editorial.
+Claro.
+Divulgativo en las capas públicas.
+Editorial en capas de contexto.
+Técnico solo en superficies de profundidad.
 Elegante.
 Confiable.
 Internacional.
 No exagerado.
+```
+
+Regla de producto:
+
+```text
+La portada, el dashboard, el mapa, las estaciones y el detalle de estación deben hablar para cualquier persona.
+Predictions, reports y about pueden introducir más contexto, pero sin esconderse detrás de jerga interna.
+Model, methodology y system pueden ser técnicos, pero deben explicar primero qué ve el lector y por qué importa.
 ```
 
 Evitar:
@@ -189,12 +199,28 @@ Usar:
 
 ```text
 Official observations.
-Temporal forecast.
-Model performance.
-Baseline comparison.
+Short-term forecast.
+How accurate the model is.
 Data freshness.
-Atmospheric signal.
-Precomputed predictions.
+Air-quality signal.
+Risk evolution.
+About this project.
+```
+
+## 2.7 Capas de contenido
+
+```text
+PUBLIC / DIVULGATIVE
+Rutas: /, /dashboard, /map, /stations, /stations/[id]
+Objetivo: explicar qué está pasando y cómo leerlo sin jerga interna.
+
+EDITORIAL / ACCESSIBLE
+Rutas: /about, /predictions, /reports
+Objetivo: añadir contexto, explicar decisiones y enlazar a la profundidad técnica.
+
+TECHNICAL / DEEP DIVE
+Rutas: /model, /methodology, /system
+Objetivo: documentar métricas, método, automatización, limitaciones y estado operativo real.
 ```
 
 ---
@@ -806,9 +832,19 @@ Mini system status.
 
 # 10. Frontend pages
 
+Marco editorial:
+
+```text
+Las páginas públicas deben priorizar lenguaje cercano, claro y explicativo.
+La jerga de arquitectura, ETL, artefactos, pipelines o detalles internos debe concentrarse en /about o en las rutas técnicas.
+Cada superficie debe dejar claro para quién está escrita y qué nivel de profundidad ofrece.
+```
+
 ## 10.1 `/`
 
 Landing + dashboard preview.
+
+Tone: divulgative.
 
 Sections:
 
@@ -825,6 +861,8 @@ Footer.
 ## 10.2 `/dashboard`
 
 Executive overview.
+
+Tone: divulgative.
 
 Modules:
 
@@ -844,6 +882,8 @@ Data quality.
 
 Full atmospheric map.
 
+Tone: divulgative.
+
 Modules:
 
 ```text
@@ -859,12 +899,16 @@ Freshness indicator.
 
 Station explorer.
 
+Tone: divulgative.
+
 Desktop: premium table.  
 Mobile: station cards.
 
 ## 10.5 `/stations/[id]`
 
 Station detail.
+
+Tone: divulgative.
 
 ```text
 Current values.
@@ -877,6 +921,8 @@ Available pollutants.
 
 ## 10.6 `/predictions`
 
+Tone: editorial-accessible.
+
 ```text
 Forecast horizon selector.
 Observed vs predicted.
@@ -886,6 +932,8 @@ Model version.
 ```
 
 ## 10.7 `/model`
+
+Tone: technical with accessible introduction.
 
 ```text
 Model card.
@@ -897,6 +945,8 @@ Limitations.
 ```
 
 ## 10.8 `/methodology`
+
+Tone: technical with accessible introduction.
 
 ```text
 Sources.
@@ -910,6 +960,8 @@ Limitations.
 
 ## 10.9 `/system`
 
+Tone: technical with operator context.
+
 ```text
 Pipeline runs.
 Data quality checks.
@@ -921,11 +973,28 @@ Cron status.
 
 ## 10.10 `/reports`
 
+Tone: editorial-accessible.
+
 ```text
 Daily summary.
 Weekly model report.
 Data freshness.
 Known issues.
+```
+
+## 10.11 `/about`
+
+Editorial hub.
+
+Tone: editorial-accessible.
+
+Modules:
+
+```text
+What the site offers.
+How to read the public surfaces.
+Direct links to dashboard, map, stations and predictions.
+Direct links to model, methodology, reports and system.
 ```
 
 ---

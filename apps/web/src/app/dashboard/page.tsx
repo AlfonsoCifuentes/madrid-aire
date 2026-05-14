@@ -28,7 +28,7 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
     { key: "map", href: `/map?lang=${language}`, label: copy.mobileNavMap },
     { key: "stations", href: `/stations?lang=${language}`, label: copy.mobileNavStations },
     { key: "predictions", href: `/predictions?lang=${language}`, label: copy.mobileNavPredictions },
-    { key: "system", href: `/system?lang=${language}`, label: copy.mobileNavSystem },
+    { key: "about", href: `/about?lang=${language}`, label: copy.mobileNavAbout },
   ];
 
   return (
@@ -52,11 +52,8 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
             <Link className="glass-panel rounded-full px-4 py-3 text-sm text-soft/80 shadow-atmosphere hover:bg-white/10" href={`/predictions?lang=${language}`}>
               {copy.openPredictions}
             </Link>
-            <Link className="glass-panel rounded-full px-4 py-3 text-sm text-soft/80 shadow-atmosphere hover:bg-white/10" href={`/model?lang=${language}`}>
-              {copy.openModel}
-            </Link>
-            <Link className="glass-panel rounded-full px-4 py-3 text-sm text-soft/80 shadow-atmosphere hover:bg-white/10" href={`/system?lang=${language}`}>
-              {copy.openSystem}
+            <Link className="glass-panel rounded-full px-4 py-3 text-sm text-soft/80 shadow-atmosphere hover:bg-white/10" href={`/about?lang=${language}`}>
+              {copy.openAbout}
             </Link>
             </div>
             <LanguageSelector currentLanguage={language} pathname="/dashboard" />
@@ -101,7 +98,7 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
             <div className="glass-panel rounded-[1.75rem] p-5 shadow-atmosphere">
               <p className="eyebrow text-soft/55">{copy.stationsOnline}</p>
               <p className="mt-4 font-data text-3xl text-bone">{summary?.station_count ?? 0}</p>
-              <p className="mt-3 text-sm text-soft/70">{copy.sourceLabel}: {summary?.source ?? "api_unavailable"}</p>
+              <p className="mt-3 text-sm text-soft/70">{copy.freshness[summary?.freshness ?? "pending"] ?? copy.freshness.pending}</p>
             </div>
           </div>
         </div>
@@ -110,7 +107,7 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
           <section className="glass-panel rounded-[2rem] p-5 shadow-atmosphere">
             <div className="flex flex-wrap items-center justify-between gap-3">
               <p className="eyebrow text-soft/60">{copy.observationsPanel}</p>
-              <p className="font-data text-sm text-soft/55">NO2 snapshot</p>
+              <p className="font-data text-sm text-soft/55">{language === "es" ? "NO2 · últimas lecturas" : "NO2 · latest readings"}</p>
             </div>
             <div className="mt-5">
               <ObservationTable items={topRows} language={language} />
@@ -124,10 +121,12 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
               <p className="mt-4 text-sm leading-6 text-soft/72">{copy.mapStatusBody}</p>
             </div>
             <div className="glass-panel rounded-[2rem] p-5 shadow-atmosphere">
-              <p className="eyebrow text-soft/60">{copy.sourceLabel}</p>
-              <p className="mt-4 break-all font-data text-sm text-bone">{summary?.source ?? "local_api_unavailable"}</p>
-              <p className="mt-4 text-xs uppercase tracking-[0.18em] text-soft/50">{copy.localFileLabel}</p>
-              <p className="mt-2 break-all font-data text-xs text-soft/65">{summary?.local_file ?? "-"}</p>
+              <p className="eyebrow text-soft/60">{copy.openAbout}</p>
+              <p className="mt-4 text-2xl font-medium text-bone">{copy.aboutTechnicalRoutesTitle}</p>
+              <p className="mt-4 text-sm leading-6 text-soft/72">{copy.aboutTechnicalRoutesBody}</p>
+              <Link className="mt-5 inline-flex min-h-11 items-center justify-center rounded-full border border-white/12 bg-white/6 px-5 py-2.5 text-sm font-medium text-soft transition hover:bg-white/10" href={`/about?lang=${language}`}>
+                {copy.openAbout}
+              </Link>
             </div>
           </aside>
         </div>

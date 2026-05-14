@@ -43,6 +43,25 @@ function formatCoordinates(latitude: number | null, longitude: number | null) {
   return `${latitude.toFixed(4)}, ${longitude.toFixed(4)}`;
 }
 
+function formatModelName(value: string | null | undefined, language: "es" | "en") {
+  const normalized = (value ?? "").toLowerCase();
+
+  if (normalized.includes("hist_gradient_boosting")) {
+    return language === "es" ? "Modelo NO2 v1" : "NO2 model v1";
+  }
+  if (normalized === "persistence") {
+    return language === "es" ? "Tendencia reciente" : "Recent trend reference";
+  }
+  if (normalized === "same_hour_yesterday") {
+    return language === "es" ? "Ayer a esta hora" : "Same time yesterday";
+  }
+  if (normalized === "rolling_mean_24h") {
+    return language === "es" ? "Media reciente" : "Recent average";
+  }
+
+  return value?.replaceAll("_", " ") ?? "-";
+}
+
 export default async function StationDetailPage({ params, searchParams }: StationDetailPageProps) {
   const resolvedParams = await params;
   const resolvedSearchParams = searchParams ? await searchParams : undefined;
@@ -88,7 +107,7 @@ export default async function StationDetailPage({ params, searchParams }: Statio
     { key: "map", href: `/map?lang=${language}`, label: copy.mobileNavMap },
     { key: "stations", href: `/stations?lang=${language}`, label: copy.mobileNavStations },
     { key: "predictions", href: `/predictions?lang=${language}`, label: copy.mobileNavPredictions },
-    { key: "system", href: `/system?lang=${language}`, label: copy.mobileNavSystem },
+    { key: "about", href: `/about?lang=${language}`, label: copy.mobileNavAbout },
   ];
 
   return (
@@ -109,8 +128,8 @@ export default async function StationDetailPage({ params, searchParams }: Statio
             <Link className="glass-panel rounded-full px-4 py-3 text-sm text-soft/80 shadow-atmosphere hover:bg-white/10" href={`/predictions?lang=${language}`}>
               {copy.openPredictions}
             </Link>
-            <Link className="glass-panel rounded-full px-4 py-3 text-sm text-soft/80 shadow-atmosphere hover:bg-white/10" href={`/model?lang=${language}`}>
-              {copy.openModel}
+            <Link className="glass-panel rounded-full px-4 py-3 text-sm text-soft/80 shadow-atmosphere hover:bg-white/10" href={`/about?lang=${language}`}>
+              {copy.openAbout}
             </Link>
             </div>
             <LanguageSelector currentLanguage={language} pathname={`/stations/${stationId}`} />
@@ -152,7 +171,7 @@ export default async function StationDetailPage({ params, searchParams }: Statio
           <section className="glass-panel rounded-[2rem] p-5 shadow-atmosphere">
             <div className="flex flex-wrap items-center justify-between gap-3">
               <p className="eyebrow text-soft/60">{copy.stationHistoryForecastTitle}</p>
-              <p className="font-data text-sm text-soft/55">NO2 · 24h observed + 24h predicted</p>
+              <p className="font-data text-sm text-soft/55">{language === "es" ? "NO2 · últimas 24 h + previsión" : "NO2 · last 24h + forecast"}</p>
             </div>
             <div className="mt-5">
               {observed.length > 0 || predicted.length > 0 ? (
@@ -191,7 +210,7 @@ export default async function StationDetailPage({ params, searchParams }: Statio
           <section className="glass-panel rounded-[2rem] p-5 shadow-atmosphere">
             <div className="flex flex-wrap items-center justify-between gap-3">
               <p className="eyebrow text-soft/60">{copy.stationModelErrorTitle}</p>
-              <p className="font-data text-sm text-soft/55">{metrics?.selected_baseline ?? "-"}</p>
+              <p className="font-data text-sm text-soft/55">{formatModelName(metrics?.selected_baseline, language)}</p>
             </div>
             <div className="mt-5 grid gap-3 sm:grid-cols-3 xl:grid-cols-1">
               <div className="rounded-[1.5rem] border border-white/10 bg-white/[0.03] p-4">
@@ -255,7 +274,7 @@ export default async function StationDetailPage({ params, searchParams }: Statio
                 </div>
                 <div>
                   <p className="eyebrow text-soft/50">{copy.stationGlobalErrorReference}</p>
-                  <p className="mt-2">{metrics?.selected_baseline ?? "-"}</p>
+                  <p className="mt-2">{formatModelName(metrics?.selected_baseline, language)}</p>
                 </div>
               </div>
             </div>

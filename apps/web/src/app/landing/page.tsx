@@ -81,6 +81,9 @@ export default async function LandingPage({ searchParams }: LandingPageProps) {
               <span className="status-dot" />
               <span className="eyebrow text-soft/80">{copy.headerStatus}</span>
             </div>
+            <Link className="glass-panel rounded-full px-4 py-3 text-sm text-soft/80 shadow-atmosphere hover:bg-white/10" href={`/about?lang=${language}`}>
+              {copy.openAbout}
+            </Link>
             <LanguageSelector currentLanguage={language} pathname="/landing" />
           </div>
         </header>

@@ -40,12 +40,13 @@ const RISK_SURFACE_CLASS: Record<string, string> = {
 function buildPredictionsPageCopy(language: "es" | "en"): PredictionsPageCopy {
   if (language === "es") {
     return {
-      artifactContextTitle: "Contexto del artefacto",
+      artifactContextTitle: "Cómo leer esta previsión",
       forecastForLabel: "Pronóstico para",
-      generatedAtLabel: "Forecast generado a las",
-      horizonSelectorBody: "Cada horizonte usa el mismo artefacto precalculado y permite inspeccionar el valor, la hora objetivo y su riesgo asociado sin inferencia en tiempo real.",
+      generatedAtLabel: "Actualizado a las",
+      horizonSelectorBody:
+        "Cada horizonte ya está listo para consultar. Puedes revisar el valor previsto, la hora estimada y el nivel de riesgo para el próximo día.",
       horizonSelectorTitle: "Selector de horizonte",
-      modelVersionLabel: "Versión del modelo",
+      modelVersionLabel: "Modelo usado",
       priorityStationLabel: "Estación prioritaria",
       riskEvolutionTitle: "Evolución del riesgo",
       riskLabel: "Riesgo",
@@ -58,19 +59,20 @@ function buildPredictionsPageCopy(language: "es" | "en"): PredictionsPageCopy {
         unknown: "desconocido",
         very_unhealthy: "muy insalubre",
       },
-      selectedForecastTitle: "Forecast seleccionado",
-      statusLabel: "Estado",
-      targetLabel: "Objetivo",
+      selectedForecastTitle: "Previsión seleccionada",
+      statusLabel: "Horizontes disponibles",
+      targetLabel: "Contaminante",
     };
   }
 
   return {
-    artifactContextTitle: "Artifact context",
+    artifactContextTitle: "How to read this forecast",
     forecastForLabel: "Forecast for",
-    generatedAtLabel: "Forecast generated at",
-    horizonSelectorBody: "Each horizon comes from the same precomputed artifact and lets the user inspect value, target time, and associated risk without real-time inference.",
+    generatedAtLabel: "Updated at",
+    horizonSelectorBody:
+      "Each horizon is ready to view. You can inspect the expected value, estimated time, and risk level for the next day.",
     horizonSelectorTitle: "Horizon selector",
-    modelVersionLabel: "Model version",
+    modelVersionLabel: "Model used",
     priorityStationLabel: "Priority station",
     riskEvolutionTitle: "Risk evolution",
     riskLabel: "Risk",
@@ -84,8 +86,8 @@ function buildPredictionsPageCopy(language: "es" | "en"): PredictionsPageCopy {
       very_unhealthy: "very unhealthy",
     },
     selectedForecastTitle: "Selected forecast",
-    statusLabel: "Status",
-    targetLabel: "Target",
+    statusLabel: "Available horizons",
+    targetLabel: "Pollutant",
   };
 }
 
@@ -124,6 +126,25 @@ function resolveRiskLabel(riskLevel: string | null | undefined, pageCopy: Predic
 function resolveRiskSurfaceClass(riskLevel: string | null | undefined) {
   const normalized = (riskLevel ?? "unknown").toLowerCase();
   return RISK_SURFACE_CLASS[normalized] ?? RISK_SURFACE_CLASS.unknown;
+}
+
+function formatModelName(value: string | null | undefined, language: "es" | "en") {
+  const normalized = (value ?? "").toLowerCase();
+
+  if (normalized.includes("hist_gradient_boosting")) {
+    return language === "es" ? "Modelo NO2 v1" : "NO2 model v1";
+  }
+  if (normalized === "persistence") {
+    return language === "es" ? "Tendencia reciente" : "Recent trend reference";
+  }
+  if (normalized === "same_hour_yesterday") {
+    return language === "es" ? "Ayer a esta hora" : "Same time yesterday";
+  }
+  if (normalized === "rolling_mean_24h") {
+    return language === "es" ? "Media reciente" : "Recent average";
+  }
+
+  return value?.replaceAll("_", " ") ?? "-";
 }
 
 export default async function PredictionsPage({ searchParams }: PredictionsPageProps) {
@@ -166,7 +187,7 @@ export default async function PredictionsPage({ searchParams }: PredictionsPageP
     { key: "map", href: `/map?lang=${language}`, label: copy.mobileNavMap },
     { key: "stations", href: `/stations?lang=${language}`, label: copy.mobileNavStations },
     { key: "predictions", href: `/predictions?lang=${language}`, label: copy.mobileNavPredictions },
-    { key: "system", href: `/system?lang=${language}`, label: copy.mobileNavSystem },
+    { key: "about", href: `/about?lang=${language}`, label: copy.mobileNavAbout },
   ];
 
   return (
@@ -187,11 +208,8 @@ export default async function PredictionsPage({ searchParams }: PredictionsPageP
               <Link className="glass-panel rounded-full px-4 py-3 text-sm text-soft/80 shadow-atmosphere hover:bg-white/10" href={`/stations?lang=${language}`}>
                 {copy.openStations}
               </Link>
-              <Link className="glass-panel rounded-full px-4 py-3 text-sm text-soft/80 shadow-atmosphere hover:bg-white/10" href={`/model?lang=${language}`}>
-                {copy.openModel}
-              </Link>
-              <Link className="glass-panel rounded-full px-4 py-3 text-sm text-soft/80 shadow-atmosphere hover:bg-white/10" href={`/system?lang=${language}`}>
-                {copy.openSystem}
+              <Link className="glass-panel rounded-full px-4 py-3 text-sm text-soft/80 shadow-atmosphere hover:bg-white/10" href={`/about?lang=${language}`}>
+                {copy.openAbout}
               </Link>
             </div>
             <LanguageSelector currentLanguage={language} pathname="/predictions" />
@@ -214,13 +232,13 @@ export default async function PredictionsPage({ searchParams }: PredictionsPageP
             </div>
             <div className="glass-panel rounded-[1.75rem] p-5 shadow-atmosphere">
               <p className="eyebrow text-soft/55">{pageCopy.modelVersionLabel}</p>
-              <p className="mt-4 font-data text-xl text-bone">{selectedPrediction?.baseline_name ?? system?.model.selected_model ?? "-"}</p>
+              <p className="mt-4 font-data text-xl text-bone">{formatModelName(selectedPrediction?.baseline_name ?? system?.model.selected_model, language)}</p>
               <p className="mt-3 text-sm text-soft/70">{copy.selectedBaseline}</p>
             </div>
             <div className="glass-panel rounded-[1.75rem] p-5 shadow-atmosphere">
               <p className="eyebrow text-soft/55">{pageCopy.generatedAtLabel}</p>
               <p className="mt-4 font-data text-sm text-bone">{formatMoment(predictions?.generated_at ?? system?.predictions.generated_at, locale)}</p>
-              <p className="mt-3 text-sm text-soft/70">{predictions?.source ?? system?.predictions.source ?? "-"}</p>
+              <p className="mt-3 text-sm text-soft/70">{selectedPrediction ? `${pageCopy.forecastForLabel}: ${formatMoment(selectedPrediction.predicted_for, locale)}` : "-"}</p>
             </div>
             <div className="glass-panel rounded-[1.75rem] p-5 shadow-atmosphere">
               <p className="eyebrow text-soft/55">{pageCopy.selectedForecastTitle}</p>
@@ -238,7 +256,7 @@ export default async function PredictionsPage({ searchParams }: PredictionsPageP
               <p className="eyebrow text-soft/60">{pageCopy.horizonSelectorTitle}</p>
               <p className="mt-3 max-w-3xl text-sm leading-6 text-soft/70">{pageCopy.horizonSelectorBody}</p>
             </div>
-            <p className="font-data text-sm text-soft/55">{targetPollutant} · {availableHorizons.length} horizons</p>
+            <p className="font-data text-sm text-soft/55">{language === "es" ? `${targetPollutant} · ${availableHorizons.length} horizontes` : `${targetPollutant} · ${availableHorizons.length} horizons`}</p>
           </div>
           <div className="mt-5 flex flex-wrap gap-2">
             {availableHorizons.length > 0 ? (
@@ -272,7 +290,7 @@ export default async function PredictionsPage({ searchParams }: PredictionsPageP
           <section className="glass-panel rounded-[2rem] p-5 shadow-atmosphere">
             <div className="flex flex-wrap items-center justify-between gap-3">
               <p className="eyebrow text-soft/60">{copy.historyLabel}</p>
-              <p className="font-data text-sm text-soft/55">{targetPollutant} · 24h observed + {availableHorizons.length} forecast steps</p>
+              <p className="font-data text-sm text-soft/55">{language === "es" ? `${targetPollutant} · últimas 24 h + previsión` : `${targetPollutant} · last 24h + forecast`}</p>
             </div>
             <div className="mt-5">
               <HistoryForecastChart observed={observed} predicted={predicted} observedLabel={copy.observedLabel} predictedLabel={copy.predictedLabel} />
@@ -300,7 +318,7 @@ export default async function PredictionsPage({ searchParams }: PredictionsPageP
             <section className="glass-panel rounded-[2rem] p-5 shadow-atmosphere">
               <div className="flex flex-wrap items-center justify-between gap-3">
                 <p className="eyebrow text-soft/60">{pageCopy.riskEvolutionTitle}</p>
-                <p className="font-data text-sm text-soft/55">{stationPredictions.length} steps</p>
+                <p className="font-data text-sm text-soft/55">{language === "es" ? `${stationPredictions.length} tramos` : `${stationPredictions.length} steps`}</p>
               </div>
               <div className="mt-5 grid gap-3 sm:grid-cols-2">
                 {stationPredictions.length > 0 ? (
@@ -336,20 +354,20 @@ export default async function PredictionsPage({ searchParams }: PredictionsPageP
               <p className="eyebrow text-soft/60">{pageCopy.artifactContextTitle}</p>
               <div className="mt-5 grid gap-4 sm:grid-cols-2 xl:grid-cols-1">
                 <div>
-                  <p className="eyebrow text-soft/55">{pageCopy.statusLabel}</p>
-                  <p className="mt-2 font-data text-sm text-bone">{predictions?.status ?? system?.predictions.status ?? "-"}</p>
-                </div>
-                <div>
                   <p className="eyebrow text-soft/55">{pageCopy.targetLabel}</p>
                   <p className="mt-2 font-data text-sm text-bone">{targetPollutant}</p>
                 </div>
                 <div>
-                  <p className="eyebrow text-soft/55">{copy.systemPredictionRowsLabel}</p>
-                  <p className="mt-2 font-data text-sm text-bone">{stationPredictions.length}</p>
+                  <p className="eyebrow text-soft/55">{pageCopy.statusLabel}</p>
+                  <p className="mt-2 font-data text-sm text-bone">{availableHorizons.length}</p>
                 </div>
                 <div>
-                  <p className="eyebrow text-soft/55">{copy.sourceLabel}</p>
-                  <p className="mt-2 break-all font-data text-sm text-bone">{predictions?.source ?? system?.predictions.source ?? "-"}</p>
+                  <p className="eyebrow text-soft/55">{pageCopy.priorityStationLabel}</p>
+                  <p className="mt-2 font-data text-sm text-bone">{station?.name ?? stationId ?? "-"}</p>
+                </div>
+                <div>
+                  <p className="eyebrow text-soft/55">{pageCopy.generatedAtLabel}</p>
+                  <p className="mt-2 font-data text-sm text-bone">{formatMoment(predictions?.generated_at ?? system?.predictions.generated_at, locale)}</p>
                 </div>
               </div>
             </section>

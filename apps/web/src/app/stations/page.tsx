@@ -59,7 +59,7 @@ export default async function StationsPage({ searchParams }: StationsPageProps) 
     { key: "map", href: `/map?lang=${language}`, label: copy.mobileNavMap },
     { key: "stations", href: `/stations?lang=${language}`, label: copy.mobileNavStations },
     { key: "predictions", href: `/predictions?lang=${language}`, label: copy.mobileNavPredictions },
-    { key: "system", href: `/system?lang=${language}`, label: copy.mobileNavSystem },
+    { key: "about", href: `/about?lang=${language}`, label: copy.mobileNavAbout },
   ];
 
   return (
@@ -80,8 +80,8 @@ export default async function StationsPage({ searchParams }: StationsPageProps) 
             <Link className="glass-panel rounded-full px-4 py-3 text-sm text-soft/80 shadow-atmosphere hover:bg-white/10" href={`/map?lang=${language}`}>
               {copy.openMap}
             </Link>
-            <Link className="glass-panel rounded-full px-4 py-3 text-sm text-soft/80 shadow-atmosphere hover:bg-white/10" href={`/system?lang=${language}`}>
-              {copy.openSystem}
+            <Link className="glass-panel rounded-full px-4 py-3 text-sm text-soft/80 shadow-atmosphere hover:bg-white/10" href={`/about?lang=${language}`}>
+              {copy.openAbout}
             </Link>
             </div>
             <LanguageSelector currentLanguage={language} pathname="/stations" />
