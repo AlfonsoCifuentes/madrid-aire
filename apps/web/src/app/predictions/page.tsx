@@ -40,6 +40,36 @@ const RISK_SURFACE_CLASS: Record<string, string> = {
   very_unhealthy: "border-[#c60b1e]/35 bg-[#c60b1e]/12 text-[#ffccd2]",
 };
 
+const RISK_BAR_COLOR: Record<string, string> = {
+  good: "#80FFB2",
+  acceptable: "#D8FF4F",
+  moderate: "#FFB000",
+  poor: "#FF6B35",
+  unhealthy: "#C2410C",
+  very_unhealthy: "#F43F5E",
+  unknown: "rgba(255,255,255,0.12)",
+};
+
+const RISK_BAR_WIDTH: Record<string, number> = {
+  good: 18,
+  acceptable: 36,
+  moderate: 54,
+  poor: 72,
+  unhealthy: 88,
+  very_unhealthy: 100,
+  unknown: 0,
+};
+
+function resolveRiskBarColor(riskLevel: string | null | undefined) {
+  const key = (riskLevel ?? "unknown").toLowerCase();
+  return RISK_BAR_COLOR[key] ?? RISK_BAR_COLOR.unknown;
+}
+
+function resolveRiskBarWidth(riskLevel: string | null | undefined) {
+  const key = (riskLevel ?? "unknown").toLowerCase();
+  return RISK_BAR_WIDTH[key] ?? 0;
+}
+
 function buildPredictionsPageCopy(language: "es" | "en"): PredictionsPageCopy {
   if (language === "es") {
     return {
@@ -378,7 +408,16 @@ export default async function PredictionsPage({ searchParams }: PredictionsPageP
                           <p className="text-xs uppercase tracking-[0.18em]">{resolveRiskLabel(item.risk_level, pageCopy)}</p>
                         </div>
                         <p className="mt-3 font-data text-xl text-bone">{item.predicted_value.toLocaleString(locale, { maximumFractionDigits: 1 })}</p>
-                        <p className="mt-3 text-xs text-soft/70">{formatMoment(item.predicted_for, locale)}</p>
+                        <div className="mt-3 h-[3px] w-full overflow-hidden rounded-full bg-white/10">
+                          <div
+                            className="h-full rounded-full transition-all duration-500"
+                            style={{
+                              width: `${resolveRiskBarWidth(item.risk_level)}%`,
+                              backgroundColor: resolveRiskBarColor(item.risk_level),
+                            }}
+                          />
+                        </div>
+                        <p className="mt-2 text-xs text-soft/70">{formatMoment(item.predicted_for, locale)}</p>
                       </Link>
                     );
                   })
