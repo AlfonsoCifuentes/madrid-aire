@@ -3,10 +3,11 @@ import Link from "next/link";
 import { MapShell } from "@/components/MapShell";
 import { MobileBottomNav } from "@/components/MobileBottomNav";
 import { PublicPageHeader, buildPublicMobileNavItems, type PublicNavLabels } from "@/components/PublicPageHeader";
+import { RiskBadge } from "@/components/RiskBadge";
 import { getDashboardPayload } from "@/lib/api";
 import { buildMunicipalitySnapshots, buildStationDetailHref } from "@/lib/editorial";
 import { copyByLanguage, resolveLanguage } from "@/lib/i18n";
-import { formatPlaceName, formatRiskLabel } from "@/lib/presentation";
+import { formatPlaceName } from "@/lib/presentation";
 
 type MapPageProps = {
   searchParams?: Promise<{ lang?: string | string[] }>;
@@ -145,18 +146,21 @@ export default async function MapPage({ searchParams }: MapPageProps) {
                       href={buildStationDetailHref(language, station.station_id)}
                       className="rounded-[1.5rem] border border-white/10 bg-white/[0.03] p-4 transition hover:border-lime/30 hover:bg-white/[0.06]"
                     >
-                      <div className="flex items-start justify-between gap-4">
-                        <div>
-                          <p className="font-data text-sm text-bone">{station.station_id}</p>
-                          <p className="mt-2 text-sm text-soft/74">
+                      <div className="flex items-start justify-between gap-3">
+                        <div className="min-w-0 flex-1">
+                          <p className="text-sm font-medium text-bone">
                             {stationMeta?.name ? formatPlaceName(stationMeta.name) : stationMeta?.municipality ? formatPlaceName(stationMeta.municipality) : station.station_id}
                           </p>
+                          <p className="mt-0.5 font-data text-xs text-soft/40">{station.station_id}</p>
                         </div>
-                        <p className="font-data text-xl text-bone">{station.value.toFixed(1)}</p>
+                        <div className="flex flex-col items-end gap-1.5">
+                          <p className="font-data text-xl text-bone">
+                            {station.value.toFixed(1)}
+                            <span className="ml-1 font-sans text-xs text-soft/50">µg/m³</span>
+                          </p>
+                          <RiskBadge riskLevel={station.risk_level} language={language} />
+                        </div>
                       </div>
-                      <p className="mt-3 text-xs uppercase tracking-[0.18em] text-soft/55">
-                        {formatRiskLabel(station.risk_level, language)}
-                      </p>
                     </Link>
                   );
                 })}
@@ -176,17 +180,23 @@ export default async function MapPage({ searchParams }: MapPageProps) {
                       href={buildStationDetailHref(language, municipality.stationId)}
                       className="rounded-[1.5rem] border border-white/10 bg-white/[0.03] p-4 transition hover:border-lime/30 hover:bg-white/[0.06]"
                     >
-                      <div className="flex items-start justify-between gap-4">
-                        <div>
+                      <div className="flex items-start justify-between gap-3">
+                        <div className="min-w-0 flex-1">
                           <p className="text-sm text-soft/72">{formatPlaceName(municipality.municipality)}</p>
-                          <p className="mt-2 font-data text-sm text-bone">{formatPlaceName(municipality.stationName)}</p>
+                          <p className="mt-1 font-data text-sm text-bone">{formatPlaceName(municipality.stationName)}</p>
                         </div>
-                        <p className="font-data text-xl text-bone">{municipality.peakValue.toFixed(1)}</p>
+                        <div className="flex flex-col items-end gap-1.5">
+                          <p className="font-data text-xl text-bone">
+                            {municipality.peakValue.toFixed(1)}
+                            <span className="ml-1 font-sans text-xs text-soft/50">µg/m³</span>
+                          </p>
+                          <RiskBadge riskLevel={municipality.riskLevel ?? null} language={language} />
+                        </div>
                       </div>
                       <p className="mt-3 text-xs text-soft/55">
                         {language === "es"
-                          ? `${municipality.stationCount} estación${municipality.stationCount === 1 ? "" : "es"} con señal · ${municipality.stationId}`
-                          : `${municipality.stationCount} active station${municipality.stationCount === 1 ? "" : "s"} · ${municipality.stationId}`}
+                          ? `${municipality.stationCount} estación${municipality.stationCount === 1 ? "" : "es"} con señal`
+                          : `${municipality.stationCount} active station${municipality.stationCount === 1 ? "" : "s"}`}
                       </p>
                     </Link>
                   ))
