@@ -234,6 +234,11 @@ export default async function PredictionsPage({ searchParams }: PredictionsPageP
   const history = stationId ? await getHistoryPayload(stationId, targetPollutant, 24) : null;
   const observed = (history?.items ?? []).map((item) => ({ timestamp: item.measured_at, value: item.value }));
   const predicted = stationPredictions.map((item) => ({ timestamp: item.predicted_for, value: item.predicted_value }));
+  const currentNo2ByStation = new Map(
+    (dashboard.latest?.items ?? [])
+      .filter((item) => item.pollutant_code === targetPollutant)
+      .map((item) => [item.station_id, item]),
+  );
   const navigationLabels: PublicNavLabels = {
     home: language === "es" ? "Inicio" : "Home",
     dashboard: copy.mobileNavDashboard,
@@ -309,6 +314,20 @@ export default async function PredictionsPage({ searchParams }: PredictionsPageP
                   >
                     <span className="font-data text-sm">{candidate.name ? formatPlaceName(candidate.name) : candidate.station_id}</span>
                     <span className="mt-2 text-xs text-soft/65">{candidate.municipality ? formatPlaceName(candidate.municipality) : candidate.station_id}</span>
+                    {(() => {
+                      const obs = currentNo2ByStation.get(candidate.station_id);
+                      if (!obs?.value) return null;
+                      return (
+                        <span className="mt-1.5 flex items-center gap-1.5">
+                          {obs.risk_level && (
+                            <span className="inline-block h-1.5 w-1.5 rounded-full" style={{ background: resolveRiskBarColor(obs.risk_level) }} />
+                          )}
+                          <span className="font-data text-[10px] text-soft/50">
+                            {obs.value.toLocaleString(locale, { maximumFractionDigits: 1 })} µg/m³
+                          </span>
+                        </span>
+                      );
+                    })()}
                   </Link>
                 );
               })
@@ -344,7 +363,13 @@ export default async function PredictionsPage({ searchParams }: PredictionsPageP
                     ].join(" ")}
                   >
                     <span className="font-data text-sm">H+{horizon}</span>
-                    <span className="mt-2 text-xs text-soft/65">{forecast ? forecast.predicted_value.toLocaleString(locale, { maximumFractionDigits: 1 }) : "-"}</span>
+                    <span className="mt-2 text-xs text-soft/65">{forecast ? `${forecast.predicted_value.toLocaleString(locale, { maximumFractionDigits: 1 })} µg/m³` : "-"}</span>
+                    {forecast?.risk_level && (
+                      <span className="mt-1.5 flex items-center gap-1.5">
+                        <span className="inline-block h-1.5 w-1.5 rounded-full" style={{ background: resolveRiskBarColor(forecast.risk_level) }} />
+                        <span className="text-[10px] text-soft/50 capitalize">{resolveRiskLabel(forecast.risk_level, pageCopy)}</span>
+                      </span>
+                    )}
                   </Link>
                 );
               })
