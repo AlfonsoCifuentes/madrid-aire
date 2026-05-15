@@ -1,5 +1,6 @@
 import Link from "next/link";
 
+import { FreshnessIndicator } from "@/components/FreshnessIndicator";
 import { MobileBottomNav } from "@/components/MobileBottomNav";
 import { OperationalStatusStrip } from "@/components/OperationalStatusStrip";
 import { PublicPageHeader, buildPublicMobileNavItems, type PublicNavLabels } from "@/components/PublicPageHeader";
@@ -98,7 +99,33 @@ export default async function AboutPage({ searchParams }: AboutPageProps) {
             <div className="glass-panel rounded-[1.75rem] p-5 shadow-atmosphere">
               <p className="eyebrow text-soft/55">{copy.latestTimestamp}</p>
               <p className="mt-4 font-data text-sm text-bone">{formatMoment(summary?.latest_timestamp, locale)}</p>
+              <div className="mt-2">
+                <FreshnessIndicator freshness={summary?.freshness ?? "unknown"} label={copy.freshness[summary?.freshness ?? "pending"] ?? copy.freshness.pending} />
+              </div>
             </div>
+            {system?.model.improvement_pct_vs_best_baseline != null && (
+              <div className="glass-panel rounded-[1.75rem] p-5 shadow-atmosphere">
+                <p className="eyebrow text-soft/55">{language === "es" ? "Mejora modelo v1" : "Model v1 improvement"}</p>
+                <p className="mt-4 font-data text-2xl text-lime">
+                  +{system.model.improvement_pct_vs_best_baseline.toLocaleString(locale, { maximumFractionDigits: 1 })}%
+                </p>
+                <p className="mt-2 text-xs text-soft/55">{language === "es" ? "vs. mejor referencia" : "vs. best baseline"}</p>
+              </div>
+            )}
+            {system?.model.horizon_hours != null && (
+              <div className="glass-panel rounded-[1.75rem] p-5 shadow-atmosphere">
+                <p className="eyebrow text-soft/55">{language === "es" ? "Horizonte de pronóstico" : "Forecast horizon"}</p>
+                <p className="mt-4 font-data text-2xl text-bone">H+{system.model.horizon_hours}</p>
+                <p className="mt-2 text-xs text-soft/55">{language === "es" ? "horas por adelantado" : "hours ahead"}</p>
+              </div>
+            )}
+            {system?.predictions.station_count != null && (
+              <div className="glass-panel rounded-[1.75rem] p-5 shadow-atmosphere">
+                <p className="eyebrow text-soft/55">{language === "es" ? "Estaciones con pronóstico" : "Stations with forecast"}</p>
+                <p className="mt-4 font-data text-2xl text-bone">{system.predictions.station_count}</p>
+                <p className="mt-2 text-xs text-soft/55">NO2 · {system.predictions.horizon_count ?? "-"} {language === "es" ? "horizontes" : "horizons"}</p>
+              </div>
+            )}
           </div>
         </div>
 
