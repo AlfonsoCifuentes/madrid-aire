@@ -228,7 +228,7 @@ export function AtmosphericMap({
   return (
     <div
       ref={containerRef}
-      className={className}
+      className={["dark-map-surface", className].filter(Boolean).join(" ")}
       style={{ minHeight: "400px" }}
       aria-label="Mapa de estaciones de calidad del aire en Madrid"
     />

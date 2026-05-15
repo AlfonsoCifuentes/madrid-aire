@@ -42,7 +42,7 @@ export function StationDrawer({ node, onClose, language = "es" }: StationDrawerP
           "xl:bottom-0 xl:left-auto xl:right-0 xl:top-0 xl:w-80",
           // Visibility
           isOpen ? "translate-y-0 xl:translate-x-0" : "translate-y-full xl:translate-x-full",
-          "glass-panel shadow-atmosphere border-l border-white/5",
+          "border-l border-white/10 bg-[linear-gradient(180deg,rgba(8,10,12,0.97),rgba(12,16,22,0.94))] shadow-[0_24px_80px_rgba(0,0,0,0.5)] backdrop-blur-[28px]",
           "px-7 py-8 xl:pt-16",
         ].join(" ")}
         role="complementary"
