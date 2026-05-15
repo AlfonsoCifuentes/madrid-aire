@@ -1,12 +1,10 @@
 import Link from "next/link";
 
-import { FreshnessIndicator } from "@/components/FreshnessIndicator";
 import { MobileBottomNav } from "@/components/MobileBottomNav";
-import { OperationalStatusStrip } from "@/components/OperationalStatusStrip";
 import { PublicPageHeader, buildPublicMobileNavItems, type PublicNavLabels } from "@/components/PublicPageHeader";
-import { getDashboardPayload, getSystemStatusPayload } from "@/lib/api";
+import { getDashboardPayload } from "@/lib/api";
 import { copyByLanguage, resolveLanguage } from "@/lib/i18n";
-import { formatHoursAhead, formatPublicModelName } from "@/lib/presentation";
+import { formatPlaceName } from "@/lib/presentation";
 
 type AboutPageProps = {
   searchParams?: Promise<{ lang?: string | string[] }>;
@@ -35,16 +33,32 @@ type RouteCardProps = {
   title: string;
   description: string;
   accent?: string;
+  cta: string;
 };
 
-function RouteCard({ href, eyebrow, title, description, accent }: RouteCardProps) {
+function RouteCard({ href, eyebrow, title, description, accent, cta }: RouteCardProps) {
   return (
     <Link className="glass-panel rounded-[1.75rem] p-5 shadow-atmosphere transition hover:bg-white/10" href={href}>
       <p className="eyebrow text-soft/55">{eyebrow}</p>
       <h2 className="mt-4 text-2xl font-medium text-bone">{title}</h2>
       <p className="mt-4 text-sm leading-6 text-soft/72">{description}</p>
       {accent && <p className="mt-5 font-data text-xs uppercase tracking-[0.18em] text-lime/80">{accent}</p>}
+      <p className="mt-6 inline-flex rounded-full border border-white/10 bg-white/[0.04] px-3 py-1.5 text-xs text-soft/80">{cta}</p>
     </Link>
+  );
+}
+
+type GuideCardProps = {
+  title: string;
+  body: string;
+};
+
+function GuideCard({ title, body }: GuideCardProps) {
+  return (
+    <article className="glass-panel rounded-[1.75rem] p-5 shadow-atmosphere">
+      <h2 className="text-xl font-medium text-bone">{title}</h2>
+      <p className="mt-4 text-sm leading-6 text-soft/74">{body}</p>
+    </article>
   );
 }
 
@@ -53,46 +67,103 @@ export default async function AboutPage({ searchParams }: AboutPageProps) {
   const language = resolveLanguage(params?.lang);
   const locale = language === "es" ? "es-ES" : "en-GB";
   const copy = copyByLanguage[language];
-  const [dashboard, system] = await Promise.all([getDashboardPayload(), getSystemStatusPayload()]);
+  const dashboard = await getDashboardPayload();
   const summary = dashboard.summary;
   const worstStationMeta = dashboard.stations?.items.find((item) => item.station_id === summary?.worst_station_id) ?? null;
-  const worstStationLabel = worstStationMeta?.name ?? worstStationMeta?.municipality ?? summary?.worst_station_id ?? "-";
+  const worstStationLabel = worstStationMeta?.name
+    ? formatPlaceName(worstStationMeta.name)
+    : worstStationMeta?.municipality
+    ? formatPlaceName(worstStationMeta.municipality)
+    : summary?.worst_station_id ?? "-";
   const publicRoutes = [
     {
       href: `/dashboard?lang=${language}`,
+      eyebrow: language === "es" ? "Empieza aquí" : "Start here",
       title: copy.dashboardTitle,
-      description: copy.aboutDashboardDesc,
-      accent:
+      description:
         language === "es"
-          ? `${summary?.station_count ?? 0} estaciones · ${summary?.pollutant_count ?? 0} contaminantes`
-          : `${summary?.station_count ?? 0} stations · ${summary?.pollutant_count ?? 0} pollutants`,
+          ? "La forma más rápida de saber qué punto registra el valor más alto y cuándo se actualizó por última vez la red."
+          : "The fastest way to see which location has the highest reading and when the network last updated.",
+      accent: language === "es" ? "Útil si solo quieres una respuesta rápida." : "Best when you want a quick answer.",
     },
     {
       href: `/map?lang=${language}`,
+      eyebrow: language === "es" ? "Sitúate" : "Get your bearings",
       title: copy.mapPageTitle,
-      description: copy.aboutMapDesc,
-      accent:
+      description:
         language === "es"
-          ? `${copy.freshness[summary?.freshness ?? "pending"] ?? copy.freshness.pending} · red visible`
-          : `${copy.freshness[summary?.freshness ?? "pending"] ?? copy.freshness.pending} · visible network`,
+          ? "Mira qué estaciones te quedan cerca y compara de forma visual cómo cambia el aire entre zonas."
+          : "See which stations are near you and visually compare how the air changes across areas.",
+      accent: language === "es" ? "Útil si quieres entender el reparto por zonas." : "Best when you want the geographic picture.",
     },
     {
       href: `/stations?lang=${language}`,
+      eyebrow: language === "es" ? "Compara" : "Compare",
       title: copy.stationsPageTitle,
-      description: copy.aboutStationsDesc,
+      description:
+        language === "es"
+          ? "Abre una estación concreta para ver ubicación, última lectura e histórico reciente sin perderte en jerga técnica."
+          : "Open a specific station to see location, latest reading, and recent history without technical jargon.",
       accent:
         language === "es"
-          ? `peor nodo: ${worstStationLabel}`
-          : `worst node: ${worstStationLabel}`,
+          ? `Ahora destaca ${worstStationLabel}.`
+          : `${worstStationLabel} is currently the highest point.`,
     },
     {
       href: `/predictions?lang=${language}`,
+      eyebrow: language === "es" ? "Anticípate" : "Plan ahead",
       title: copy.predictionsTitle,
-      description: copy.aboutPredictionsDesc,
-      accent:
+      description:
         language === "es"
-          ? `NO2 · ${system?.predictions.station_count ?? 0} estaciones · ${system?.predictions.horizon_count ?? 0} horizontes`
-          : `NO2 · ${system?.predictions.station_count ?? 0} stations · ${system?.predictions.horizon_count ?? 0} horizons`,
+          ? "Consulta una orientación para las próximas horas y compárala con la última lectura disponible."
+          : "Check an indicative outlook for the next few hours and compare it with the latest reading.",
+      accent: language === "es" ? "Útil para planificar salidas o desplazamientos." : "Best when planning trips or outdoor time.",
+    },
+  ];
+  const plainLanguageCards = [
+    {
+      title: language === "es" ? "Qué significa NO₂" : "What NO₂ means",
+      body:
+        language === "es"
+          ? "NO₂ es un contaminante muy ligado al tráfico. Aquí se usa como indicador principal porque cambia rápido entre horas y entre zonas de Madrid."
+          : "NO₂ is a pollutant strongly linked to traffic. It is used here as the main indicator because it can change quickly by hour and by area across Madrid.",
+    },
+    {
+      title: language === "es" ? "Qué significa la última actualización" : "What the latest update means",
+      body:
+        language === "es"
+          ? "Te dice cuándo llegó la última lectura oficial. Si han pasado muchas horas, la foto sigue siendo útil como referencia, pero ya no describe el momento exacto."
+          : "It tells you when the last official reading arrived. If many hours have passed, the view is still useful as context, but it no longer describes the exact current moment.",
+    },
+    {
+      title: language === "es" ? "Qué significa una previsión a 24 h" : "What a 24h forecast means",
+      body:
+        language === "es"
+          ? "Es una orientación para anticipar cambios durante el día. Sirve para planificar, pero no sustituye a los avisos oficiales ni a una recomendación sanitaria."
+          : "It is a guide to anticipate changes through the day. It helps with planning, but it does not replace official alerts or health advice.",
+    },
+  ];
+  const quickStartCards = [
+    {
+      title: language === "es" ? "Si solo quieres saber cómo está el aire ahora" : "If you only want to know how the air looks right now",
+      body:
+        language === "es"
+          ? "Empieza por el Resumen del aire. En unos segundos verás el punto con la lectura más alta, la hora de actualización y el estado general de la red."
+          : "Start with the Overview. In a few seconds you will see the highest reading, the update time, and the overall network status.",
+    },
+    {
+      title: language === "es" ? "Si quieres mirar tu zona o un municipio" : "If you want to inspect your area or municipality",
+      body:
+        language === "es"
+          ? "Ve al mapa si prefieres una vista espacial y a Estaciones si quieres comparar nombres, tipos de entorno y una ficha concreta."
+          : "Go to the map if you prefer a spatial view, and to Stations if you want to compare places, surroundings, and a specific station card.",
+    },
+    {
+      title: language === "es" ? "Si quieres planificar las próximas horas" : "If you want to plan the next few hours",
+      body:
+        language === "es"
+          ? "Abre Pronóstico. Ahí verás cómo podría cambiar el NO₂ y si la tendencia sube, baja o se mantiene."
+          : "Open Forecast. There you can see how NO₂ might change and whether the trend is rising, falling, or holding steady.",
     },
   ];
   const technicalRoutes = [
@@ -100,37 +171,32 @@ export default async function AboutPage({ searchParams }: AboutPageProps) {
       href: `/model?lang=${language}`,
       title: copy.modelTitle,
       description: copy.aboutModelDesc,
-      accent:
-        system?.model.improvement_pct_vs_best_baseline != null
-          ? `${system.model.improvement_pct_vs_best_baseline > 0 ? "+" : ""}${system.model.improvement_pct_vs_best_baseline.toLocaleString(locale, { maximumFractionDigits: 1 })}% ${language === "es" ? "vs. referencia" : "vs. baseline"}`
-          : undefined,
+      eyebrow: copy.aboutTechnicalLabel,
+      accent: language === "es" ? "Precisión y límites del pronóstico." : "Accuracy and forecast limits.",
     },
     {
       href: `/methodology?lang=${language}`,
       title: copy.methodologyTitle,
       description: copy.aboutMethodologyDesc,
+      eyebrow: copy.aboutTechnicalLabel,
       accent:
         summary?.latest_timestamp
-          ? `${language === "es" ? "última señal" : "latest signal"}: ${formatMoment(summary.latest_timestamp, locale)}`
+          ? `${language === "es" ? "Última señal usada" : "Latest signal used"}: ${formatMoment(summary.latest_timestamp, locale)}`
           : undefined,
     },
     {
       href: `/reports?lang=${language}`,
       title: copy.reportsTitle,
       description: copy.aboutReportsDesc,
-      accent:
-        language === "es"
-          ? `${system?.predictions.generated_at ? `forecast ${formatMoment(system.predictions.generated_at, locale)}` : "forecast -"}`
-          : `${system?.predictions.generated_at ? `forecast ${formatMoment(system.predictions.generated_at, locale)}` : "forecast -"}`,
+      eyebrow: copy.aboutTechnicalLabel,
+      accent: language === "es" ? "Lectura interpretada y contexto adicional." : "Interpretation and additional context.",
     },
     {
       href: `/system?lang=${language}`,
       title: copy.systemTitle,
       description: copy.aboutSystemDesc,
-      accent:
-        language === "es"
-          ? `${copy.freshness[system?.data_quality.freshness ?? "pending"] ?? copy.freshness.pending} · estado operativo`
-          : `${copy.freshness[system?.data_quality.freshness ?? "pending"] ?? copy.freshness.pending} · operational state`,
+      eyebrow: copy.aboutTechnicalLabel,
+      accent: language === "es" ? "Actualizaciones, alertas y mantenimiento." : "Updates, alerts, and maintenance.",
     },
   ];
   const navigationLabels: PublicNavLabels = {
@@ -156,68 +222,33 @@ export default async function AboutPage({ searchParams }: AboutPageProps) {
             </h1>
             <p className="mt-6 max-w-2xl text-lg leading-8 text-soft/74">{copy.aboutSubtitle}</p>
           </div>
-          <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+          <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
             <div className="glass-panel rounded-[1.75rem] p-5 shadow-atmosphere">
-              <p className="eyebrow text-soft/55">{copy.stationsOnline}</p>
+              <p className="eyebrow text-soft/55">{language === "es" ? "Estaciones que puedes consultar" : "Stations you can inspect"}</p>
               <p className="mt-4 font-data text-3xl text-bone">{summary?.station_count ?? 0}</p>
+              <p className="mt-2 text-sm text-soft/60">{language === "es" ? "Puntos con lectura reciente" : "Locations with recent readings"}</p>
             </div>
             <div className="glass-panel rounded-[1.75rem] p-5 shadow-atmosphere">
-              <p className="eyebrow text-soft/55">{copy.pollutantCoverage}</p>
+              <p className="eyebrow text-soft/55">{language === "es" ? "Contaminantes visibles" : "Visible pollutants"}</p>
               <p className="mt-4 font-data text-3xl text-bone">{summary?.pollutant_count ?? 0}</p>
+              <p className="mt-2 text-sm text-soft/60">NO2 · O3 · PM10 · PM2.5</p>
             </div>
             <div className="glass-panel rounded-[1.75rem] p-5 shadow-atmosphere">
               <p className="eyebrow text-soft/55">{copy.latestTimestamp}</p>
               <p className="mt-4 font-data text-sm text-bone">{formatMoment(summary?.latest_timestamp, locale)}</p>
-              <div className="mt-2">
-                <FreshnessIndicator freshness={summary?.freshness ?? "unknown"} label={copy.freshness[summary?.freshness ?? "pending"] ?? copy.freshness.pending} />
-              </div>
+              <p className="mt-2 text-sm text-soft/60">{copy.freshness[summary?.freshness ?? "pending"] ?? copy.freshness.pending}</p>
             </div>
-            {system?.model.improvement_pct_vs_best_baseline != null && (
-              <div className="glass-panel rounded-[1.75rem] p-5 shadow-atmosphere">
-                <p className="eyebrow text-soft/55">{language === "es" ? "Mejora modelo v1" : "Model v1 improvement"}</p>
-                <p className="mt-4 font-data text-2xl text-lime">
-                  +{system.model.improvement_pct_vs_best_baseline.toLocaleString(locale, { maximumFractionDigits: 1 })}%
-                </p>
-                <p className="mt-2 text-xs text-soft/55">{language === "es" ? "vs. mejor referencia" : "vs. best baseline"}</p>
-              </div>
-            )}
-            {system?.model.horizon_hours != null && (
-              <div className="glass-panel rounded-[1.75rem] p-5 shadow-atmosphere">
-                <p className="eyebrow text-soft/55">{language === "es" ? "Hasta cuándo llega el pronóstico" : "Forecast reach"}</p>
-                <p className="mt-4 font-data text-2xl text-bone">{formatHoursAhead(system.model.horizon_hours, language, true)}</p>
-                <p className="mt-2 text-xs text-soft/55">{language === "es" ? "alcance máximo de la previsión" : "furthest point in the forecast"}</p>
-                {system.model.selected_model && (
-                  <p className="mt-2 inline-block rounded-full border border-lime/30 bg-lime/10 px-2.5 py-0.5 font-data text-[10px] uppercase tracking-widest text-lime/80">
-                    {formatPublicModelName(system.model.selected_model, language)}
-                  </p>
-                )}
-              </div>
-            )}
-            {system?.predictions.station_count != null && (
-              <div className="glass-panel rounded-[1.75rem] p-5 shadow-atmosphere">
-                <p className="eyebrow text-soft/55">{language === "es" ? "Estaciones con pronóstico" : "Stations with forecast"}</p>
-                <p className="mt-4 font-data text-2xl text-bone">{system.predictions.station_count}</p>
-                <p className="mt-2 text-xs text-soft/55">
-                  NO2 · {language === "es" ? "hasta" : "up to"} {formatHoursAhead(system.predictions.horizon_count ?? null, language, true)}
-                </p>
-              </div>
-            )}
-            {system?.model.training_period_start != null && (
-              <div className="glass-panel rounded-[1.75rem] p-5 shadow-atmosphere">
-                <p className="eyebrow text-soft/55">{language === "es" ? "Periodo de entrenamiento" : "Training period"}</p>
-                <p className="mt-4 font-data text-xs text-bone leading-5">
-                  {formatMoment(system.model.training_period_start, locale)}
-                </p>
-                <p className="font-data text-xs text-soft/55 leading-5">
-                  → {formatMoment(system.model.training_period_end, locale)}
-                </p>
-                {system.model.test_period_start != null && (
-                  <p className="mt-2 text-[10px] text-soft/40 uppercase tracking-widest">
-                    {language === "es" ? "Test" : "Test"}: {formatMoment(system.model.test_period_start, locale)}
-                  </p>
-                )}
-              </div>
-            )}
+            <div className="glass-panel rounded-[1.75rem] p-5 shadow-atmosphere">
+              <p className="eyebrow text-soft/55">{copy.worstStation}</p>
+              <p className="mt-4 font-data text-2xl text-bone">{worstStationLabel}</p>
+              <p className="mt-2 text-sm text-soft/60">
+                {summary?.worst_value != null
+                  ? `NO2 · ${summary.worst_value.toLocaleString(locale, { maximumFractionDigits: 1 })} µg/m³`
+                  : language === "es"
+                  ? "Sin valor destacado"
+                  : "No highlighted value"}
+              </p>
+            </div>
           </div>
         </div>
 
@@ -231,35 +262,72 @@ export default async function AboutPage({ searchParams }: AboutPageProps) {
               <RouteCard
                 key={route.href}
                 href={route.href}
-                eyebrow={copy.aboutLiveLabel}
+                eyebrow={route.eyebrow}
                 title={route.title}
                 description={route.description}
                 accent={route.accent}
+                cta={language === "es" ? "Abrir esta vista" : "Open this view"}
               />
             ))}
           </div>
         </section>
 
-        <OperationalStatusStrip language={language} system={system} freshnessLabels={copy.freshness} currentPage="about" />
-
-        <section id="advanced" className="grid gap-6 xl:grid-cols-[0.95fr_1.05fr]">
+        <section className="grid gap-6 xl:grid-cols-[0.95fr_1.05fr]">
           <div>
-            <p className="eyebrow text-soft/55">{copy.aboutTechnicalRoutesTitle}</p>
-            <p className="mt-4 max-w-xl text-base leading-7 text-soft/74">{copy.aboutTechnicalRoutesBody}</p>
+            <p className="eyebrow text-soft/55">{language === "es" ? "Cómo interpretar lo que ves" : "How to read what you see"}</p>
+            <p className="mt-4 max-w-xl text-base leading-7 text-soft/74">
+              {language === "es"
+                ? "Estas tres ideas bastan para leer la página sin conocimientos previos: qué indicador manda, qué significa la hora de actualización y cómo usar la previsión sin sobreinterpretarla."
+                : "These three ideas are enough to read the site without prior knowledge: what the main indicator means, what the update time tells you, and how to use the forecast without overreading it."}
+            </p>
           </div>
-          <div className="grid gap-4 md:grid-cols-2">
+          <div className="grid gap-4 md:grid-cols-3">
+            {plainLanguageCards.map((item) => (
+              <GuideCard key={item.title} title={item.title} body={item.body} />
+            ))}
+          </div>
+        </section>
+
+        <section className="grid gap-6 xl:grid-cols-[0.95fr_1.05fr]">
+          <div>
+            <p className="eyebrow text-soft/55">{language === "es" ? "Si quieres decidir rápido" : "If you want to decide quickly"}</p>
+            <p className="mt-4 max-w-xl text-base leading-7 text-soft/74">
+              {language === "es"
+                ? "No hace falta recorrer toda la web. Elige la ruta según tu necesidad inmediata y vuelve al detalle técnico solo si de verdad lo necesitas."
+                : "You do not need to browse the whole site. Pick a route based on your immediate need and only go to the technical detail if you truly need it."}
+            </p>
+          </div>
+          <div className="grid gap-4 md:grid-cols-3">
+            {quickStartCards.map((item) => (
+              <GuideCard key={item.title} title={item.title} body={item.body} />
+            ))}
+          </div>
+        </section>
+
+        <details id="advanced" className="glass-panel rounded-[2rem] p-6 shadow-atmosphere group">
+          <summary className="flex cursor-pointer list-none flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+            <div>
+              <p className="eyebrow text-soft/55">{copy.aboutTechnicalRoutesTitle}</p>
+              <p className="mt-3 max-w-3xl text-base leading-7 text-soft/74">{copy.aboutTechnicalRoutesBody}</p>
+            </div>
+            <span className="inline-flex rounded-full border border-white/10 bg-white/[0.04] px-4 py-2 text-sm text-soft/80 transition group-open:bg-white/[0.08]">
+              {language === "es" ? "Abrir detalle técnico" : "Open technical detail"}
+            </span>
+          </summary>
+          <div className="mt-6 grid gap-4 md:grid-cols-2">
             {technicalRoutes.map((route) => (
               <RouteCard
                 key={route.href}
                 href={route.href}
-                eyebrow={copy.aboutTechnicalLabel}
+                eyebrow={route.eyebrow}
                 title={route.title}
                 description={route.description}
                 accent={route.accent}
+                cta={language === "es" ? "Abrir detalle" : "Open details"}
               />
             ))}
           </div>
-        </section>
+        </details>
       </section>
       <MobileBottomNav currentLanguage={language} currentPage="about" ariaLabel={copy.mobileNavAriaLabel} items={mobileNavItems} />
     </main>

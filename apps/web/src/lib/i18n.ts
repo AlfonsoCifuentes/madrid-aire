@@ -238,7 +238,7 @@ export const copyByLanguage: Record<Language, Copy> = {
     openSystem: "Abrir sistema",
     openMethodology: "Abrir metodología",
     openReports: "Abrir informes",
-    openAbout: "Ayuda",
+    openAbout: "Guía",
     mobileNavAriaLabel: "Navegación inferior",
     mobileNavDashboard: "Resumen",
     mobileNavMap: "Mapa",
@@ -248,7 +248,7 @@ export const copyByLanguage: Record<Language, Copy> = {
     mobileNavMethodology: "Método",
     mobileNavReports: "Informes",
     mobileNavSystem: "Estado",
-    mobileNavAbout: "Ayuda",
+    mobileNavAbout: "Guía",
     dashboardMetricsTitle: "Qué está pasando ahora",
     worstStation: "Lectura más alta ahora",
     latestTimestamp: "Última actualización",
@@ -363,11 +363,11 @@ export const copyByLanguage: Record<Language, Copy> = {
     aboutPublicRoutesTitle: "Empieza por aquí",
     aboutPublicRoutesBody:
       "Estas rutas están pensadas para cualquiera: ver la situación actual, ubicarla en el mapa, comparar estaciones y mirar el pronóstico de las próximas horas.",
-    aboutTechnicalRoutesTitle: "Avanzado",
+    aboutTechnicalRoutesTitle: "Si quieres más detalle",
     aboutTechnicalRoutesBody:
-      "Aquí están la metodología, las métricas del modelo, los informes y el estado operativo del proyecto. Entra solo si quieres más detalle técnico.",
+      "Aquí están la metodología, las métricas del modelo, los informes y el estado operativo. Entra solo cuando quieras profundizar.",
     aboutLiveLabel: "Para cualquier persona",
-    aboutTechnicalLabel: "Avanzado",
+    aboutTechnicalLabel: "Parte técnica",
     aboutDashboardDesc:
       "Resumen general con las estaciones más comprometidas, la hora de actualización y la señal más reciente.",
     aboutMapDesc:
@@ -461,7 +461,7 @@ export const copyByLanguage: Record<Language, Copy> = {
     openSystem: "Open system",
     openMethodology: "Open methodology",
     openReports: "Open reports",
-    openAbout: "Help",
+    openAbout: "Guide",
     mobileNavAriaLabel: "Bottom navigation",
     mobileNavDashboard: "Overview",
     mobileNavMap: "Map",
@@ -471,7 +471,7 @@ export const copyByLanguage: Record<Language, Copy> = {
     mobileNavMethodology: "Method",
     mobileNavReports: "Reports",
     mobileNavSystem: "System",
-    mobileNavAbout: "Help",
+    mobileNavAbout: "Guide",
     dashboardMetricsTitle: "What is happening now",
     worstStation: "Highest reading now",
     latestTimestamp: "Latest update",
@@ -586,11 +586,11 @@ export const copyByLanguage: Record<Language, Copy> = {
     aboutPublicRoutesTitle: "Start here",
     aboutPublicRoutesBody:
       "These routes are meant for anyone: see current conditions, place them on the map, compare stations, and check the short-term forecast.",
-    aboutTechnicalRoutesTitle: "Advanced",
+    aboutTechnicalRoutesTitle: "If you want more detail",
     aboutTechnicalRoutesBody:
-      "This is where methodology, model metrics, reports, and operational status live. Open it only when you want the technical detail.",
+      "This is where methodology, model metrics, reports, and operational status live. Open it only when you want to go deeper.",
     aboutLiveLabel: "For everyone",
-    aboutTechnicalLabel: "Advanced",
+    aboutTechnicalLabel: "Technical details",
     aboutDashboardDesc:
       "A quick overview of the most affected stations, the last update time, and the latest signal.",
     aboutMapDesc:
