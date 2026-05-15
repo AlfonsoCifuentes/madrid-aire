@@ -77,6 +77,9 @@ export default async function SystemPage({ searchParams }: SystemPageProps) {
   const language = resolveLanguage(params?.lang);
   const copy = copyByLanguage[language];
   const [system, alerts] = await Promise.all([getSystemStatusPayload(), getAlertsPayload()]);
+  const criticalAlertCount = alerts?.items.filter((alert) => alert.severity === "critical").length ?? 0;
+  const warningAlertCount = alerts?.items.filter((alert) => alert.severity === "warning").length ?? 0;
+  const leadAlert = alerts?.items.find((alert) => alert.severity === "critical") ?? alerts?.items[0] ?? null;
   const advancedLabels: AdvancedNavLabels = {
     guide: copy.openAbout,
     dashboard: copy.mobileNavDashboard,
@@ -109,18 +112,31 @@ export default async function SystemPage({ searchParams }: SystemPageProps) {
             <div className="glass-panel rounded-[1.75rem] p-5 shadow-atmosphere">
               <p className="eyebrow text-soft/55">{copy.systemEnvironmentLabel}</p>
               <p className="mt-4 font-data text-3xl text-bone">{formatOperationalLabel(system?.environment, language)}</p>
+              <p className="mt-3 text-sm text-soft/70">{formatSourceLabel(system?.pipeline.source, language)}</p>
             </div>
             <div className="glass-panel rounded-[1.75rem] p-5 shadow-atmosphere">
               <p className="eyebrow text-soft/55">{copy.systemGlobalStatusLabel}</p>
               <p className="mt-4 font-data text-3xl text-bone">{formatOperationalLabel(system?.status ?? "system_pending", language)}</p>
+              <p className="mt-3 text-sm text-soft/70">{formatOperationalLabel(system?.pipeline.status ?? "foundation_ready", language)}</p>
             </div>
             <div className="glass-panel rounded-[1.75rem] p-5 shadow-atmosphere">
               <p className="eyebrow text-soft/55">{copy.latestTimestamp}</p>
               <p className="mt-4 font-data text-sm text-bone">{formatMoment(system?.pipeline.latest_timestamp ?? null)}</p>
+              <p className="mt-3 text-sm text-soft/70">{copy.freshness[system?.data_quality.freshness ?? "pending"] ?? copy.freshness.pending}</p>
             </div>
             <div className="glass-panel rounded-[1.75rem] p-5 shadow-atmosphere">
               <p className="eyebrow text-soft/55">{copy.systemAlertsLabel}</p>
               <p className="mt-4 font-data text-3xl text-bone">{alerts?.items.length ?? 0}</p>
+              <p className="mt-3 text-sm text-soft/70">
+                {alerts?.items.length
+                  ? `${criticalAlertCount} ${language === "es" ? "críticas" : "critical"} · ${warningAlertCount} ${language === "es" ? "warning" : "warning"}`
+                  : (language === "es" ? "sin alertas activas" : "no active alerts")}
+              </p>
+              {leadAlert?.risk_level && (
+                <div className="mt-3">
+                  <RiskBadge riskLevel={leadAlert.risk_level} language={language} />
+                </div>
+              )}
             </div>
           </div>
         </div>
