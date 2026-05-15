@@ -1,6 +1,7 @@
 import Link from "next/link";
 
 import { FreshnessIndicator } from "@/components/FreshnessIndicator";
+import { RiskBadge } from "@/components/RiskBadge";
 import { HistoryForecastChart } from "@/components/HistoryForecastChart";
 import { MobileBottomNav } from "@/components/MobileBottomNav";
 import { PublicPageHeader, buildPublicMobileNavItems, type PublicNavLabels } from "@/components/PublicPageHeader";
@@ -80,6 +81,10 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
     if (found?.municipality) return formatPlaceName(found.municipality);
     return worstStationId;
   })();
+  const worstRiskLevel = summary?.worst_risk_level
+    ?? (worstStationId
+      ? latest.find((item) => item.station_id === worstStationId && item.pollutant_code === "NO2")?.risk_level ?? null
+      : null);
   const history = worstStationId ? await getHistoryPayload(worstStationId, "NO2", 24) : null;
   const topRows = latest
     .filter((item) => item.pollutant_code === "NO2")
@@ -128,10 +133,15 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
             <div className="glass-panel rounded-[1.75rem] p-5 shadow-atmosphere">
               <p className="eyebrow text-soft/55">{copy.worstStation}</p>
               <p className="mt-4 font-data text-3xl text-bone">{worstStationName ?? "-"}</p>
-              <p className="mt-3 text-sm text-soft/70">
-                {summary?.worst_pollutant_code ?? "-"}
-                {summary?.worst_value != null ? ` · ${summary.worst_value.toLocaleString(locale, { maximumFractionDigits: 1 })}` : ""}
-              </p>
+              <div className="mt-3 flex flex-wrap items-center gap-2">
+                <span className="text-sm text-soft/70">
+                  {summary?.worst_pollutant_code ?? "-"}
+                  {summary?.worst_value != null ? ` · ${summary.worst_value.toLocaleString(locale, { maximumFractionDigits: 1 })} µg/m³` : ""}
+                </span>
+                {worstRiskLevel && (
+                  <RiskBadge riskLevel={worstRiskLevel} language={language} />
+                )}
+              </div>
             </div>
             <div className="glass-panel rounded-[1.75rem] p-5 shadow-atmosphere">
               <p className="eyebrow text-soft/55">{copy.latestTimestamp}</p>
@@ -144,7 +154,12 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
                     }).format(new Date(summary.latest_timestamp))
                   : "-"}
               </p>
-              <p className="mt-3 text-sm text-soft/70">{copy.freshness[summary?.freshness ?? "pending"] ?? copy.freshness.pending}</p>
+              <div className="mt-3 flex items-center gap-2">
+                <FreshnessIndicator
+                  freshness={summary?.freshness ?? "unknown"}
+                  label={copy.freshness[summary?.freshness ?? "unknown"]}
+                />
+              </div>
             </div>
             <div className="glass-panel rounded-[1.75rem] p-5 shadow-atmosphere">
               <p className="eyebrow text-soft/55">{copy.pollutantCoverage}</p>

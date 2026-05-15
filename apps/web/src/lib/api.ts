@@ -13,6 +13,7 @@ export type SummaryEnvelope = {
   worst_station_id: string | null;
   worst_pollutant_code: string | null;
   worst_value: number | null;
+  worst_risk_level?: string | null;
 };
 
 export type LatestObservationItem = {
