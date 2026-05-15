@@ -82,8 +82,8 @@ export function MapShell({ nodes, language = "es" }: MapShellProps) {
 
       <p className="text-xs text-soft/45 print:text-graphite/65">
         {language === "es"
-          ? "Base cartográfica oscura: CARTO + OpenStreetMap. Los puntos mantienen la lectura y el nivel de aviso de cada estación."
-          : "Dark basemap: CARTO + OpenStreetMap. Markers keep the live reading and alert level for each station."}
+          ? "El mapa te ayuda a situar cada estación. Lo importante son los puntos, su tamaño relativo y el nivel que muestra cada uno."
+          : "The map helps you place each station. The key information is in the markers, their relative size, and the level shown for each one."}
       </p>
     </div>
   );

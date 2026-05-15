@@ -30,7 +30,7 @@ const MADRID_REFERENCE_BOUNDS: [[number, number], [number, number]] = [
 
 const MADRID_CORE: [number, number] = [40.4168, -3.7038];
 
-const DARK_BASEMAP_URL = "https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}g";
+const DARK_BASEMAP_URL = "https://tile.openstreetmap.org/{z}/{x}/{y}.png";
 
 const RISK_COLORS: Record<string, string> = {
   good: "#80FFB2",
@@ -166,9 +166,8 @@ export function AtmosphericMap({
       map.setView([40.4168, -3.7038], 10.5);
 
       leaflet.tileLayer(DARK_BASEMAP_URL, {
-        subdomains: "abcd",
         maxZoom: 20,
-        attribution: "&copy; OpenStreetMap contributors &copy; CARTO",
+        attribution: "&copy; OpenStreetMap contributors",
       }).addTo(map);
 
       leaflet.circle(MADRID_CORE, {
@@ -184,7 +183,7 @@ export function AtmosphericMap({
       leaflet.control.zoom({ position: "topright" }).addTo(map);
       leaflet.control
         .attribution({ position: "bottomright", prefix: false })
-        .addAttribution("&copy; OpenStreetMap contributors &copy; CARTO")
+        .addAttribution("&copy; OpenStreetMap contributors")
         .addTo(map);
 
       const layerGroup = leaflet.layerGroup().addTo(map);

@@ -1,32 +1,14 @@
 "use client";
 
 import Link from "next/link";
+
+import { formatRiskLabel, getPublicRiskColor } from "@/lib/presentation";
 import type { MapNode } from "./AtmosphericMap";
 
 type StationDrawerProps = {
   node: MapNode | null;
   onClose: () => void;
   language?: "es" | "en";
-};
-
-const RISK_COLORS: Record<string, string> = {
-  good: "#80FFB2",
-  acceptable: "#D8FF4F",
-  moderate: "#FFB000",
-  poor: "#FF6B35",
-  very_poor: "#C2410C",
-  extreme: "#F43F5E",
-  unknown: "#8B949E",
-};
-
-const RISK_LABELS: Record<string, { es: string; en: string }> = {
-  good: { es: "Bueno", en: "Good" },
-  acceptable: { es: "Aceptable", en: "Acceptable" },
-  moderate: { es: "Moderado", en: "Moderate" },
-  poor: { es: "Deficiente", en: "Poor" },
-  very_poor: { es: "Muy deficiente", en: "Very poor" },
-  extreme: { es: "Extremo", en: "Extreme" },
-  unknown: { es: "Desconocido", en: "Unknown" },
 };
 
 const FRESHNESS_LABELS: Record<string, { es: string; en: string }> = {
@@ -84,6 +66,12 @@ export function StationDrawer({ node, onClose, language = "es" }: StationDrawerP
 
         {node && (
           <div className="mt-5 flex flex-col gap-5">
+            {(() => {
+              const riskColor = getPublicRiskColor(node.risk_level);
+              const riskLabel = formatRiskLabel(node.risk_level, language);
+
+              return (
+                <>
             <div>
               <p className="font-data text-2xl text-bone">{node.label}</p>
             </div>
@@ -91,7 +79,7 @@ export function StationDrawer({ node, onClose, language = "es" }: StationDrawerP
             <div className="grid grid-cols-2 gap-3">
               <div className="glass-panel rounded-2xl p-4">
                 <p className="eyebrow text-soft/50">NO2</p>
-                <p className="mt-2 font-data text-2xl" style={{ color: RISK_COLORS[node.risk_level ?? "unknown"] ?? "#8B949E" }}>
+                <p className="mt-2 font-data text-2xl" style={{ color: riskColor }}>
                   {node.value.toFixed(1)}
                   <span className="ml-1 font-data text-xs text-soft/50">µg/m³</span>
                 </p>
@@ -100,8 +88,8 @@ export function StationDrawer({ node, onClose, language = "es" }: StationDrawerP
                 <p className="eyebrow text-soft/50">
                   {language === "es" ? "Nivel" : "Level"}
                 </p>
-                <p className="mt-2 text-sm font-medium" style={{ color: RISK_COLORS[node.risk_level ?? "unknown"] ?? "#8B949E" }}>
-                  {(RISK_LABELS[node.risk_level ?? "unknown"] ?? RISK_LABELS.unknown)[language]}
+                <p className="mt-2 text-sm font-medium" style={{ color: riskColor }}>
+                  {riskLabel}
                 </p>
               </div>
             </div>
@@ -136,8 +124,8 @@ export function StationDrawer({ node, onClose, language = "es" }: StationDrawerP
               <div className="rounded-2xl border border-lime/30 bg-lime/5 px-4 py-3">
                 <p className="text-xs text-lime/80">
                   {language === "es"
-                    ? "Peor estación activa de la red"
-                    : "Worst active station in the network"}
+                    ? "Punto con el valor más alto ahora"
+                    : "Point with the highest reading right now"}
                 </p>
               </div>
             )}
@@ -147,6 +135,9 @@ export function StationDrawer({ node, onClose, language = "es" }: StationDrawerP
             >
               {language === "es" ? "Ver estación completa →" : "View full station →"}
             </Link>
+                </>
+              );
+            })()}
           </div>
         )}
       </div>

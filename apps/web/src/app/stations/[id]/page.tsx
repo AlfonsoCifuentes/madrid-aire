@@ -239,30 +239,7 @@ export default async function StationDetailPage({ params, searchParams }: Statio
           </section>
         </div>
 
-        <div className="grid gap-6 xl:grid-cols-[0.8fr_1.2fr]">
-          <section className="glass-panel rounded-[2rem] p-5 shadow-atmosphere">
-            <div className="flex flex-wrap items-center justify-between gap-3">
-              <p className="eyebrow text-soft/60">{copy.stationModelErrorTitle}</p>
-              <p className="font-data text-sm text-soft/55">{formatModelName(metrics?.selected_baseline, language)}</p>
-            </div>
-            <div className="mt-5 grid gap-3 sm:grid-cols-3 xl:grid-cols-1">
-              <div className="rounded-[1.5rem] border border-white/10 bg-white/[0.03] p-4">
-                <p className="eyebrow text-soft/55">{copy.metricMae}</p>
-                <p className="mt-3 font-data text-2xl text-bone">{selectedMetric?.mae == null ? "-" : selectedMetric.mae.toFixed(2)}</p>
-              </div>
-              <div className="rounded-[1.5rem] border border-white/10 bg-white/[0.03] p-4">
-                <p className="eyebrow text-soft/55">{copy.metricRmse}</p>
-                <p className="mt-3 font-data text-2xl text-bone">{selectedMetric?.rmse == null ? "-" : selectedMetric.rmse.toFixed(2)}</p>
-              </div>
-              <div className="rounded-[1.5rem] border border-white/10 bg-white/[0.03] p-4">
-                <p className="eyebrow text-soft/55">{copy.metricR2}</p>
-                <p className="mt-3 font-data text-2xl text-bone">{selectedMetric?.r2 == null ? "-" : selectedMetric.r2.toFixed(3)}</p>
-              </div>
-            </div>
-            <p className="mt-5 text-sm leading-6 text-soft/70">{copy.stationGlobalErrorNote}</p>
-          </section>
-
-          <section className="grid gap-6 lg:grid-cols-2">
+        <section className="grid gap-6 lg:grid-cols-2">
             <div className="glass-panel rounded-[2rem] p-5 shadow-atmosphere">
               <p className="eyebrow text-soft/60">{copy.stationAvailablePollutantsTitle}</p>
               <div className="mt-5 flex flex-wrap gap-3">
@@ -272,10 +249,15 @@ export default async function StationDetailPage({ params, searchParams }: Statio
                   </span>
                 ))}
               </div>
+              <p className="mt-4 text-sm leading-6 text-soft/68">
+                {language === "es"
+                  ? "NO2 aparece primero porque es el indicador principal de esta web. El resto mantiene las siglas oficiales de cada contaminante."
+                  : "NO2 appears first because it is the main indicator on this site. The rest keep the official pollutant abbreviations."}
+              </p>
             </div>
 
             <div className="glass-panel rounded-[2rem] p-5 shadow-atmosphere">
-              <p className="eyebrow text-soft/60">{copy.stationOfficialContextTitle}</p>
+              <p className="eyebrow text-soft/60">{language === "es" ? "Dónde está esta estación" : "Where this station is"}</p>
               <div className="mt-5 grid gap-4 text-sm text-soft/74">
                 <div>
                   <p className="eyebrow text-soft/50">{copy.stationMunicipality}</p>
@@ -305,14 +287,59 @@ export default async function StationDetailPage({ params, searchParams }: Statio
                   <p className="eyebrow text-soft/50">{copy.stationCoordinates}</p>
                   <p className="mt-2">{formatCoordinates(station.latitude, station.longitude)}</p>
                 </div>
-                <div>
-                  <p className="eyebrow text-soft/50">{copy.stationGlobalErrorReference}</p>
-                  <p className="mt-2">{formatModelName(metrics?.selected_baseline, language)}</p>
-                </div>
               </div>
             </div>
-          </section>
-        </div>
+        </section>
+
+        <details className="glass-panel rounded-[2rem] p-5 shadow-atmosphere group">
+          <summary className="flex cursor-pointer list-none flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+            <div>
+              <p className="eyebrow text-soft/60">{language === "es" ? "Si quieres más detalle técnico" : "If you want more technical detail"}</p>
+              <p className="mt-3 max-w-3xl text-sm leading-6 text-soft/70">
+                {language === "es"
+                  ? "Aquí queda el rendimiento general de la previsión y la referencia técnica del modelo, para no mezclarlo con la lectura pública principal."
+                  : "This is where the general forecast performance and model reference stay, so they do not compete with the main public reading."}
+              </p>
+            </div>
+            <span className="inline-flex rounded-full border border-white/10 bg-white/[0.04] px-4 py-2 text-sm text-soft/80 transition group-open:bg-white/[0.08]">
+              {language === "es" ? "Abrir detalle técnico" : "Open technical detail"}
+            </span>
+          </summary>
+
+          <div className="mt-6 grid gap-6 xl:grid-cols-[0.8fr_1.2fr]">
+            <section className="rounded-[1.75rem] border border-white/10 bg-white/[0.03] p-5">
+              <div className="flex flex-wrap items-center justify-between gap-3">
+                <p className="eyebrow text-soft/60">{copy.stationModelErrorTitle}</p>
+                <p className="font-data text-sm text-soft/55">{formatModelName(metrics?.selected_baseline, language)}</p>
+              </div>
+              <div className="mt-5 grid gap-3 sm:grid-cols-3 xl:grid-cols-1">
+                <div className="rounded-[1.5rem] border border-white/10 bg-black/10 p-4">
+                  <p className="eyebrow text-soft/55">{copy.metricMae}</p>
+                  <p className="mt-3 font-data text-2xl text-bone">{selectedMetric?.mae == null ? "-" : selectedMetric.mae.toFixed(2)}</p>
+                </div>
+                <div className="rounded-[1.5rem] border border-white/10 bg-black/10 p-4">
+                  <p className="eyebrow text-soft/55">{copy.metricRmse}</p>
+                  <p className="mt-3 font-data text-2xl text-bone">{selectedMetric?.rmse == null ? "-" : selectedMetric.rmse.toFixed(2)}</p>
+                </div>
+                <div className="rounded-[1.5rem] border border-white/10 bg-black/10 p-4">
+                  <p className="eyebrow text-soft/55">{copy.metricR2}</p>
+                  <p className="mt-3 font-data text-2xl text-bone">{selectedMetric?.r2 == null ? "-" : selectedMetric.r2.toFixed(3)}</p>
+                </div>
+              </div>
+              <p className="mt-5 text-sm leading-6 text-soft/70">{copy.stationGlobalErrorNote}</p>
+            </section>
+
+            <section className="rounded-[1.75rem] border border-white/10 bg-white/[0.03] p-5">
+              <p className="eyebrow text-soft/60">{copy.stationGlobalErrorReference}</p>
+              <p className="mt-3 font-data text-xl text-bone">{formatModelName(metrics?.selected_baseline, language)}</p>
+              <p className="mt-4 text-sm leading-6 text-soft/70">
+                {language === "es"
+                  ? "Esta referencia resume el comportamiento general de la previsión en el conjunto de datos recientes, no un acierto exclusivo de esta estación."
+                  : "This reference summarises how the forecast behaves across recent data overall, not a station-specific accuracy score."}
+              </p>
+            </section>
+          </div>
+        </details>
       </section>
 
         {hourlyHeatmapData.length > 0 && (
