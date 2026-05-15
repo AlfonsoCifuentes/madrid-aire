@@ -284,21 +284,16 @@ export default async function LandingPage({ searchParams }: LandingPageProps) {
             </div>
           </div>
 
-          <div className="glass-panel rounded-[2rem] p-5 shadow-atmosphere">
-            <div className="relative min-h-[360px] overflow-hidden rounded-[1.75rem] border border-white/10 p-5">
+          <div className="glass-panel rounded-[2rem] p-2 shadow-atmosphere">
+            <div className="relative min-h-[380px] overflow-hidden rounded-[1.75rem] border border-white/10">
+              {/* Full-bleed dark map — no decorative overlays so tiles are visible */}
               <AtmosphericMiniMap nodes={landingMapNodes} className="pointer-events-none absolute inset-0 h-full w-full" />
-              <div className="absolute inset-0 bg-[radial-gradient(circle_at_18%_22%,rgba(216,255,79,0.12),transparent_0_26%),radial-gradient(circle_at_76%_74%,rgba(198,11,30,0.14),transparent_0_30%)]" />
-              <div className="absolute inset-0 bg-gradient-to-br from-[#080a0c]/28 via-[#080a0c]/10 to-[#080a0c]/48" />
-              <CinematicOverlay className="absolute inset-0" variant="panel" />
-              <IsobarLines className="absolute inset-0 opacity-[0.05]" />
-              <NoiseOverlay className="absolute inset-0 opacity-35" />
-              <div className="absolute inset-x-[12%] top-[18%] h-px bg-gradient-to-r from-transparent via-white/18 to-transparent" />
-              <div className="absolute inset-x-[18%] bottom-[24%] h-px bg-gradient-to-r from-transparent via-white/12 to-transparent" />
-              <div className="absolute inset-y-[20%] left-[24%] w-px bg-gradient-to-b from-transparent via-white/12 to-transparent" />
-              <div className="absolute inset-y-[14%] right-[18%] w-px bg-gradient-to-b from-transparent via-white/10 to-transparent" />
+              {/* Minimal scrim for card readability */}
+              <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-transparent to-black/65" />
 
-              <div className="relative z-10 grid gap-3 sm:grid-cols-2">
-                <div className="rounded-[1.5rem] border border-white/10 bg-black/25 p-4 backdrop-blur">
+              {/* Top stat cards */}
+              <div className="absolute inset-x-4 top-4 z-10 grid gap-3 sm:grid-cols-2">
+                <div className="rounded-[1.5rem] border border-white/10 bg-black/50 p-4 backdrop-blur-md">
                   <p className="eyebrow text-soft/55">{copy.worstStation}</p>
                   <p className="mt-3 font-data text-xl text-bone">{worstStationName}</p>
                   {summary?.worst_value != null && (
@@ -310,7 +305,7 @@ export default async function LandingPage({ searchParams }: LandingPageProps) {
                     </div>
                   )}
                 </div>
-                <div className="rounded-[1.5rem] border border-white/10 bg-black/25 p-4 backdrop-blur">
+                <div className="rounded-[1.5rem] border border-white/10 bg-black/50 p-4 backdrop-blur-md">
                   <p className="eyebrow text-soft/55">{copy.stationsOnline}</p>
                   <p className="mt-3 font-data text-xl text-bone">{summary?.station_count ?? 0}</p>
                   <p className="mt-2 text-xs text-soft/60">
@@ -319,16 +314,17 @@ export default async function LandingPage({ searchParams }: LandingPageProps) {
                 </div>
               </div>
 
-              <div className="absolute bottom-5 left-5 right-5 z-10 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-                <div className="rounded-[1.25rem] border border-white/10 bg-black/30 p-4 backdrop-blur">
+              {/* Bottom stat row */}
+              <div className="absolute bottom-4 left-4 right-4 z-10 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+                <div className="rounded-[1.25rem] border border-white/10 bg-black/50 p-4 backdrop-blur-md">
                   <p className="eyebrow text-soft/55">{copy.pollutantCoverage}</p>
                   <p className="mt-2 font-data text-lg text-bone">{summary?.pollutant_count ?? 0}</p>
                 </div>
-                <div className="rounded-[1.25rem] border border-white/10 bg-black/30 p-4 backdrop-blur">
+                <div className="rounded-[1.25rem] border border-white/10 bg-black/50 p-4 backdrop-blur-md">
                   <p className="eyebrow text-soft/55">{copy.latestTimestamp}</p>
                   <p className="mt-2 text-sm leading-6 text-soft/80">{latestTimestampValue}</p>
                 </div>
-                <div className="rounded-[1.25rem] border border-white/10 bg-black/30 p-4 backdrop-blur">
+                <div className="rounded-[1.25rem] border border-white/10 bg-black/50 p-4 backdrop-blur-md">
                   <p className="eyebrow text-soft/55">{copy.mapMetadataStatus}</p>
                   <p className="mt-2 font-data text-lg text-bone">{freshnessLabel}</p>
                 </div>
