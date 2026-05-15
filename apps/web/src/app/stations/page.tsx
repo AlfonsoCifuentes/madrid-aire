@@ -2,6 +2,7 @@ import Link from "next/link";
 
 import { MobileBottomNav } from "@/components/MobileBottomNav";
 import { PublicPageHeader, buildPublicMobileNavItems, type PublicNavLabels } from "@/components/PublicPageHeader";
+import { RiskBadge } from "@/components/RiskBadge";
 import { getDashboardPayload } from "@/lib/api";
 import { copyByLanguage, resolveLanguage } from "@/lib/i18n";
 import { formatPlaceName } from "@/lib/presentation";
@@ -108,16 +109,20 @@ export default async function StationsPage({ searchParams }: StationsPageProps) 
               href={`/stations/${station.station_id}?lang=${language}`}
             >
               <div className="flex items-start justify-between gap-4">
-                <div>
-                  <p className="font-data text-sm text-bone">{station.station_id}</p>
-                  <p className="mt-2 text-lg text-soft">{station.name ? formatPlaceName(station.name) : station.municipality ? formatPlaceName(station.municipality) : station.station_id}</p>
+                <div className="min-w-0 flex-1">
+                  <p className="font-data text-sm text-bone">{station.name ? formatPlaceName(station.name) : station.municipality ? formatPlaceName(station.municipality) : station.station_id}</p>
+                  <p className="mt-1 text-xs text-soft/50">{station.municipality ? formatPlaceName(station.municipality) : "-"}</p>
                 </div>
-                <p className="font-data text-2xl text-bone">{no2?.value == null ? "-" : no2.value.toLocaleString(locale, { maximumFractionDigits: 1 })}</p>
+                <div className="flex flex-col items-end gap-2">
+                  <p className="font-data text-2xl text-bone">
+                    {no2?.value == null ? "-" : no2.value.toLocaleString(locale, { maximumFractionDigits: 1 })}
+                    {no2?.value != null && <span className="ml-1 text-xs text-soft/55">µg/m³</span>}
+                  </p>
+                  <RiskBadge riskLevel={no2?.risk_level ?? null} language={language} />
+                </div>
               </div>
-              <div className="mt-4 grid gap-2 text-sm text-soft/68">
-                <p>{station.municipality ? formatPlaceName(station.municipality) : "-"}</p>
+              <div className="mt-4 flex items-center justify-between text-sm text-soft/68">
                 <p>{station.area_type ?? "-"} · {station.station_type ?? "-"}</p>
-                <p>{copy.stationsTableFreshness}: {copy.freshness[freshnessKey]}</p>
                 <p className="eyebrow text-soft/52">{copy.stationsOpenDetail}</p>
               </div>
             </Link>
@@ -148,8 +153,14 @@ export default async function StationsPage({ searchParams }: StationsPageProps) 
                     <td className="px-5 py-4 text-sm text-soft/76">{station.municipality ? formatPlaceName(station.municipality) : "-"}</td>
                     <td className="px-5 py-4 text-sm text-soft/76">{station.area_type ?? "-"}</td>
                     <td className="px-5 py-4 text-sm text-soft/76">{station.station_type ?? "-"}</td>
-                    <td className="px-5 py-4 font-data text-sm text-bone">
-                      {no2?.value == null ? "-" : no2.value.toLocaleString(locale, { maximumFractionDigits: 1 })}
+                    <td className="px-5 py-4">
+                      <span className="font-data text-sm text-bone">
+                        {no2?.value == null ? "-" : no2.value.toLocaleString(locale, { maximumFractionDigits: 1 })}
+                        {no2?.value != null && <span className="ml-1 text-xs text-soft/50">µg/m³</span>}
+                      </span>
+                      {no2?.risk_level && (
+                        <div className="mt-1.5"><RiskBadge riskLevel={no2.risk_level} language={language} /></div>
+                      )}
                     </td>
                     <td className="px-5 py-4 text-sm text-soft/76">{copy.freshness[freshnessKey]}</td>
                     <td className="px-5 py-4">
