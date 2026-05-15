@@ -236,7 +236,13 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
             {averageNo2 != null && (
               <p className="mt-3 text-sm text-soft/70">
                 {copy.dashboardAverageNo2Label} ·{" "}
-                {averageNo2.toLocaleString(locale, { maximumFractionDigits: 1 })} µg/m³
+                <span className="font-data text-bone">{averageNo2.toLocaleString(locale, { maximumFractionDigits: 1 })}</span>
+                {" "}µg/m³
+              </p>
+            )}
+            {no2Values.length > 0 && (
+              <p className="mt-2 font-data text-xs text-soft/40">
+                {no2Values.length} {language === "es" ? "estaciones activas" : "active stations"}
               </p>
             )}
           </div>
@@ -256,9 +262,14 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
           <div className="glass-panel rounded-[1.75rem] p-5 shadow-atmosphere">
             <p className="eyebrow text-soft/55">{copy.dashboardModelStatusTitle}</p>
             <p className="mt-4 font-data text-2xl text-bone">{modelDisplayName}</p>
-            <p className="mt-3 text-sm text-soft/70">
-              {copy.dashboardModelImprovementLabel} · {modelImprovementLabel}
-            </p>
+            {improvement != null ? (
+              <p className={`mt-3 font-data text-xl ${improvement >= 0 ? "text-lime" : "text-red-400"}`}>
+                {modelImprovementLabel}
+                <span className="ml-1 text-xs text-soft/50">{copy.dashboardModelImprovementLabel}</span>
+              </p>
+            ) : (
+              <p className="mt-3 text-sm text-soft/70">{copy.dashboardModelImprovementLabel} · {modelImprovementLabel}</p>
+            )}
             <Link
               className="mt-4 inline-flex text-sm text-soft/60 hover:text-soft"
               href={`/model?lang=${language}`}
