@@ -117,6 +117,11 @@ export default async function AboutPage({ searchParams }: AboutPageProps) {
                 <p className="eyebrow text-soft/55">{language === "es" ? "Horizonte de pronóstico" : "Forecast horizon"}</p>
                 <p className="mt-4 font-data text-2xl text-bone">H+{system.model.horizon_hours}</p>
                 <p className="mt-2 text-xs text-soft/55">{language === "es" ? "horas por adelantado" : "hours ahead"}</p>
+                {system.model.selected_model && (
+                  <p className="mt-2 inline-block rounded-full border border-lime/30 bg-lime/10 px-2.5 py-0.5 font-data text-[10px] uppercase tracking-widest text-lime/80">
+                    {system.model.selected_model}
+                  </p>
+                )}
               </div>
             )}
             {system?.predictions.station_count != null && (
@@ -124,6 +129,22 @@ export default async function AboutPage({ searchParams }: AboutPageProps) {
                 <p className="eyebrow text-soft/55">{language === "es" ? "Estaciones con pronóstico" : "Stations with forecast"}</p>
                 <p className="mt-4 font-data text-2xl text-bone">{system.predictions.station_count}</p>
                 <p className="mt-2 text-xs text-soft/55">NO2 · {system.predictions.horizon_count ?? "-"} {language === "es" ? "horizontes" : "horizons"}</p>
+              </div>
+            )}
+            {system?.model.training_period_start != null && (
+              <div className="glass-panel rounded-[1.75rem] p-5 shadow-atmosphere">
+                <p className="eyebrow text-soft/55">{language === "es" ? "Periodo de entrenamiento" : "Training period"}</p>
+                <p className="mt-4 font-data text-xs text-bone leading-5">
+                  {formatMoment(system.model.training_period_start, locale)}
+                </p>
+                <p className="font-data text-xs text-soft/55 leading-5">
+                  → {formatMoment(system.model.training_period_end, locale)}
+                </p>
+                {system.model.test_period_start != null && (
+                  <p className="mt-2 text-[10px] text-soft/40 uppercase tracking-widest">
+                    {language === "es" ? "Test" : "Test"}: {formatMoment(system.model.test_period_start, locale)}
+                  </p>
+                )}
               </div>
             )}
           </div>
