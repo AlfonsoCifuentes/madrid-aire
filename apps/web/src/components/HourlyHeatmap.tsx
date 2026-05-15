@@ -4,6 +4,9 @@
  * Pure SVG, no external chart library.
  */
 
+import type { Language } from "@/lib/i18n";
+import { formatRiskLabel } from "@/lib/presentation";
+
 export type HeatmapPoint = {
   hour: number; // 0–23
   value: number; // µg/m³
@@ -15,6 +18,7 @@ type HourlyHeatmapProps = {
   hourLabel?: string;
   /** Unit shown in the top-right corner */
   unit?: string;
+  language?: Language;
   className?: string;
 };
 
@@ -35,13 +39,13 @@ function relativeOpacity(value: number, min: number, max: number): number {
 
 const HOURS = Array.from({ length: 24 }, (_, i) => i);
 
-export function HourlyHeatmap({ data, hourLabel = "h", unit = "µg/m³", className }: HourlyHeatmapProps) {
+export function HourlyHeatmap({ data, hourLabel = "h", unit = "µg/m³", language = "en", className }: HourlyHeatmapProps) {
   if (data.length === 0) {
     return (
       <div
         className={`flex min-h-[80px] items-center justify-center rounded-[1.5rem] border border-white/10 bg-white/[0.03] ${className ?? ""}`}
       >
-        <p className="eyebrow text-soft/35">NO DATA</p>
+        <p className="eyebrow text-soft/35">{language === "es" ? "SIN DATOS" : "NO DATA"}</p>
       </div>
     );
   }
@@ -67,14 +71,14 @@ export function HourlyHeatmap({ data, hourLabel = "h", unit = "µg/m³", classNa
   return (
     <div className={`overflow-x-auto rounded-[1.5rem] border border-white/10 bg-white/[0.03] p-4 ${className ?? ""}`}>
       <div className="mb-2 flex items-center justify-between">
-        <p className="eyebrow text-soft/50">24h pattern</p>
+        <p className="eyebrow text-soft/50">{language === "es" ? "patrón 24 h" : "24h pattern"}</p>
         <p className="font-data text-xs text-soft/35">{unit}</p>
       </div>
       <svg
         viewBox={`0 0 ${TOTAL_W} ${TOTAL_H}`}
         style={{ width: "100%", minWidth: `${Math.min(TOTAL_W, 400)}px`, height: "auto" }}
         role="img"
-        aria-label="Hourly NO2 heatmap"
+        aria-label={language === "es" ? "Mapa de calor horario de NO2" : "Hourly NO2 heatmap"}
       >
         {HOURS.map((hour) => {
           const val = byHour.get(hour);
@@ -128,15 +132,15 @@ export function HourlyHeatmap({ data, hourLabel = "h", unit = "µg/m³", classNa
       {/* Risk legend */}
       <div className="mt-3 flex flex-wrap items-center gap-3 text-[0.62rem] uppercase tracking-[0.14em] text-soft/38">
         {[
-          { color: "#80FFB2", label: "Good" },
-          { color: "#D8FF4F", label: "Acceptable" },
-          { color: "#FFB000", label: "Moderate" },
-          { color: "#FF6B35", label: "Poor" },
-          { color: "#C2410C", label: "Very poor" },
-        ].map(({ color, label }) => (
-          <span key={label} className="inline-flex items-center gap-1.5">
+          { color: "#80FFB2", key: "good" },
+          { color: "#D8FF4F", key: "acceptable" },
+          { color: "#FFB000", key: "moderate" },
+          { color: "#FF6B35", key: "poor" },
+          { color: "#C2410C", key: "very_poor" },
+        ].map(({ color, key }) => (
+          <span key={key} className="inline-flex items-center gap-1.5">
             <span className="inline-block h-2 w-2 rounded-sm" style={{ background: color }} />
-            {label}
+            {formatRiskLabel(key, language)}
           </span>
         ))}
       </div>

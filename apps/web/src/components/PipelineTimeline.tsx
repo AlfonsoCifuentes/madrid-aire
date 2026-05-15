@@ -7,6 +7,7 @@
  */
 
 import { type SystemStatusEnvelope } from "@/lib/api";
+import { formatOperationalLabel } from "@/lib/presentation";
 
 type PipelineTimelineProps = {
   system: SystemStatusEnvelope | null;
@@ -82,7 +83,9 @@ function buildStages(system: SystemStatusEnvelope | null, language: "es" | "en")
       rawStatus: system?.data_quality.freshness ?? system?.data_quality.status ?? "unknown",
       detail:
         system?.data_quality.station_count != null
-          ? `${system.data_quality.station_count} stations · ${system.data_quality.pollutant_count ?? 0} pollutants`
+          ? language === "es"
+            ? `${system.data_quality.station_count} estaciones · ${system.data_quality.pollutant_count ?? 0} contaminantes`
+            : `${system.data_quality.station_count} stations · ${system.data_quality.pollutant_count ?? 0} pollutants`
           : "-",
     },
     {
@@ -131,7 +134,7 @@ export function PipelineTimeline({ system, language = "en", className }: Pipelin
             {/* Content */}
             <div className="pb-6">
               <p className="eyebrow text-soft/50">{language === "es" ? stage.labelEs : stage.label}</p>
-              <p className="mt-1 font-data text-sm text-bone">{stage.rawStatus}</p>
+              <p className="mt-1 font-data text-sm text-bone">{formatOperationalLabel(stage.rawStatus, language)}</p>
               <p className="mt-1 font-data text-xs text-soft/40">{stage.detail}</p>
             </div>
           </div>
@@ -160,7 +163,7 @@ export function PipelineTimeline({ system, language = "en", className }: Pipelin
                   className="mt-2 font-data text-xs uppercase tracking-[0.18em] truncate"
                   style={{ color: statusColor(stage.status) }}
                 >
-                  {stage.rawStatus}
+                  {formatOperationalLabel(stage.rawStatus, language)}
                 </p>
                 {/* Detail */}
                 <p className="mt-1 font-data text-xs text-soft/38 truncate">{stage.detail}</p>

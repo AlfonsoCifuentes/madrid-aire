@@ -1,3 +1,5 @@
+import type { Language } from "@/lib/i18n";
+
 export type ChartPoint = {
   timestamp: string;
   value: number;
@@ -8,6 +10,7 @@ type HistoryForecastChartProps = {
   predicted: ChartPoint[];
   observedLabel: string;
   predictedLabel: string;
+  language?: Language;
 };
 
 // NO2 risk thresholds (µg/m³) matching §15.5 of spec
@@ -79,7 +82,7 @@ function buildRiskBandRects(
   return rects.filter((r) => r.h > 0);
 }
 
-export function HistoryForecastChart({ observed, predicted, observedLabel, predictedLabel }: HistoryForecastChartProps) {
+export function HistoryForecastChart({ observed, predicted, observedLabel, predictedLabel, language = "en" }: HistoryForecastChartProps) {
   const W = 820;
   const H = 280;
   const PAD_X = 24;
@@ -92,7 +95,7 @@ export function HistoryForecastChart({ observed, predicted, observedLabel, predi
   if (allValues.length === 0) {
     return (
       <div className="flex min-h-[200px] items-center justify-center rounded-[1.75rem] border border-white/10 bg-white/[0.03] p-4">
-        <p className="eyebrow text-soft/40">NO DATA</p>
+        <p className="eyebrow text-soft/40">{language === "es" ? "SIN DATOS" : "NO DATA"}</p>
       </div>
     );
   }
@@ -126,11 +129,11 @@ export function HistoryForecastChart({ observed, predicted, observedLabel, predi
         </span>
         <span className="ml-auto inline-flex items-center gap-2 text-soft/35">
           <span className="inline-block h-2 w-5 rounded-sm border border-white/20 bg-white/5" />
-          risk bands
+          {language === "es" ? "bandas de riesgo" : "risk bands"}
         </span>
       </div>
 
-      <svg className="h-auto w-full" viewBox={`0 0 ${W} ${H + PAD_Y}`} role="img" aria-label="History and forecast chart">
+      <svg className="h-auto w-full" viewBox={`0 0 ${W} ${H + PAD_Y}`} role="img" aria-label={language === "es" ? "Gráfico de histórico y previsión" : "History and forecast chart"}>
         <defs>
           <clipPath id="hfc-obs-clip">
             <rect x={PAD_X} y={PAD_Y} width={PANEL_W} height={CHART_H} />
@@ -212,7 +215,7 @@ export function HistoryForecastChart({ observed, predicted, observedLabel, predi
           fontFamily="monospace"
           letterSpacing="0.14em"
         >
-          NOW
+          {language === "es" ? "AHORA" : "NOW"}
         </text>
 
         {/* Observed area fill */}

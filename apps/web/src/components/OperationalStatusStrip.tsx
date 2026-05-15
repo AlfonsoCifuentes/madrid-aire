@@ -2,6 +2,7 @@ import Link from "next/link";
 
 import { SystemStatusEnvelope } from "@/lib/api";
 import { Language } from "@/lib/i18n";
+import { formatOperationalLabel, formatSourceLabel } from "@/lib/presentation";
 
 type OperationalStatusStripProps = {
   language: Language;
@@ -47,6 +48,7 @@ function buildStatusNarrative(
   const latestObservation = formatMoment(system.pipeline.latest_timestamp, language);
   const freshness = freshnessLabels[system.data_quality.freshness] ?? system.data_quality.freshness;
   const usingD1 = system.pipeline.source === "cloudflare_d1";
+  const sourceLabel = formatSourceLabel(system.pipeline.source, language);
 
   if (usingD1 && system.data_quality.freshness === "stale") {
     return {
@@ -102,8 +104,8 @@ function buildStatusNarrative(
           : "D1 is configured, but it is not the active source",
       body:
         language === "es"
-          ? `La señal actual sigue entrando por ${system.pipeline.source}. Cloudflare D1 está listo, pero todavía no gobierna la lectura activa.`
-          : `The current signal still comes through ${system.pipeline.source}. Cloudflare D1 is configured, but it does not yet govern the live reading path.`,
+          ? `La señal actual sigue entrando por ${sourceLabel}. Cloudflare D1 está listo, pero todavía no gobierna la lectura activa.`
+          : `The current signal still comes through ${sourceLabel}. Cloudflare D1 is configured, but it does not yet govern the live reading path.`,
       tone: "border-white/10 bg-white/[0.04] text-soft",
     };
   }
@@ -130,12 +132,12 @@ export function OperationalStatusStrip({ language, system, freshnessLabels, curr
     ? [
         {
           label: language === "es" ? "Entorno" : "Environment",
-          value: system.environment,
+          value: formatOperationalLabel(system.environment, language),
           note: language === "es" ? "lectura declarada por la API" : "reported by the API",
         },
         {
           label: language === "es" ? "Fuente observacional" : "Observation source",
-          value: system.pipeline.source,
+          value: formatSourceLabel(system.pipeline.source, language),
           note: language === "es" ? "ruta activa de lectura" : "active read path",
         },
         {
@@ -145,7 +147,7 @@ export function OperationalStatusStrip({ language, system, freshnessLabels, curr
         },
         {
           label: language === "es" ? "Ingestión remota" : "Remote ingest",
-          value: system.cron.status,
+          value: formatOperationalLabel(system.cron.status, language),
           note: `D1 ${system.cron.cloudflare_d1_configured ? yesLabel : noLabel} · jobs ${system.cron.jobs_configured ? yesLabel : noLabel}`,
         },
       ]
@@ -175,7 +177,7 @@ export function OperationalStatusStrip({ language, system, freshnessLabels, curr
               className="rounded-full border border-white/10 bg-white/[0.03] px-4 py-2.5 text-sm text-soft/78 transition hover:bg-white/[0.08] hover:text-soft"
               href={`/about?lang=${language}#advanced`}
             >
-              {language === "es" ? "Volver a Advanced" : "Back to Advanced"}
+              {language === "es" ? "Volver a la guía" : "Back to guide"}
             </Link>
           ) : null}
         </div>

@@ -6,6 +6,7 @@ import { PublicPageHeader, buildPublicMobileNavItems, type PublicNavLabels } fro
 import { getDashboardPayload, getHistoryPayload, getPredictionsPayload, getSystemStatusPayload } from "@/lib/api";
 import { buildPredictionsHref } from "@/lib/editorial";
 import { copyByLanguage, resolveLanguage } from "@/lib/i18n";
+import { formatPlaceName } from "@/lib/presentation";
 
 type PredictionsPageProps = {
   searchParams?: Promise<{ h?: string | string[]; lang?: string | string[]; station?: string | string[] }>;
@@ -56,13 +57,13 @@ function buildPredictionsPageCopy(language: "es" | "en"): PredictionsPageCopy {
         acceptable: "aceptable",
         good: "bueno",
         moderate: "moderado",
-        poor: "malo",
+        poor: "deficiente",
         unhealthy: "insalubre",
         unknown: "desconocido",
         very_unhealthy: "muy insalubre",
       },
       selectedForecastTitle: "Previsión seleccionada",
-      stationSelectorBody: "Puedes cambiar de estación para revisar cómo cambia el forecast previsto en cada punto prioritario de la red.",
+      stationSelectorBody: "Puedes cambiar de estación para revisar cómo cambia la previsión esperada en cada punto prioritario de la red.",
       stationSelectorTitle: "Selector de estación",
       statusLabel: "Horizontes disponibles",
       targetLabel: "Contaminante",
@@ -185,8 +186,8 @@ export default async function PredictionsPage({ searchParams }: PredictionsPageP
   const stationOptions = dashboard.stations?.items
     .filter((item) => predictedStationIds.includes(item.station_id))
     .sort((left, right) => {
-      const leftLabel = `${left.municipality ?? ""} ${left.name ?? left.station_id}`.trim();
-      const rightLabel = `${right.municipality ?? ""} ${right.name ?? right.station_id}`.trim();
+      const leftLabel = `${left.municipality ? formatPlaceName(left.municipality) : ""} ${left.name ? formatPlaceName(left.name) : left.station_id}`.trim();
+      const rightLabel = `${right.municipality ? formatPlaceName(right.municipality) : ""} ${right.name ? formatPlaceName(right.name) : right.station_id}`.trim();
       return leftLabel.localeCompare(rightLabel);
     }) ?? [];
   const stationPredictions = stationId
@@ -229,7 +230,7 @@ export default async function PredictionsPage({ searchParams }: PredictionsPageP
           <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
             <div className="glass-panel rounded-[1.75rem] p-5 shadow-atmosphere">
               <p className="eyebrow text-soft/55">{pageCopy.priorityStationLabel}</p>
-              <p className="mt-4 font-data text-2xl text-bone">{station?.name ?? stationId ?? "-"}</p>
+              <p className="mt-4 font-data text-2xl text-bone">{station?.name ? formatPlaceName(station.name) : stationId ?? "-"}</p>
               <p className="mt-3 text-sm text-soft/70">{stationId ?? "-"}</p>
             </div>
             <div className="glass-panel rounded-[1.75rem] p-5 shadow-atmosphere">
@@ -276,8 +277,8 @@ export default async function PredictionsPage({ searchParams }: PredictionsPageP
                         : "border-white/10 bg-white/[0.03] text-soft/78 hover:bg-white/[0.08]",
                     ].join(" ")}
                   >
-                    <span className="font-data text-sm">{candidate.name ?? candidate.station_id}</span>
-                    <span className="mt-2 text-xs text-soft/65">{candidate.municipality ?? candidate.station_id}</span>
+                    <span className="font-data text-sm">{candidate.name ? formatPlaceName(candidate.name) : candidate.station_id}</span>
+                    <span className="mt-2 text-xs text-soft/65">{candidate.municipality ? formatPlaceName(candidate.municipality) : candidate.station_id}</span>
                   </Link>
                 );
               })
@@ -330,7 +331,7 @@ export default async function PredictionsPage({ searchParams }: PredictionsPageP
               <p className="font-data text-sm text-soft/55">{language === "es" ? `${targetPollutant} · últimas 24 h + previsión` : `${targetPollutant} · last 24h + forecast`}</p>
             </div>
             <div className="mt-5">
-              <HistoryForecastChart observed={observed} predicted={predicted} observedLabel={copy.observedLabel} predictedLabel={copy.predictedLabel} />
+              <HistoryForecastChart observed={observed} predicted={predicted} observedLabel={copy.observedLabel} predictedLabel={copy.predictedLabel} language={language} />
             </div>
             <div className="mt-5 grid gap-4 sm:grid-cols-2 2xl:grid-cols-3">
               <div className="rounded-[1.5rem] border border-white/10 bg-white/[0.03] p-4">
@@ -400,7 +401,7 @@ export default async function PredictionsPage({ searchParams }: PredictionsPageP
                 </div>
                 <div>
                   <p className="eyebrow text-soft/55">{pageCopy.priorityStationLabel}</p>
-                  <p className="mt-2 font-data text-sm text-bone">{station?.name ?? stationId ?? "-"}</p>
+                  <p className="mt-2 font-data text-sm text-bone">{station?.name ? formatPlaceName(station.name) : stationId ?? "-"}</p>
                 </div>
                 <div>
                   <p className="eyebrow text-soft/55">{pageCopy.generatedAtLabel}</p>

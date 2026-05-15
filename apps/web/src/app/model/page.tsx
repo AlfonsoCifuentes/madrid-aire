@@ -51,8 +51,8 @@ function buildModelSections(language: "es" | "en") {
           body: "Genera previsiones en pasos horarios para las próximas 24 horas desde el momento de generación.",
         },
         {
-          title: "Variables meteorológicas y temporales",
-          body: "Incluye hora del día, día de la semana y temperatura como variables explicativas principales.",
+          title: "Variables temporales y contexto de estación",
+          body: "Incluye hora del día, día de la semana, mes, indicador de fin de semana y codificación por estación como base explicativa del modelo.",
         },
         {
           title: "Comparación con referencias simples",
@@ -66,8 +66,8 @@ function buildModelSections(language: "es" | "en") {
           body: "Los datos de entrenamiento no cubren episodios de contaminación severa o eventos meteorológicos excepcionales.",
         },
         {
-          title: "Sin cobertura espacial completa",
-          body: "El modelo produce una previsión única para la red, no valores individuales para cada estación.",
+          title: "Cobertura limitada a la red oficial",
+          body: "El modelo genera previsiones por estación para la red oficial, pero no interpola fuera de esos puntos ni crea superficies continuas sobre todo Madrid.",
         },
         {
           title: "Sin actualización en tiempo real",
@@ -93,8 +93,8 @@ function buildModelSections(language: "es" | "en") {
         body: "Produces hourly forecasts for the next 24 hours from the moment of generation.",
       },
       {
-        title: "Meteorological and temporal variables",
-        body: "Includes time of day, day of week, and temperature as the main explanatory variables.",
+        title: "Temporal variables and station context",
+        body: "Includes time of day, day of week, month, weekend flag, and station encoding as the model's explanatory base.",
       },
       {
         title: "Comparison against simple baselines",
@@ -108,8 +108,8 @@ function buildModelSections(language: "es" | "en") {
         body: "Training data does not cover severe pollution episodes or exceptional meteorological events.",
       },
       {
-        title: "No full spatial coverage",
-        body: "The model produces a single network-wide forecast, not individual values per station.",
+        title: "Coverage limited to the official network",
+        body: "The model produces station-level forecasts for the official network, but it does not interpolate beyond those points or generate a continuous surface across Madrid.",
       },
       {
         title: "No real-time updates",
@@ -226,6 +226,7 @@ export default async function ModelPage({ searchParams }: ModelPageProps) {
             maeLabel={copy.metricMae}
             rmseLabel={copy.metricRmse}
             selectedBaseline={metrics?.selected_baseline}
+            language={language}
           />
         </section>
 

@@ -8,6 +8,7 @@ import { PublicPageHeader, buildPublicMobileNavItems, type PublicNavLabels } fro
 import { Sparkline } from "@/components/Sparkline";
 import { getDashboardPayload, getHistoryPayload, getModelMetricsPayload, getPredictionsPayload } from "@/lib/api";
 import { copyByLanguage, resolveLanguage } from "@/lib/i18n";
+import { formatPlaceName, formatRiskLabel } from "@/lib/presentation";
 
 type StationDetailPageProps = {
   params: Promise<{ id: string }>;
@@ -135,7 +136,7 @@ export default async function StationDetailPage({ params, searchParams }: Statio
           <div>
             <p className="eyebrow text-soft/55">{copy.stationDetailTitle}</p>
             <h1 className="mt-4 text-4xl font-medium tracking-[-0.04em] text-soft sm:text-5xl lg:text-6xl">
-              {station.name ?? station.municipality ?? station.station_id}
+              {station.name ? formatPlaceName(station.name) : station.municipality ? formatPlaceName(station.municipality) : station.station_id}
             </h1>
             <p className="mt-4 font-data text-lg text-soft/62">{station.station_id}</p>
             <p className="mt-6 max-w-2xl text-lg leading-8 text-soft/74">{copy.stationDetailSubtitle}</p>
@@ -170,7 +171,7 @@ export default async function StationDetailPage({ params, searchParams }: Statio
             </div>
             <div className="mt-5">
               {observed.length > 0 || predicted.length > 0 ? (
-                <HistoryForecastChart observed={observed} predicted={predicted} observedLabel={copy.observedLabel} predictedLabel={copy.predictedLabel} />
+                <HistoryForecastChart observed={observed} predicted={predicted} observedLabel={copy.observedLabel} predictedLabel={copy.predictedLabel} language={language} />
               ) : (
                 <div className="rounded-[1.75rem] border border-white/10 bg-white/[0.03] p-5 text-sm text-soft/72">
                   {copy.stationNoHistory}
@@ -195,7 +196,7 @@ export default async function StationDetailPage({ params, searchParams }: Statio
                   <div className="flex items-start justify-between gap-4">
                     <div>
                       <p className="font-data text-sm text-bone">{item.pollutant_code}</p>
-                      <p className="mt-2 text-xs uppercase tracking-[0.18em] text-soft/52">{item.risk_level ?? "unknown"}</p>
+                      <p className="mt-2 text-xs uppercase tracking-[0.18em] text-soft/52">{formatRiskLabel(item.risk_level, language)}</p>
                     </div>
                     <div className="flex flex-col items-end gap-1.5">
                       <p className="font-data text-xl text-bone">{item.value.toLocaleString(locale, { maximumFractionDigits: 1 })}</p>
@@ -250,7 +251,7 @@ export default async function StationDetailPage({ params, searchParams }: Statio
               <div className="mt-5 grid gap-4 text-sm text-soft/74">
                 <div>
                   <p className="eyebrow text-soft/50">{copy.stationMunicipality}</p>
-                  <p className="mt-2">{station.municipality ?? "-"}</p>
+                  <p className="mt-2">{station.municipality ? formatPlaceName(station.municipality) : "-"}</p>
                 </div>
                 <div>
                   <p className="eyebrow text-soft/50">{copy.stationAddress}</p>
@@ -296,6 +297,7 @@ export default async function StationDetailPage({ params, searchParams }: Statio
               data={hourlyHeatmapData}
               hourLabel="h"
               unit="µg/m³"
+              language={language}
             />
           </section>
         )}

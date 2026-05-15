@@ -7,6 +7,7 @@ import { OperationalStatusStrip } from "@/components/OperationalStatusStrip";
 import { getAlertsPayload, getDashboardPayload, getModelMetricsPayload, getPredictionsPayload, getSystemStatusPayload } from "@/lib/api";
 import { buildForecastHotspots, buildMunicipalitySnapshots, buildPredictionsHref, buildStationDetailHref } from "@/lib/editorial";
 import { copyByLanguage, resolveLanguage } from "@/lib/i18n";
+import { formatAlertBody, formatAlertCategory, formatAlertSeverity, formatAlertTitle, formatOperationalLabel, formatPlaceName } from "@/lib/presentation";
 
 type ReportsPageProps = {
   searchParams?: Promise<{ lang?: string | string[] }>;
@@ -77,11 +78,11 @@ function buildCopy(language: "es" | "en") {
       predictorLabel: "Modelo actual",
       overallNote: "No es un parte oficial; es una lectura editorial construida sobre datos oficiales y el estado actual del proyecto.",
       editorialTitle: "Lectura editorial del día",
-      editorialBody: "Un resumen corto para entender dónde mirar ahora, qué zona concentra más presión y qué tramo del forecast conviene seguir a continuación.",
+      editorialBody: "Un resumen corto para entender dónde mirar ahora, qué zona concentra más presión y qué tramo de la previsión conviene seguir a continuación.",
       municipalitiesTitle: "Municipios a vigilar",
       municipalitiesBody: "La lectura territorial se apoya en el peor valor actual de NO2 por municipio con presencia operativa en la red.",
       forecastWatchTitle: "Próximos picos previstos",
-      forecastWatchBody: "Estos son los puntos donde el forecast actual concentra los valores más altos en la próxima ventana operativa.",
+      forecastWatchBody: "Estos son los puntos donde la previsión actual concentra los valores más altos en la próxima ventana operativa.",
       municipalityStationsLabel: "estaciones con señal",
       peakStationLabel: "Punto más alto",
       forecastForLabel: "Previsto para",
@@ -197,15 +198,15 @@ export default async function ReportsPage({ searchParams }: ReportsPageProps) {
                 <p className="mt-3 text-lg text-bone">
                   {leadingMunicipality
                     ? language === "es"
-                      ? `${leadingMunicipality.municipality} lidera la lectura territorial actual.`
-                      : `${leadingMunicipality.municipality} is currently leading the territorial read.`
+                      ? `${formatPlaceName(leadingMunicipality.municipality)} lidera la lectura territorial actual.`
+                      : `${formatPlaceName(leadingMunicipality.municipality)} is currently leading the territorial read.`
                     : "-"}
                 </p>
                 <p className="mt-3 text-sm leading-6 text-soft/70">
                   {leadingMunicipality
                     ? language === "es"
-                      ? `${pageCopy.peakStationLabel}: ${leadingMunicipality.stationName} (${leadingMunicipality.stationId}) con ${leadingMunicipality.peakValue.toFixed(1)} µg/m³.`
-                      : `${pageCopy.peakStationLabel}: ${leadingMunicipality.stationName} (${leadingMunicipality.stationId}) with ${leadingMunicipality.peakValue.toFixed(1)} µg/m³.`
+                      ? `${pageCopy.peakStationLabel}: ${formatPlaceName(leadingMunicipality.stationName)} (${leadingMunicipality.stationId}) con ${leadingMunicipality.peakValue.toFixed(1)} µg/m³.`
+                      : `${pageCopy.peakStationLabel}: ${formatPlaceName(leadingMunicipality.stationName)} (${leadingMunicipality.stationId}) with ${leadingMunicipality.peakValue.toFixed(1)} µg/m³.`
                     : "-"}
                 </p>
               </Link>
@@ -217,15 +218,15 @@ export default async function ReportsPage({ searchParams }: ReportsPageProps) {
                 <p className="mt-3 text-lg text-bone">
                   {leadingForecast
                     ? language === "es"
-                      ? `${leadingForecast.municipality} concentra el próximo pico previsto.`
-                      : `${leadingForecast.municipality} concentrates the next forecast peak.`
+                      ? `${formatPlaceName(leadingForecast.municipality)} concentra el próximo pico previsto.`
+                      : `${formatPlaceName(leadingForecast.municipality)} concentrates the next forecast peak.`
                     : "-"}
                 </p>
                 <p className="mt-3 text-sm leading-6 text-soft/70">
                   {leadingForecast
                     ? language === "es"
-                      ? `${leadingForecast.stationName} marca ${leadingForecast.predictedValue.toFixed(1)} µg/m³ en H+${leadingForecast.horizonHours}.`
-                      : `${leadingForecast.stationName} reaches ${leadingForecast.predictedValue.toFixed(1)} µg/m³ at H+${leadingForecast.horizonHours}.`
+                      ? `${formatPlaceName(leadingForecast.stationName)} marca ${leadingForecast.predictedValue.toFixed(1)} µg/m³ en H+${leadingForecast.horizonHours}.`
+                      : `${formatPlaceName(leadingForecast.stationName)} reaches ${leadingForecast.predictedValue.toFixed(1)} µg/m³ at H+${leadingForecast.horizonHours}.`
                     : "-"}
                 </p>
               </Link>
@@ -245,8 +246,8 @@ export default async function ReportsPage({ searchParams }: ReportsPageProps) {
                   >
                     <div className="flex items-start justify-between gap-3">
                       <div>
-                        <p className="text-sm text-soft/72">{municipality.municipality}</p>
-                        <p className="mt-2 font-data text-sm text-bone">{municipality.stationName}</p>
+                        <p className="text-sm text-soft/72">{formatPlaceName(municipality.municipality)}</p>
+                        <p className="mt-2 font-data text-sm text-bone">{formatPlaceName(municipality.stationName)}</p>
                       </div>
                       <p className="font-data text-xl text-bone">{municipality.peakValue.toFixed(1)}</p>
                     </div>
@@ -314,7 +315,7 @@ export default async function ReportsPage({ searchParams }: ReportsPageProps) {
             <div className="mt-5 grid gap-4 sm:grid-cols-2 2xl:grid-cols-3">
               <div>
                 <p className="eyebrow text-soft/55">{copy.systemGlobalStatusLabel}</p>
-                <p className="mt-2 font-data text-sm text-bone">{system?.status ?? "-"}</p>
+                <p className="mt-2 font-data text-sm text-bone">{formatOperationalLabel(system?.status, language)}</p>
               </div>
               <div>
                 <p className="eyebrow text-soft/55">{copy.mapNodeFreshness}</p>
@@ -335,11 +336,11 @@ export default async function ReportsPage({ searchParams }: ReportsPageProps) {
                 alerts.items.map((alert) => (
                   <article key={alert.id} className={`rounded-[1.5rem] border p-4 ${severityClasses(alert.severity)}`}>
                     <div className="flex flex-wrap items-center justify-between gap-3">
-                      <p className="eyebrow">{alert.category}</p>
-                      <p className="font-data text-xs uppercase tracking-[0.24em]">{alert.severity}</p>
+                      <p className="eyebrow">{formatAlertCategory(alert.category, language)}</p>
+                      <p className="font-data text-xs uppercase tracking-[0.24em]">{formatAlertSeverity(alert.severity, language)}</p>
                     </div>
-                    <h3 className="mt-3 text-lg font-medium text-bone">{alert.title}</h3>
-                    <p className="mt-2 text-sm leading-6">{alert.body}</p>
+                    <h3 className="mt-3 text-lg font-medium text-bone">{formatAlertTitle(alert.title, language)}</h3>
+                    <p className="mt-2 text-sm leading-6">{formatAlertBody(alert.body, language)}</p>
                   </article>
                 ))
               ) : (
@@ -365,8 +366,8 @@ export default async function ReportsPage({ searchParams }: ReportsPageProps) {
                 >
                   <div className="flex items-start justify-between gap-3">
                     <div>
-                      <p className="text-sm text-soft/72">{forecast.municipality}</p>
-                      <p className="mt-2 font-data text-sm text-bone">{forecast.stationName}</p>
+                      <p className="text-sm text-soft/72">{formatPlaceName(forecast.municipality)}</p>
+                      <p className="mt-2 font-data text-sm text-bone">{formatPlaceName(forecast.stationName)}</p>
                     </div>
                     <p className="font-data text-xl text-bone">{forecast.predictedValue.toFixed(1)}</p>
                   </div>

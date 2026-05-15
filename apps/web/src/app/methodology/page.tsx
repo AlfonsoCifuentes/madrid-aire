@@ -66,21 +66,21 @@ function buildSections(language: "es" | "en", stationCount: number, pollutantCou
       limitationsTitle: "Limitaciones",
       sources: [
         `Comunidad de Madrid: históricos oficiales 2025 y 2026 para calidad del aire.`,
-        `CSV oficial de día actual para extender la señal operativa del slice local-first.`,
+        `Cloudflare D1 sirve la señal observacional reciente ya normalizada; los CSV oficiales diarios siguen siendo la materia prima y el respaldo verificable del flujo.`,
         `Metadatos oficiales de estación para municipio, dirección, zona y coordenadas.`,
-        `Meteorología documentada en el bible, pero todavía no integrada en el modelo v1.`,
+        `Las variables meteorológicas siguen documentadas para iteraciones futuras, pero todavía no forman parte del modelo v1 publicado.`,
       ],
       etl: [
         "Lectura flexible de CSV oficiales con pandas.",
         "Normalización wide-to-long a observaciones por estación, contaminante y hora.",
-        "Merge local de todos los snapshots `.normalized.csv` con deduplicación por timestamp.",
+        "Consolidación de snapshots `.normalized.csv` con deduplicación por timestamp antes de publicar la señal operativa.",
         "Asignación conservadora de `risk_level` y descarte explícito de valores inválidos.",
       ],
       validation: [
         `Cobertura observacional actual: ${stationCount} estaciones y ${pollutantCount} contaminantes activos.`,
-        "Sin estaciones sintéticas, sin coordenadas inventadas y sin forecast en frontend.",
+        "Sin estaciones sintéticas, sin coordenadas inventadas y sin previsión calculada en el frontend.",
         "Chequeos de frescura y consistencia antes de exponer `/api/latest`, `/api/summary` y `/api/system-status`.",
-        "Artefactos ML publicados solo tras split temporal honesto y métricas comparadas contra baseline.",
+        "Artefactos ML publicados solo tras split temporal honesto y métricas comparadas contra una referencia simple.",
       ],
       features: [
         "Variables temporales: hora, día de la semana, mes e indicador de fin de semana.",
@@ -88,13 +88,13 @@ function buildSections(language: "es" | "en", stationCount: number, pollutantCou
         "Lags de 1h, 3h, 6h, 24h y 168h sobre la señal de NO2.",
         "Rolling means de 3h, 6h y 24h calculadas por estación sin fuga temporal.",
       ],
-      evaluationNote: "Comparativa real entre el predictor seleccionado y los baselines de referencia sobre la ventana de test.",
-      splitNote: "La validación local actual es train 2025 / test 2026; todavía no existe una ventana intermedia persistida.",
+      evaluationNote: "Comparativa real entre el predictor seleccionado y las referencias simples sobre la ventana de test.",
+      splitNote: "La validación actual usa train 2025 / test 2026; todavía no existe una ventana intermedia persistida entre ambos bloques.",
       limitations: [
         "La API pública todavía no expone error por estación aunque el artefacto sí lo calcula.",
-        "La ruta operativa sigue siendo local-first; Cloudflare D1 y el cron remoto aún no gobiernan el flujo real.",
+        "La lectura observacional ya sale de Cloudflare D1, pero la frescura sigue dependiendo de que el ciclo protegido complete la ingestión a tiempo.",
         "No hay features meteorológicas en el modelo v1 actual.",
-        "Los reports longitudinales todavía no tienen persistencia semanal histórica.",
+        "Las previsiones y métricas siguen publicándose como artefactos versionados; todavía no existe persistencia longitudinal semanal para informes históricos.",
       ],
     };
   }
@@ -109,14 +109,14 @@ function buildSections(language: "es" | "en", stationCount: number, pollutantCou
     limitationsTitle: "Limitations",
     sources: [
       "Comunidad de Madrid: official 2025 and 2026 historical air-quality exports.",
-      "Official current-day CSV used to extend the operational signal in the local-first slice.",
+      "Cloudflare D1 serves the recent normalized observation signal, while official daily CSV exports remain the verified raw input and fallback source.",
       "Official station metadata for municipality, address, zone, and coordinates.",
-      "Weather is documented in the bible but not integrated into model v1 yet.",
+      "Weather variables remain documented for future iterations, but they are not part of the published v1 model yet.",
     ],
     etl: [
       "Flexible ingestion of official CSV files with pandas.",
       "Wide-to-long normalization into station, pollutant, and hourly observations.",
-      "Local merge of all `.normalized.csv` snapshots with timestamp-level deduplication.",
+      "Consolidation of `.normalized.csv` snapshots with timestamp-level deduplication before the operational signal is published.",
       "Conservative `risk_level` assignment and explicit removal of invalid values.",
     ],
     validation: [
@@ -132,12 +132,12 @@ function buildSections(language: "es" | "en", stationCount: number, pollutantCou
       "3h, 6h, and 24h rolling means computed per station without temporal leakage.",
     ],
     evaluationNote: "Real comparison between the selected predictor and the reference baselines on the test window.",
-    splitNote: "The current local validation uses train 2025 / test 2026; an intermediate persisted validation window does not exist yet.",
+    splitNote: "The current validation uses train 2025 / test 2026; an intermediate persisted validation window does not exist yet.",
     limitations: [
       "The public API still does not expose station-level error even though the artifact computes it.",
-      "The operational path remains local-first; Cloudflare D1 and remote cron do not govern the live flow yet.",
+      "Observations already come from Cloudflare D1, but freshness still depends on the protected ingest cycle completing on time.",
       "Weather features are not part of the current v1 model.",
-      "Longitudinal reports still lack persisted weekly history.",
+      "Forecasts and metrics are still published as versioned artifacts, and weekly historical reporting is not persisted yet.",
     ],
   };
 }

@@ -199,6 +199,7 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
                 predicted={[]}
                 observedLabel={copy.observedLabel}
                 predictedLabel={copy.predictedLabel}
+                language={language}
               />
             </div>
           </section>

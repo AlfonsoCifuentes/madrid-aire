@@ -4,6 +4,7 @@ import { OperationalStatusStrip } from "@/components/OperationalStatusStrip";
 import { PipelineTimeline } from "@/components/PipelineTimeline";
 import { AlertItem, getAlertsPayload, getSystemStatusPayload } from "@/lib/api";
 import { copyByLanguage, resolveLanguage } from "@/lib/i18n";
+import { formatAlertBody, formatAlertCategory, formatAlertSeverity, formatAlertTitle, formatOperationalLabel, formatSourceLabel } from "@/lib/presentation";
 
 type SystemPageProps = {
   searchParams?: Promise<{ lang?: string | string[] }>;
@@ -35,20 +36,30 @@ function severityClasses(severity: string) {
   return "border-white/10 bg-white/5 text-soft/78";
 }
 
-function AlertCard({ alert }: { alert: AlertItem }) {
+function formatModelName(value: string | null | undefined, language: "es" | "en") {
+  const normalized = (value ?? "").toLowerCase();
+
+  if (normalized.includes("hist_gradient_boosting")) {
+    return language === "es" ? "Modelo NO2 v1" : "NO2 model v1";
+  }
+
+  return value?.replaceAll("_", " ") ?? "-";
+}
+
+function AlertCard({ alert, language }: { alert: AlertItem; language: "es" | "en" }) {
   return (
     <article className={`rounded-[1.5rem] border p-4 ${severityClasses(alert.severity)}`}>
       <div className="flex flex-wrap items-center justify-between gap-3">
-        <p className="eyebrow">{alert.category}</p>
-        <p className="font-data text-xs uppercase tracking-[0.24em]">{alert.severity}</p>
+        <p className="eyebrow">{formatAlertCategory(alert.category, language)}</p>
+        <p className="font-data text-xs uppercase tracking-[0.24em]">{formatAlertSeverity(alert.severity, language)}</p>
       </div>
-      <h3 className="mt-3 text-lg font-medium text-bone">{alert.title}</h3>
-      <p className="mt-2 text-sm leading-6">{alert.body}</p>
+      <h3 className="mt-3 text-lg font-medium text-bone">{formatAlertTitle(alert.title, language)}</h3>
+      <p className="mt-2 text-sm leading-6">{formatAlertBody(alert.body, language)}</p>
       <div className="mt-4 flex flex-wrap gap-3 font-data text-xs text-current/80">
         {alert.station_id ? <span>{alert.station_id}</span> : null}
         {alert.predicted_for ? <span>{formatMoment(alert.predicted_for)}</span> : null}
         {alert.measured_at ? <span>{formatMoment(alert.measured_at)}</span> : null}
-        <span>{alert.source}</span>
+        <span>{formatSourceLabel(alert.source, language)}</span>
       </div>
     </article>
   );
@@ -90,11 +101,11 @@ export default async function SystemPage({ searchParams }: SystemPageProps) {
           <div className="grid gap-4 md:grid-cols-2">
             <div className="glass-panel rounded-[1.75rem] p-5 shadow-atmosphere">
               <p className="eyebrow text-soft/55">{copy.systemEnvironmentLabel}</p>
-              <p className="mt-4 font-data text-3xl text-bone">{system?.environment ?? "-"}</p>
+              <p className="mt-4 font-data text-3xl text-bone">{formatOperationalLabel(system?.environment, language)}</p>
             </div>
             <div className="glass-panel rounded-[1.75rem] p-5 shadow-atmosphere">
               <p className="eyebrow text-soft/55">{copy.systemGlobalStatusLabel}</p>
-              <p className="mt-4 font-data text-3xl text-bone">{system?.status ?? "system_pending"}</p>
+              <p className="mt-4 font-data text-3xl text-bone">{formatOperationalLabel(system?.status ?? "system_pending", language)}</p>
             </div>
             <div className="glass-panel rounded-[1.75rem] p-5 shadow-atmosphere">
               <p className="eyebrow text-soft/55">{copy.latestTimestamp}</p>
@@ -112,7 +123,7 @@ export default async function SystemPage({ searchParams }: SystemPageProps) {
         <section className="glass-panel rounded-[2rem] p-5 shadow-atmosphere">
           <div className="flex flex-wrap items-center justify-between gap-3 mb-5">
             <h2 className="text-2xl font-medium text-bone">{language === "es" ? "Estado del pipeline" : "Pipeline status"}</h2>
-            <p className="font-data text-xs uppercase tracking-[0.24em] text-soft/55">{system?.environment ?? "-"}</p>
+            <p className="font-data text-xs uppercase tracking-[0.24em] text-soft/55">{formatOperationalLabel(system?.environment, language)}</p>
           </div>
           <PipelineTimeline system={system} language={language} />
         </section>
@@ -121,12 +132,12 @@ export default async function SystemPage({ searchParams }: SystemPageProps) {
           <section className="glass-panel rounded-[2rem] p-5 shadow-atmosphere">
             <div className="flex items-center justify-between gap-3">
               <h2 className="text-2xl font-medium text-bone">{copy.systemPipelineRunsTitle}</h2>
-              <p className="font-data text-xs uppercase tracking-[0.24em] text-soft/55">{system?.pipeline.status ?? "foundation_ready"}</p>
+              <p className="font-data text-xs uppercase tracking-[0.24em] text-soft/55">{formatOperationalLabel(system?.pipeline.status ?? "foundation_ready", language)}</p>
             </div>
             <div className="mt-5 grid gap-4 md:grid-cols-2">
               <div>
                 <p className="eyebrow text-soft/55">{copy.sourceLabel}</p>
-                <p className="mt-2 font-data text-sm text-bone">{system?.pipeline.source ?? "-"}</p>
+                <p className="mt-2 font-data text-sm text-bone">{formatSourceLabel(system?.pipeline.source, language)}</p>
               </div>
               <div>
                 <p className="eyebrow text-soft/55">{copy.localFileLabel}</p>
@@ -151,7 +162,7 @@ export default async function SystemPage({ searchParams }: SystemPageProps) {
               </div>
               <div>
                 <p className="eyebrow text-soft/55">{copy.systemQualityStatusLabel}</p>
-                <p className="mt-2 font-data text-sm text-bone">{system?.data_quality.status ?? "quality_pending"}</p>
+                <p className="mt-2 font-data text-sm text-bone">{formatOperationalLabel(system?.data_quality.status ?? "quality_pending", language)}</p>
               </div>
             </div>
           </section>
@@ -159,7 +170,7 @@ export default async function SystemPage({ searchParams }: SystemPageProps) {
           <section className="glass-panel rounded-[2rem] p-5 shadow-atmosphere">
             <div className="flex items-center justify-between gap-3">
               <h2 className="text-2xl font-medium text-bone">{copy.systemPredictionRunsTitle}</h2>
-              <p className="font-data text-xs uppercase tracking-[0.24em] text-soft/55">{system?.predictions.status ?? "predictions_pending"}</p>
+              <p className="font-data text-xs uppercase tracking-[0.24em] text-soft/55">{formatOperationalLabel(system?.predictions.status ?? "predictions_pending", language)}</p>
             </div>
             <div className="mt-5 grid gap-4 sm:grid-cols-2 2xl:grid-cols-3">
               <div>
@@ -178,7 +189,7 @@ export default async function SystemPage({ searchParams }: SystemPageProps) {
             <div className="mt-5 grid gap-4 md:grid-cols-2">
               <div>
                 <p className="eyebrow text-soft/55">{copy.sourceLabel}</p>
-                <p className="mt-2 font-data text-sm text-bone">{system?.predictions.source ?? "-"}</p>
+                <p className="mt-2 font-data text-sm text-bone">{formatSourceLabel(system?.predictions.source, language)}</p>
               </div>
               <div>
                 <p className="eyebrow text-soft/55">{copy.systemGeneratedAtLabel}</p>
@@ -190,12 +201,12 @@ export default async function SystemPage({ searchParams }: SystemPageProps) {
           <section className="glass-panel rounded-[2rem] p-5 shadow-atmosphere">
             <div className="flex items-center justify-between gap-3">
               <h2 className="text-2xl font-medium text-bone">{copy.systemModelProductionTitle}</h2>
-              <p className="font-data text-xs uppercase tracking-[0.24em] text-soft/55">{system?.model.status ?? "model_pending"}</p>
+              <p className="font-data text-xs uppercase tracking-[0.24em] text-soft/55">{formatOperationalLabel(system?.model.status ?? "model_pending", language)}</p>
             </div>
             <div className="mt-5 grid gap-4 sm:grid-cols-2 2xl:grid-cols-3">
               <div>
                 <p className="eyebrow text-soft/55">{copy.selectedBaseline}</p>
-                <p className="mt-2 font-data text-sm text-bone">{system?.model.selected_model ?? "-"}</p>
+                <p className="mt-2 font-data text-sm text-bone">{formatModelName(system?.model.selected_model, language)}</p>
               </div>
               <div>
                 <p className="eyebrow text-soft/55">{copy.horizonLabel}</p>
@@ -227,17 +238,17 @@ export default async function SystemPage({ searchParams }: SystemPageProps) {
           <section className="glass-panel rounded-[2rem] p-5 shadow-atmosphere">
             <div className="flex items-center justify-between gap-3">
               <h2 className="text-2xl font-medium text-bone">{copy.systemActiveAlertsTitle}</h2>
-              <p className="font-data text-xs uppercase tracking-[0.24em] text-soft/55">{alerts?.status ?? "quiet"}</p>
+              <p className="font-data text-xs uppercase tracking-[0.24em] text-soft/55">{formatOperationalLabel(alerts?.status ?? "quiet", language)}</p>
             </div>
             <div className="mt-5 grid gap-4">
-              {alerts?.items.length ? alerts.items.map((alert) => <AlertCard key={alert.id} alert={alert} />) : <p className="text-sm leading-6 text-soft/70">{copy.systemNoAlerts}</p>}
+              {alerts?.items.length ? alerts.items.map((alert) => <AlertCard key={alert.id} alert={alert} language={language} />) : <p className="text-sm leading-6 text-soft/70">{copy.systemNoAlerts}</p>}
             </div>
           </section>
 
           <section className="glass-panel rounded-[2rem] p-5 shadow-atmosphere">
             <div className="flex items-center justify-between gap-3">
               <h2 className="text-2xl font-medium text-bone">{copy.systemCronStatusTitle}</h2>
-              <p className="font-data text-xs uppercase tracking-[0.24em] text-soft/55">{system?.cron.status ?? "cron_pending_secret"}</p>
+              <p className="font-data text-xs uppercase tracking-[0.24em] text-soft/55">{formatOperationalLabel(system?.cron.status ?? "cron_pending_secret", language)}</p>
             </div>
             <div className="mt-5 grid gap-4">
               <div>

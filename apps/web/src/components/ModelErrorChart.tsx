@@ -14,6 +14,7 @@ type ModelErrorChartProps = {
   rmseLabel?: string;
   /** Optional: highlight this baseline in lime */
   selectedBaseline?: string | null;
+  language?: "es" | "en";
   className?: string;
 };
 
@@ -27,6 +28,7 @@ export function ModelErrorChart({
   maeLabel = "MAE",
   rmseLabel = "RMSE",
   selectedBaseline,
+  language = "en",
   className,
 }: ModelErrorChartProps) {
   if (!items || items.length === 0) {
@@ -34,7 +36,7 @@ export function ModelErrorChart({
       <div
         className={`flex min-h-[140px] items-center justify-center rounded-[1.75rem] border border-white/10 bg-white/[0.03] ${className ?? ""}`}
       >
-        <p className="eyebrow text-soft/35">NO DATA</p>
+        <p className="eyebrow text-soft/35">{language === "es" ? "SIN DATOS" : "NO DATA"}</p>
       </div>
     );
   }
@@ -76,10 +78,10 @@ export function ModelErrorChart({
   // Abbreviate baseline names
   function shortName(name: string) {
     const n = name.toLowerCase();
-    if (n.includes("hist_gradient")) return "Model";
-    if (n.includes("persistence")) return "Persist";
-    if (n.includes("same_hour")) return "Yesterday";
-    if (n.includes("rolling")) return "Mean24h";
+    if (n.includes("hist_gradient")) return language === "es" ? "Modelo" : "Model";
+    if (n.includes("persistence")) return language === "es" ? "Reciente" : "Persist";
+    if (n.includes("same_hour")) return language === "es" ? "Ayer" : "Yesterday";
+    if (n.includes("rolling")) return language === "es" ? "Media24h" : "Mean24h";
     return name.slice(0, 7);
   }
 
@@ -105,7 +107,7 @@ export function ModelErrorChart({
         viewBox={`0 0 ${CHART_W} ${SVG_H}`}
         style={{ width: "100%", minWidth: `${Math.min(CHART_W, 360)}px`, height: "auto" }}
         role="img"
-        aria-label="Model error chart"
+        aria-label={language === "es" ? "Gráfico de error del modelo" : "Model error chart"}
       >
         {/* Y-axis grid lines */}
         {gridValues.map((val, i) => {

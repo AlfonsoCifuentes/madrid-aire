@@ -6,6 +6,7 @@ import { PublicPageHeader, buildPublicMobileNavItems, type PublicNavLabels } fro
 import { getDashboardPayload } from "@/lib/api";
 import { buildMunicipalitySnapshots, buildStationDetailHref } from "@/lib/editorial";
 import { copyByLanguage, resolveLanguage } from "@/lib/i18n";
+import { formatPlaceName, formatRiskLabel } from "@/lib/presentation";
 
 type MapPageProps = {
   searchParams?: Promise<{ lang?: string | string[] }>;
@@ -25,7 +26,10 @@ export default async function MapPage({ searchParams }: MapPageProps) {
   );
   const coordinatesReady = stations.filter((station) => station.latitude != null && station.longitude != null);
   const municipalitiesRepresented = new Set(
-    coordinatesReady.map((station) => station.municipality ?? station.name ?? station.station_id),
+    coordinatesReady.map((station) => {
+      const label = station.municipality ?? station.name;
+      return label ? formatPlaceName(label) : station.station_id;
+    }),
   ).size;
   const municipalityWatch = buildMunicipalitySnapshots(stations, latest).slice(0, 6);
   const pulseNodes = coordinatesReady
@@ -37,7 +41,7 @@ export default async function MapPage({ searchParams }: MapPageProps) {
 
       return {
         station_id: station.station_id,
-        label: station.name ?? station.station_id,
+        label: station.name ? formatPlaceName(station.name) : station.station_id,
         latitude: station.latitude as number,
         longitude: station.longitude as number,
         value: observation.value,
@@ -141,13 +145,13 @@ export default async function MapPage({ searchParams }: MapPageProps) {
                         <div>
                           <p className="font-data text-sm text-bone">{station.station_id}</p>
                           <p className="mt-2 text-sm text-soft/74">
-                            {stationMeta?.name ?? stationMeta?.municipality ?? station.station_id}
+                            {stationMeta?.name ? formatPlaceName(stationMeta.name) : stationMeta?.municipality ? formatPlaceName(stationMeta.municipality) : station.station_id}
                           </p>
                         </div>
                         <p className="font-data text-xl text-bone">{station.value.toFixed(1)}</p>
                       </div>
                       <p className="mt-3 text-xs uppercase tracking-[0.18em] text-soft/55">
-                        {station.risk_level ?? "unknown"}
+                        {formatRiskLabel(station.risk_level, language)}
                       </p>
                     </Link>
                   );
@@ -170,8 +174,8 @@ export default async function MapPage({ searchParams }: MapPageProps) {
                     >
                       <div className="flex items-start justify-between gap-4">
                         <div>
-                          <p className="text-sm text-soft/72">{municipality.municipality}</p>
-                          <p className="mt-2 font-data text-sm text-bone">{municipality.stationName}</p>
+                          <p className="text-sm text-soft/72">{formatPlaceName(municipality.municipality)}</p>
+                          <p className="mt-2 font-data text-sm text-bone">{formatPlaceName(municipality.stationName)}</p>
                         </div>
                         <p className="font-data text-xl text-bone">{municipality.peakValue.toFixed(1)}</p>
                       </div>

@@ -4,6 +4,7 @@ import { MobileBottomNav } from "@/components/MobileBottomNav";
 import { PublicPageHeader, buildPublicMobileNavItems, type PublicNavLabels } from "@/components/PublicPageHeader";
 import { getDashboardPayload } from "@/lib/api";
 import { copyByLanguage, resolveLanguage } from "@/lib/i18n";
+import { formatPlaceName } from "@/lib/presentation";
 
 type StationsPageProps = {
   searchParams?: Promise<{ lang?: string | string[] }>;
@@ -102,12 +103,12 @@ export default async function StationsPage({ searchParams }: StationsPageProps) 
               <div className="flex items-start justify-between gap-4">
                 <div>
                   <p className="font-data text-sm text-bone">{station.station_id}</p>
-                  <p className="mt-2 text-lg text-soft">{station.name ?? station.municipality ?? station.station_id}</p>
+                  <p className="mt-2 text-lg text-soft">{station.name ? formatPlaceName(station.name) : station.municipality ? formatPlaceName(station.municipality) : station.station_id}</p>
                 </div>
                 <p className="font-data text-2xl text-bone">{no2?.value == null ? "-" : no2.value.toLocaleString(locale, { maximumFractionDigits: 1 })}</p>
               </div>
               <div className="mt-4 grid gap-2 text-sm text-soft/68">
-                <p>{station.municipality ?? "-"}</p>
+                <p>{station.municipality ? formatPlaceName(station.municipality) : "-"}</p>
                 <p>{station.area_type ?? "-"} · {station.station_type ?? "-"}</p>
                 <p>{copy.stationsTableFreshness}: {copy.freshness[freshnessKey]}</p>
                 <p className="eyebrow text-soft/52">{copy.stationsOpenDetail}</p>
@@ -135,9 +136,9 @@ export default async function StationsPage({ searchParams }: StationsPageProps) 
                   <tr key={station.station_id} className="border-b border-white/6 last:border-b-0">
                     <td className="px-5 py-4">
                       <p className="font-data text-sm text-bone">{station.station_id}</p>
-                      <p className="mt-2 text-sm text-soft/72">{station.name ?? station.municipality ?? station.station_id}</p>
+                      <p className="mt-2 text-sm text-soft/72">{station.name ? formatPlaceName(station.name) : station.municipality ? formatPlaceName(station.municipality) : station.station_id}</p>
                     </td>
-                    <td className="px-5 py-4 text-sm text-soft/76">{station.municipality ?? "-"}</td>
+                    <td className="px-5 py-4 text-sm text-soft/76">{station.municipality ? formatPlaceName(station.municipality) : "-"}</td>
                     <td className="px-5 py-4 text-sm text-soft/76">{station.area_type ?? "-"}</td>
                     <td className="px-5 py-4 text-sm text-soft/76">{station.station_type ?? "-"}</td>
                     <td className="px-5 py-4 font-data text-sm text-bone">
