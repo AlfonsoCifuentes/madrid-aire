@@ -9,7 +9,8 @@ import { PublicPageHeader, buildPublicMobileNavItems, type PublicNavLabels } fro
 import { Sparkline } from "@/components/Sparkline";
 import { getDashboardPayload, getHistoryPayload, getModelMetricsPayload, getPredictionsPayload } from "@/lib/api";
 import { copyByLanguage, resolveLanguage } from "@/lib/i18n";
-import { formatPlaceName, formatRiskLabel } from "@/lib/presentation";
+import { RiskBadge } from "@/components/RiskBadge";
+import { formatPlaceName } from "@/lib/presentation";
 
 type StationDetailPageProps = {
   params: Promise<{ id: string }>;
@@ -147,7 +148,9 @@ export default async function StationDetailPage({ params, searchParams }: Statio
               <p className="eyebrow text-soft/55">{copy.stationLatestNo2}</p>
               <p className="mt-4 font-data text-3xl text-bone">
                 {no2Current?.value == null ? "-" : no2Current.value.toLocaleString(locale, { maximumFractionDigits: 1 })}
+                {no2Current?.value != null && <span className="ml-1 font-data text-base text-soft/55">µg/m³</span>}
               </p>
+              {no2Current?.risk_level && <div className="mt-3"><RiskBadge riskLevel={no2Current.risk_level} language={language} /></div>}
             </div>
             <div className="glass-panel rounded-[1.75rem] p-5 shadow-atmosphere">
               <p className="eyebrow text-soft/55">{copy.stationsTableFreshness}</p>
@@ -221,10 +224,10 @@ export default async function StationDetailPage({ params, searchParams }: Statio
                   <div className="flex items-start justify-between gap-4">
                     <div>
                       <p className="font-data text-sm text-bone">{item.pollutant_code}</p>
-                      <p className="mt-2 text-xs uppercase tracking-[0.18em] text-soft/52">{formatRiskLabel(item.risk_level, language)}</p>
+                      <div className="mt-2"><RiskBadge riskLevel={item.risk_level} language={language} /></div>
                     </div>
                     <div className="flex flex-col items-end gap-1.5">
-                      <p className="font-data text-xl text-bone">{item.value.toLocaleString(locale, { maximumFractionDigits: 1 })}</p>
+                      <p className="font-data text-xl text-bone">{item.value.toLocaleString(locale, { maximumFractionDigits: 1 })}<span className="ml-1 font-data text-xs text-soft/55">µg/m³</span></p>
                       {item.pollutant_code === "NO2" && no2SparklineData.length >= 2 && (
                         <Sparkline data={no2SparklineData} width={60} height={20} color="#FFB000" />
                       )}
