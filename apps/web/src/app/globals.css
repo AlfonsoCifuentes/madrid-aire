@@ -163,6 +163,39 @@ a {
   backdrop-filter: blur(22px);
 }
 
+.home-hero-secondary {
+  display: grid;
+  gap: 2.5rem;
+}
+
+.home-hero-secondary > * {
+  min-width: 0;
+}
+
+.home-hero-map {
+  max-width: 1120px;
+}
+
+@media (min-width: 1280px) {
+  .home-hero {
+    gap: 3rem;
+  }
+
+  .home-hero-secondary {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    align-items: start;
+    column-gap: 3rem;
+  }
+
+  .home-hero-copy {
+    padding-right: 2rem;
+  }
+
+  .home-hero-map {
+    max-width: none;
+  }
+}
+
 .status-dot {
   display: inline-flex;
   height: 0.55rem;

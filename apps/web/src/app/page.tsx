@@ -162,7 +162,7 @@ export default async function HomePage({ searchParams }: HomePageProps) {
           </div>
         </header>
 
-        <div className="flex flex-1 flex-col gap-10 py-12 xl:gap-12">
+        <div className="home-hero flex flex-1 flex-col gap-10 py-12">
           <div className="w-full">
             <p className="eyebrow mb-6 text-soft/68">{landingCopy.eyebrow}</p>
             <h1 className="sr-only">{language === "es" ? "Madrid Aire, inicio" : "Madrid Aire home"}</h1>
@@ -171,8 +171,8 @@ export default async function HomePage({ searchParams }: HomePageProps) {
             </div>
           </div>
 
-          <div className="grid gap-10 xl:grid-cols-2 xl:items-start xl:gap-12">
-            <div className="max-w-none xl:pr-8">
+          <div className="home-hero-secondary">
+            <div className="home-hero-copy max-w-none">
             <p className="mt-8 max-w-2xl text-balance text-xl leading-8 text-soft/82 sm:text-2xl sm:leading-9 lg:text-[2rem] lg:leading-[1.34]">
               {landingCopy.claim}
             </p>
@@ -195,7 +195,7 @@ export default async function HomePage({ searchParams }: HomePageProps) {
             </div>
             </div>
 
-            <div className="glass-panel w-full rounded-[2.2rem] p-2 shadow-atmosphere">
+            <div className="home-hero-map glass-panel w-full rounded-[2.2rem] p-2 shadow-atmosphere">
               <div className="relative min-h-[440px] overflow-hidden rounded-[2rem] border border-white/10 bg-black/40">
                 <AtmosphericMiniMap nodes={homeMapNodes} className="absolute inset-0 h-full w-full" />
                 <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(6,8,11,0.16),rgba(6,8,11,0.34)_38%,rgba(6,8,11,0.72))]" />
