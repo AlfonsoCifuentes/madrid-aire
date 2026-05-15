@@ -6,6 +6,7 @@ import { IsobarLines } from "@/components/IsobarLines";
 import { LanguageSelector } from "@/components/LanguageSelector";
 import { NoiseOverlay } from "@/components/NoiseOverlay";
 import { PollutantGlow } from "@/components/PollutantGlow";
+import { ScrollCue } from "@/components/ScrollCue";
 import { MadridAireWordmark } from "@/components/branding/MadridAireWordmark";
 import { getDashboardPayload } from "@/lib/api";
 import { copyByLanguage, resolveLanguage } from "@/lib/i18n";
@@ -153,6 +154,9 @@ export default async function LandingPage({ searchParams }: LandingPageProps) {
               </div>
             </div>
           </div>
+        </div>
+        <div className="flex justify-center pb-2 pt-8">
+          <ScrollCue targetId="build" />
         </div>
       </section>
 

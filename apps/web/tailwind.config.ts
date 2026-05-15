@@ -61,6 +61,7 @@ const config: Config = {
         float: "float 18s ease-in-out infinite",
         pulseSoft: "pulseSoft 6s ease-in-out infinite",
         drift: "drift 20s linear infinite",
+        scrollDot: "scrollDot 2s ease-in-out infinite",
       },
       keyframes: {
         float: {
@@ -74,6 +75,11 @@ const config: Config = {
         drift: {
           from: { transform: "translate3d(0, 0, 0)" },
           to: { transform: "translate3d(-120px, 0, 0)" },
+        },
+        scrollDot: {
+          "0%": { transform: "translateY(0)", opacity: "1" },
+          "70%": { transform: "translateY(8px)", opacity: "0.3" },
+          "100%": { transform: "translateY(0)", opacity: "1" },
         },
       },
     },
