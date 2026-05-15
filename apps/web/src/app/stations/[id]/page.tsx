@@ -10,7 +10,7 @@ import { Sparkline } from "@/components/Sparkline";
 import { getDashboardPayload, getHistoryPayload, getModelMetricsPayload, getPredictionsPayload } from "@/lib/api";
 import { copyByLanguage, resolveLanguage } from "@/lib/i18n";
 import { RiskBadge } from "@/components/RiskBadge";
-import { formatPlaceName } from "@/lib/presentation";
+import { formatPlaceName, formatStationAreaType, formatStationType } from "@/lib/presentation";
 
 type StationDetailPageProps = {
   params: Promise<{ id: string }>;
@@ -291,11 +291,11 @@ export default async function StationDetailPage({ params, searchParams }: Statio
                 </div>
                 <div>
                   <p className="eyebrow text-soft/50">{copy.stationAreaType}</p>
-                  <p className="mt-2">{station.area_type ?? "-"}</p>
+                  <p className="mt-2">{formatStationAreaType(station.area_type, language)}</p>
                 </div>
                 <div>
                   <p className="eyebrow text-soft/50">{copy.stationStationType}</p>
-                  <p className="mt-2">{station.station_type ?? "-"}</p>
+                  <p className="mt-2">{formatStationType(station.station_type, language)}</p>
                 </div>
                 <div>
                   <p className="eyebrow text-soft/50">{copy.stationAltitude}</p>

@@ -7,7 +7,7 @@ import { RiskBadge } from "@/components/RiskBadge";
 import { getDashboardPayload } from "@/lib/api";
 import { buildMunicipalitySnapshots, buildStationDetailHref } from "@/lib/editorial";
 import { copyByLanguage, resolveLanguage } from "@/lib/i18n";
-import { formatPlaceName, getPublicRiskScale } from "@/lib/presentation";
+import { areEquivalentPlaceNames, formatPlaceName, formatSecondaryPlaceName, getPublicRiskScale } from "@/lib/presentation";
 
 type MapPageProps = {
   searchParams?: Promise<{ lang?: string | string[] }>;
@@ -102,8 +102,8 @@ export default async function MapPage({ searchParams }: MapPageProps) {
               <div className="glass-panel rounded-[1.75rem] p-5 shadow-atmosphere">
                 <p className="eyebrow text-soft/55">{copy.worstStation}</p>
                 <p className="mt-4 font-data text-3xl text-bone">{worstStationLabel}</p>
-                {worstStationMeta?.municipality && (
-                  <p className="mt-2 text-sm text-soft/60">{formatPlaceName(worstStationMeta.municipality)}</p>
+                {worstStationMeta?.municipality && formatSecondaryPlaceName(worstStationLabel, worstStationMeta.municipality) && (
+                  <p className="mt-2 text-sm text-soft/60">{formatSecondaryPlaceName(worstStationLabel, worstStationMeta.municipality)}</p>
                 )}
                 <p className="mt-3 text-sm text-soft/70">
                   {worstPulseNode ? `NO2 \u00b7 ${worstPulseNode.value.toFixed(1)} \u00b5g/m\u00b3` : "-"}
@@ -196,8 +196,10 @@ export default async function MapPage({ searchParams }: MapPageProps) {
                     >
                       <div className="flex items-start justify-between gap-3">
                         <div className="min-w-0 flex-1">
-                          <p className="text-sm text-soft/72">{formatPlaceName(municipality.municipality)}</p>
-                          <p className="mt-1 font-data text-sm text-bone">{formatPlaceName(municipality.stationName)}</p>
+                          <p className="font-data text-sm text-bone">{formatPlaceName(municipality.municipality)}</p>
+                          {!areEquivalentPlaceNames(municipality.municipality, municipality.stationName) && (
+                            <p className="mt-1 text-sm text-soft/72">{formatPlaceName(municipality.stationName)}</p>
+                          )}
                         </div>
                         <div className="flex flex-col items-end gap-1.5">
                           <p className="font-data text-xl text-bone">

@@ -6,7 +6,7 @@ import { PublicPageHeader, buildPublicMobileNavItems, type PublicNavLabels } fro
 import { RiskBadge } from "@/components/RiskBadge";
 import { getDashboardPayload } from "@/lib/api";
 import { copyByLanguage, resolveLanguage } from "@/lib/i18n";
-import { formatPlaceName } from "@/lib/presentation";
+import { formatPlaceName, formatSecondaryPlaceName, formatStationAreaType, formatStationType } from "@/lib/presentation";
 
 type StationsPageProps = {
   searchParams?: Promise<{ lang?: string | string[] }>;
@@ -133,7 +133,7 @@ export default async function StationsPage({ searchParams }: StationsPageProps) 
         </div>
 
         <section className="grid gap-4 lg:hidden">
-          {rows.map(({ station, no2, freshnessKey }) => (
+          {rows.map(({ station, no2 }) => (
             <Link
               key={station.station_id}
               className="glass-panel rounded-[1.75rem] p-5 shadow-atmosphere transition hover:bg-white/10"
@@ -142,7 +142,9 @@ export default async function StationsPage({ searchParams }: StationsPageProps) 
               <div className="flex items-start justify-between gap-4">
                 <div className="min-w-0 flex-1">
                   <p className="font-data text-sm text-bone">{station.name ? formatPlaceName(station.name) : station.municipality ? formatPlaceName(station.municipality) : station.station_id}</p>
-                  <p className="mt-1 text-xs text-soft/50">{station.municipality ? formatPlaceName(station.municipality) : "-"}</p>
+                  {formatSecondaryPlaceName(station.name, station.municipality) && (
+                    <p className="mt-1 text-xs text-soft/50">{formatSecondaryPlaceName(station.name, station.municipality)}</p>
+                  )}
                 </div>
                 <div className="flex flex-col items-end gap-2">
                   <p className="font-data text-2xl text-bone">
@@ -153,7 +155,7 @@ export default async function StationsPage({ searchParams }: StationsPageProps) 
                 </div>
               </div>
               <div className="mt-4 flex items-center justify-between text-sm text-soft/68">
-                <p>{station.area_type ?? "-"} · {station.station_type ?? "-"}</p>
+                <p>{formatStationAreaType(station.area_type, language)} · {formatStationType(station.station_type, language)}</p>
                 <p className="eyebrow text-soft/52">{copy.stationsOpenDetail}</p>
               </div>
             </Link>
@@ -183,9 +185,9 @@ export default async function StationsPage({ searchParams }: StationsPageProps) 
                       </p>
                       <p className="mt-1 font-data text-xs text-soft/40">{station.station_id}</p>
                     </td>
-                    <td className="px-5 py-4 text-sm text-soft/76">{station.municipality ? formatPlaceName(station.municipality) : "-"}</td>
-                    <td className="px-5 py-4 text-sm text-soft/76">{station.area_type ?? "-"}</td>
-                    <td className="px-5 py-4 text-sm text-soft/76">{station.station_type ?? "-"}</td>
+                    <td className="px-5 py-4 text-sm text-soft/76">{formatSecondaryPlaceName(station.name, station.municipality) ?? "-"}</td>
+                    <td className="px-5 py-4 text-sm text-soft/76">{formatStationAreaType(station.area_type, language)}</td>
+                    <td className="px-5 py-4 text-sm text-soft/76">{formatStationType(station.station_type, language)}</td>
                     <td className="px-5 py-4">
                       <span className="font-data text-sm text-bone">
                         {no2?.value == null ? "-" : no2.value.toLocaleString(locale, { maximumFractionDigits: 1 })}

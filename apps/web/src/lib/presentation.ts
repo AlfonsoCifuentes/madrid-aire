@@ -102,6 +102,18 @@ const PLACE_NAME_CORRECTIONS: Record<string, string> = {
   "san sebastian de los reyes": "San Sebastián de los Reyes",
 };
 
+const AREA_TYPE_LABELS: Record<string, Record<Language, string>> = {
+  rural: { es: "zona rural", en: "rural area" },
+  suburbana: { es: "zona periurbana", en: "outer urban area" },
+  urbana: { es: "zona urbana", en: "urban area" },
+};
+
+const STATION_TYPE_LABELS: Record<string, Record<Language, string>> = {
+  fondo: { es: "zona de fondo", en: "background location" },
+  industrial: { es: "entorno industrial", en: "industrial setting" },
+  trafico: { es: "cerca del tráfico", en: "traffic-exposed" },
+};
+
 function humanizeMachineValue(value: string) {
   return value.replaceAll("_", " ").trim();
 }
@@ -241,4 +253,38 @@ export function formatPlaceName(value: string | null | undefined) {
 
   const normalized = normalizeWhitespace(value);
   return PLACE_NAME_CORRECTIONS[normalizeLookupKey(normalized)] ?? normalized;
+}
+
+export function areEquivalentPlaceNames(primary: string | null | undefined, secondary: string | null | undefined) {
+  if (!primary || !secondary) {
+    return false;
+  }
+
+  return normalizeLookupKey(formatPlaceName(primary)) === normalizeLookupKey(formatPlaceName(secondary));
+}
+
+export function formatSecondaryPlaceName(primary: string | null | undefined, secondary: string | null | undefined) {
+  if (!secondary || areEquivalentPlaceNames(primary, secondary)) {
+    return null;
+  }
+
+  return formatPlaceName(secondary);
+}
+
+export function formatStationAreaType(value: string | null | undefined, language: Language) {
+  if (!value) {
+    return "-";
+  }
+
+  const normalized = normalizeLookupKey(value);
+  return AREA_TYPE_LABELS[normalized]?.[language] ?? humanizeMachineValue(normalizeWhitespace(value).toLowerCase());
+}
+
+export function formatStationType(value: string | null | undefined, language: Language) {
+  if (!value) {
+    return "-";
+  }
+
+  const normalized = normalizeLookupKey(value);
+  return STATION_TYPE_LABELS[normalized]?.[language] ?? humanizeMachineValue(normalizeWhitespace(value).toLowerCase());
 }
