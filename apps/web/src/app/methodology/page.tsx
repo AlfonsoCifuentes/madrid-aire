@@ -19,6 +19,20 @@ function formatWindow(start: string | null, end: string | null) {
   return `${start.slice(0, 10)} → ${end.slice(0, 10)}`;
 }
 
+function countWindowDays(start: string | null, end: string | null) {
+  if (!start || !end) {
+    return null;
+  }
+
+  const startMs = new Date(start).getTime();
+  const endMs = new Date(end).getTime();
+  if (Number.isNaN(startMs) || Number.isNaN(endMs) || endMs < startMs) {
+    return null;
+  }
+
+  return Math.floor((endMs - startMs) / 86_400_000) + 1;
+}
+
 function formatModelName(value: string | null | undefined, language: "es" | "en") {
   const normalized = (value ?? "").toLowerCase();
 
@@ -164,6 +178,8 @@ export default async function MethodologyPage({ searchParams }: MethodologyPageP
   const [system, metrics] = await Promise.all([getSystemStatusPayload(), getModelMetricsPayload()]);
   const sections = buildSections(language, system?.data_quality.station_count ?? 0, system?.data_quality.pollutant_count ?? 0);
   const intro = buildIntro(language);
+  const trainingDays = countWindowDays(metrics?.training_period_start ?? null, metrics?.training_period_end ?? null);
+  const testDays = countWindowDays(metrics?.test_period_start ?? null, metrics?.test_period_end ?? null);
   const advancedLabels: AdvancedNavLabels = {
     guide: copy.openAbout,
     dashboard: copy.mobileNavDashboard,
@@ -196,18 +212,42 @@ export default async function MethodologyPage({ searchParams }: MethodologyPageP
             <div className="glass-panel rounded-[1.75rem] p-5 shadow-atmosphere">
               <p className="eyebrow text-soft/55">{copy.selectedBaseline}</p>
               <p className="mt-4 font-data text-3xl text-bone">{formatModelName(metrics?.selected_baseline, language)}</p>
+              <p className="mt-3 text-sm text-soft/70">
+                {system?.model.improvement_pct_vs_best_baseline != null
+                  ? `${system.model.improvement_pct_vs_best_baseline > 0 ? "+" : ""}${system.model.improvement_pct_vs_best_baseline.toLocaleString(language === "es" ? "es-ES" : "en-GB", { maximumFractionDigits: 1 })}% ${language === "es" ? "vs. referencia" : "vs. baseline"}`
+                  : "-"}
+              </p>
             </div>
             <div className="glass-panel rounded-[1.75rem] p-5 shadow-atmosphere">
               <p className="eyebrow text-soft/55">{copy.horizonLabel}</p>
               <p className="mt-4 font-data text-3xl text-bone">{metrics?.horizon_hours ? `${metrics.horizon_hours}h` : "-"}</p>
+              <p className="mt-3 text-sm text-soft/70">
+                {language === "es"
+                  ? `${system?.data_quality.station_count ?? 0} estaciones · ${system?.data_quality.pollutant_count ?? 0} contaminantes`
+                  : `${system?.data_quality.station_count ?? 0} stations · ${system?.data_quality.pollutant_count ?? 0} pollutants`}
+              </p>
             </div>
             <div className="glass-panel rounded-[1.75rem] p-5 shadow-atmosphere">
               <p className="eyebrow text-soft/55">{copy.trainingWindow}</p>
               <p className="mt-4 font-data text-sm text-bone">{formatWindow(metrics?.training_period_start ?? null, metrics?.training_period_end ?? null)}</p>
+              <p className="mt-3 text-sm text-soft/70">
+                {trainingDays != null
+                  ? language === "es"
+                    ? `${trainingDays} días de entrenamiento`
+                    : `${trainingDays} training days`
+                  : "-"}
+              </p>
             </div>
             <div className="glass-panel rounded-[1.75rem] p-5 shadow-atmosphere">
               <p className="eyebrow text-soft/55">{copy.testWindow}</p>
               <p className="mt-4 font-data text-sm text-bone">{formatWindow(metrics?.test_period_start ?? null, metrics?.test_period_end ?? null)}</p>
+              <p className="mt-3 text-sm text-soft/70">
+                {testDays != null
+                  ? language === "es"
+                    ? `${testDays} días de validación`
+                    : `${testDays} validation days`
+                  : "-"}
+              </p>
             </div>
           </div>
         </div>
