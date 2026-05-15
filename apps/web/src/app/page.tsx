@@ -163,7 +163,7 @@ export default async function HomePage({ searchParams }: HomePageProps) {
         </header>
 
         <div className="grid flex-1 gap-10 py-12 xl:grid-cols-[0.92fr_1.08fr] xl:items-center xl:gap-14">
-          <div className="relative z-20 max-w-3xl xl:pr-6">
+          <div className="max-w-3xl xl:pr-6">
             <p className="eyebrow mb-6 text-soft/68">{landingCopy.eyebrow}</p>
             <h1 className="sr-only">{language === "es" ? "Madrid Aire, inicio" : "Madrid Aire home"}</h1>
             <div className="max-w-full pb-2">
@@ -191,7 +191,7 @@ export default async function HomePage({ searchParams }: HomePageProps) {
             </div>
           </div>
 
-          <div className="relative z-0 glass-panel rounded-[2.2rem] p-2 shadow-atmosphere xl:-ml-8">
+          <div className="glass-panel rounded-[2.2rem] p-2 shadow-atmosphere xl:-ml-8 xl:mt-16">
             <div className="relative min-h-[440px] overflow-hidden rounded-[2rem] border border-white/10 bg-black/40">
               <AtmosphericMiniMap nodes={homeMapNodes} className="absolute inset-0 h-full w-full" />
               <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(6,8,11,0.16),rgba(6,8,11,0.34)_38%,rgba(6,8,11,0.72))]" />
