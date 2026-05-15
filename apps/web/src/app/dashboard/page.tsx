@@ -106,6 +106,13 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
     improvement != null ? `${improvement >= 0 ? "+" : ""}${improvement.toFixed(1)}%` : "-";
   const modelDisplayName = resolveModelName(system?.model?.selected_model, language);
   const locale = language === "es" ? "es-ES" : "en-GB";
+  const predictionsGeneratedAt = system?.predictions?.generated_at
+    ? new Intl.DateTimeFormat(locale, {
+        dateStyle: "short",
+        timeStyle: "short",
+        timeZone: "Europe/Madrid",
+      }).format(new Date(system.predictions.generated_at))
+    : null;
   const navigationLabels: PublicNavLabels = {
     home: language === "es" ? "Inicio" : "Home",
     dashboard: copy.mobileNavDashboard,
@@ -252,6 +259,16 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
               <p className="mt-4 font-data text-xl text-bone">{copy.dashboardForecastTrendReady}</p>
             ) : null}
             <p className="mt-3 text-sm leading-6 text-soft/70">{copy.dashboardForecastTrendBody}</p>
+            <p className="mt-3 font-data text-xs text-soft/45">
+              {language === "es"
+                ? `${system?.predictions.station_count ?? 0} estaciones · ${system?.predictions.horizon_count ?? 0} horizontes`
+                : `${system?.predictions.station_count ?? 0} stations · ${system?.predictions.horizon_count ?? 0} horizons`}
+            </p>
+            {predictionsGeneratedAt && (
+              <p className="mt-2 text-xs text-soft/55">
+                {language === "es" ? `generado: ${predictionsGeneratedAt}` : `generated: ${predictionsGeneratedAt}`}
+              </p>
+            )}
             <Link
               className="mt-4 inline-flex text-sm text-soft/60 hover:text-soft"
               href={`/predictions?lang=${language}`}
