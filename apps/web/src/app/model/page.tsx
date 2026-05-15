@@ -145,6 +145,7 @@ export default async function ModelPage({ searchParams }: ModelPageProps) {
   const copy = copyByLanguage[language];
   const [metrics, system] = await Promise.all([getModelMetricsPayload(), getSystemStatusPayload()]);
   const metricNotes = buildMetricNotes(language);
+  const selectedMetric = (metrics?.items ?? []).find((item) => item.baseline_name === metrics?.selected_baseline) ?? null;
   const modelSections = buildModelSections(language);
   const advancedLabels: AdvancedNavLabels = {
     guide: copy.openAbout,
@@ -178,6 +179,9 @@ export default async function ModelPage({ searchParams }: ModelPageProps) {
             <div className="glass-panel rounded-[1.75rem] p-5 shadow-atmosphere">
               <p className="eyebrow text-soft/55">{copy.selectedBaseline}</p>
               <p className="mt-4 font-data text-3xl text-bone">{formatModelName(metrics?.selected_baseline, language)}</p>
+              <span className="mt-3 inline-block rounded-full border border-lime/30 bg-lime/10 px-3 py-0.5 text-[10px] font-medium uppercase tracking-wider text-lime">
+                {language === "es" ? "modelo activo" : "active model"}
+              </span>
             </div>
             <div className="glass-panel rounded-[1.75rem] p-5 shadow-atmosphere">
               <p className="eyebrow text-soft/55">{copy.horizonLabel}</p>
@@ -197,12 +201,26 @@ export default async function ModelPage({ searchParams }: ModelPageProps) {
         <OperationalStatusStrip language={language} system={system} freshnessLabels={copy.freshness} currentPage="model" />
 
         <section className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
-          {metricNotes.map((item) => (
-            <div key={item.title} className="glass-panel rounded-[1.75rem] p-5 shadow-atmosphere">
-              <p className="eyebrow text-soft/55">{item.title}</p>
-              <p className="mt-4 text-sm leading-6 text-soft/74">{item.body}</p>
-            </div>
-          ))}
+          {metricNotes.map((item) => {
+            const value =
+              item.title === "MAE" ? selectedMetric?.mae
+              : item.title === "RMSE" ? selectedMetric?.rmse
+              : item.title === "R²" ? selectedMetric?.r2
+              : undefined;
+            const formatted =
+              item.title === "R²" && value != null
+                ? value.toLocaleString(language === "es" ? "es-ES" : "en-GB", { minimumFractionDigits: 2, maximumFractionDigits: 2 })
+                : value != null
+                ? `${value.toLocaleString(language === "es" ? "es-ES" : "en-GB", { maximumFractionDigits: 2 })} µg/m³`
+                : null;
+            return (
+              <div key={item.title} className="glass-panel rounded-[1.75rem] p-5 shadow-atmosphere">
+                <p className="eyebrow text-soft/55">{item.title}</p>
+                {formatted && <p className="mt-4 font-data text-3xl text-bone">{formatted}</p>}
+                <p className={formatted ? "mt-3 text-sm leading-6 text-soft/74" : "mt-4 text-sm leading-6 text-soft/74"}>{item.body}</p>
+              </div>
+            );
+          })}
         </section>
 
         <section className="glass-panel rounded-[2rem] p-5 shadow-atmosphere">
