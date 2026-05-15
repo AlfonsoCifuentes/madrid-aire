@@ -86,7 +86,6 @@ export function StationDrawer({ node, onClose, language = "es" }: StationDrawerP
           <div className="mt-5 flex flex-col gap-5">
             <div>
               <p className="font-data text-2xl text-bone">{node.label}</p>
-              <p className="mt-1 font-data text-xs text-soft/50">{node.station_id}</p>
             </div>
 
             <div className="grid grid-cols-2 gap-3">
