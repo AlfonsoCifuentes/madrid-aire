@@ -2,6 +2,7 @@ import { AdvancedPageHeader, buildAdvancedMobileNavItems, type AdvancedNavLabels
 import { MobileBottomNav } from "@/components/MobileBottomNav";
 import { OperationalStatusStrip } from "@/components/OperationalStatusStrip";
 import { PipelineTimeline } from "@/components/PipelineTimeline";
+import { RiskBadge } from "@/components/RiskBadge";
 import { AlertItem, getAlertsPayload, getSystemStatusPayload } from "@/lib/api";
 import { copyByLanguage, resolveLanguage } from "@/lib/i18n";
 import { formatAlertBody, formatAlertCategory, formatAlertSeverity, formatAlertTitle, formatOperationalLabel, formatSourceLabel } from "@/lib/presentation";
@@ -57,10 +58,16 @@ function AlertCard({ alert, language }: { alert: AlertItem; language: "es" | "en
       <p className="mt-2 text-sm leading-6">{formatAlertBody(alert.body, language)}</p>
       <div className="mt-4 flex flex-wrap gap-3 font-data text-xs text-current/80">
         {alert.station_id ? <span>{alert.station_id}</span> : null}
+        {alert.pollutant_code ? <span className="rounded-full border border-current/20 bg-current/10 px-2.5 py-0.5">{alert.pollutant_code}</span> : null}
         {alert.predicted_for ? <span>{formatMoment(alert.predicted_for)}</span> : null}
         {alert.measured_at ? <span>{formatMoment(alert.measured_at)}</span> : null}
         <span>{formatSourceLabel(alert.source, language)}</span>
       </div>
+      {alert.risk_level && (
+        <div className="mt-3">
+          <RiskBadge riskLevel={alert.risk_level} language={language} />
+        </div>
+      )}
     </article>
   );
 }
