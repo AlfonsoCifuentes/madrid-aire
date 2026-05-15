@@ -54,6 +54,7 @@ export default async function MapPage({ searchParams }: MapPageProps) {
     .filter((node): node is NonNullable<typeof node> => node !== null);
   const priorityStations = [...pulseNodes].sort((left, right) => right.value - left.value).slice(0, 6);
   const worstPulseNode = pulseNodes.find((n) => n.station_id === payload.summary?.worst_station_id) ?? null;
+  const worstStationMeta = stations.find((station) => station.station_id === payload.summary?.worst_station_id) ?? null;
   const worstStationLabel = worstPulseNode?.label ?? payload.summary?.worst_station_id ?? "-";
   const navigationLabels: PublicNavLabels = {
     home: language === "es" ? "Inicio" : "Home",
@@ -101,9 +102,22 @@ export default async function MapPage({ searchParams }: MapPageProps) {
               <div className="glass-panel rounded-[1.75rem] p-5 shadow-atmosphere">
                 <p className="eyebrow text-soft/55">{copy.worstStation}</p>
                 <p className="mt-4 font-data text-3xl text-bone">{worstStationLabel}</p>
+                {worstStationMeta?.municipality && (
+                  <p className="mt-2 text-sm text-soft/60">{formatPlaceName(worstStationMeta.municipality)}</p>
+                )}
                 <p className="mt-3 text-sm text-soft/70">
                   {worstPulseNode ? `NO2 \u00b7 ${worstPulseNode.value.toFixed(1)} \u00b5g/m\u00b3` : "-"}
                 </p>
+                {worstPulseNode?.risk_level && (
+                  <div className="mt-3">
+                    <RiskBadge riskLevel={worstPulseNode.risk_level} language={language} />
+                  </div>
+                )}
+                {worstPulseNode && (
+                  <Link className="mt-4 inline-flex text-sm text-soft/60 hover:text-soft" href={buildStationDetailHref(language, worstPulseNode.station_id)}>
+                    {language === "es" ? "Abrir estación" : "Open station"} →
+                  </Link>
+                )}
               </div>
               <div className="glass-panel rounded-[1.75rem] p-5 shadow-atmosphere">
                 <p className="eyebrow text-soft/55">{language === "es" ? "Cobertura territorial" : "Territorial coverage"}</p>
