@@ -277,7 +277,7 @@ export default async function PredictionsPage({ searchParams }: PredictionsPageP
               <p className="eyebrow text-soft/55">{pageCopy.selectedForecastTitle}</p>
               <p className="mt-4 font-data text-3xl text-bone">{selectedHorizon == null ? "-" : `H+${selectedHorizon}`}</p>
               <p className="mt-3 text-sm text-soft/70">
-                {selectedPrediction ? `${selectedPrediction.predicted_value.toLocaleString(locale, { maximumFractionDigits: 1 })} · ${resolveRiskLabel(selectedPrediction.risk_level, pageCopy)}` : "-"}
+                {selectedPrediction ? `${selectedPrediction.predicted_value.toLocaleString(locale, { maximumFractionDigits: 1 })} µg/m³ · ${resolveRiskLabel(selectedPrediction.risk_level, pageCopy)}` : "-"}
               </p>
             </div>
           </div>
@@ -407,7 +407,10 @@ export default async function PredictionsPage({ searchParams }: PredictionsPageP
                           <p className="font-data text-sm text-bone">H+{item.horizon_hours}</p>
                           <p className="text-xs uppercase tracking-[0.18em]">{resolveRiskLabel(item.risk_level, pageCopy)}</p>
                         </div>
-                        <p className="mt-3 font-data text-xl text-bone">{item.predicted_value.toLocaleString(locale, { maximumFractionDigits: 1 })}</p>
+                        <p className="mt-3 font-data text-xl text-bone">
+                          {item.predicted_value.toLocaleString(locale, { maximumFractionDigits: 1 })}
+                          <span className="ml-1 font-sans text-xs text-soft/50">µg/m³</span>
+                        </p>
                         <div className="mt-3 h-[3px] w-full overflow-hidden rounded-full bg-white/10">
                           <div
                             className="h-full rounded-full transition-all duration-500"

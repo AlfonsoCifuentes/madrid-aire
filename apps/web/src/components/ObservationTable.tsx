@@ -1,6 +1,16 @@
 import { LatestObservationItem } from "@/lib/api";
 import { copyByLanguage, Language } from "@/lib/i18n";
 import { formatPlaceName } from "@/lib/presentation";
+import { RiskBadge } from "@/components/RiskBadge";
+
+const POLLUTANT_UNIT: Record<string, string> = {
+  NO2: "µg/m³",
+  O3: "µg/m³",
+  PM10: "µg/m³",
+  PM25: "µg/m³",
+  SO2: "µg/m³",
+  CO: "mg/m³",
+};
 
 type StationMeta = { station_id: string; name: string | null; municipality: string | null };
 
@@ -41,7 +51,17 @@ export function ObservationTable({ items, language, stations }: ObservationTable
             <tr key={`${item.station_id}-${item.pollutant_code}`} className="border-b border-white/6 last:border-b-0">
               <td className="px-4 py-4 font-data text-sm text-bone">{resolveStationLabel(item.station_id)}</td>
               <td className="px-4 py-4 text-sm text-soft/80">{item.pollutant_code}</td>
-              <td className="px-4 py-4 font-data text-sm text-soft">{item.value.toLocaleString(locale, { maximumFractionDigits: 1 })}</td>
+              <td className="px-4 py-4 font-data text-sm text-soft">
+                <div className="flex flex-col gap-1.5">
+                  <span>
+                    {item.value.toLocaleString(locale, { maximumFractionDigits: 1 })}
+                    {POLLUTANT_UNIT[item.pollutant_code] && (
+                      <span className="ml-1 font-sans text-xs text-soft/50">{POLLUTANT_UNIT[item.pollutant_code]}</span>
+                    )}
+                  </span>
+                  {item.risk_level && <RiskBadge riskLevel={item.risk_level} language={language} />}
+                </div>
+              </td>
               <td className="px-4 py-4 font-data text-sm text-soft/70">
                 {new Intl.DateTimeFormat(locale, {
                   dateStyle: "short",
