@@ -213,9 +213,43 @@ export default async function MapPage({ searchParams }: MapPageProps) {
             <section className="glass-panel rounded-[2rem] p-5 shadow-atmosphere">
               <p className="eyebrow text-soft/60">{copy.mapLegendTitle}</p>
               <div className="mt-5 grid gap-4 text-sm text-soft/72">
-                <div className="rounded-[1.25rem] border border-white/10 bg-white/[0.03] p-4">{copy.mapNodeSize}</div>
-                <div className="rounded-[1.25rem] border border-white/10 bg-white/[0.03] p-4">{copy.mapNodeColor}</div>
-                <div className="rounded-[1.25rem] border border-white/10 bg-white/[0.03] p-4">{copy.mapNodeFreshness}</div>
+                {/* Size legend */}
+                <div className="rounded-[1.25rem] border border-white/10 bg-white/[0.03] p-4">
+                  <div className="mb-2 flex items-end gap-3">
+                    <span className="inline-block rounded-full bg-white/30" style={{ width: 8, height: 8 }} />
+                    <span className="inline-block rounded-full bg-white/30" style={{ width: 14, height: 14 }} />
+                    <span className="inline-block rounded-full bg-white/30" style={{ width: 20, height: 20 }} />
+                  </div>
+                  {copy.mapNodeSize}
+                </div>
+                {/* Color legend */}
+                <div className="rounded-[1.25rem] border border-white/10 bg-white/[0.03] p-4">
+                  <div className="mb-2 flex flex-wrap gap-2">
+                    {[
+                      { color: "#80FFB2", label: language === "es" ? "Bueno" : "Good" },
+                      { color: "#D8FF4F", label: language === "es" ? "Aceptable" : "Acceptable" },
+                      { color: "#FFB000", label: language === "es" ? "Moderado" : "Moderate" },
+                      { color: "#FF6B35", label: language === "es" ? "Malo" : "Poor" },
+                      { color: "#C2410C", label: language === "es" ? "Muy malo" : "Unhealthy" },
+                      { color: "#F43F5E", label: language === "es" ? "Peligroso" : "Hazardous" },
+                    ].map(({ color, label }) => (
+                      <span key={color} className="flex items-center gap-1 text-xs">
+                        <span className="inline-block h-3 w-3 rounded-full flex-shrink-0" style={{ backgroundColor: color }} />
+                        <span className="text-soft/60">{label}</span>
+                      </span>
+                    ))}
+                  </div>
+                  {copy.mapNodeColor}
+                </div>
+                {/* Freshness legend */}
+                <div className="rounded-[1.25rem] border border-white/10 bg-white/[0.03] p-4">
+                  <div className="mb-2 flex items-center gap-3">
+                    <span className="inline-block h-3 w-3 rounded-full bg-white/90" />
+                    <span className="inline-block h-3 w-3 rounded-full bg-white/50" />
+                    <span className="inline-block h-3 w-3 rounded-full bg-white/20" />
+                  </div>
+                  {copy.mapNodeFreshness}
+                </div>
               </div>
             </section>
           </section>
