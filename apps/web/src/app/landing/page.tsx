@@ -6,6 +6,7 @@ import { IsobarLines } from "@/components/IsobarLines";
 import { LanguageSelector } from "@/components/LanguageSelector";
 import { NoiseOverlay } from "@/components/NoiseOverlay";
 import { PollutantGlow } from "@/components/PollutantGlow";
+import { RiskBadge } from "@/components/RiskBadge";
 import { ScrollCue } from "@/components/ScrollCue";
 import { MadridAireWordmark } from "@/components/branding/MadridAireWordmark";
 import { getDashboardPayload } from "@/lib/api";
@@ -58,6 +59,13 @@ export default async function LandingPage({ searchParams }: LandingPageProps) {
     if (found?.municipality) return formatPlaceName(found.municipality);
     return summary.worst_station_id;
   })();
+  const latestItems = dashboard.latest?.items ?? [];
+  const worstRiskLevel = summary?.worst_station_id
+    ? latestItems.find(
+        (item) => item.station_id === summary.worst_station_id && item.pollutant_code === "NO2",
+      )?.risk_level ?? null
+    : null;
+  const locale = language === "es" ? "es-ES" : "en-GB";
   const signalCopy = buildSignalCopy(
     Boolean(summary?.observations_ready),
     summary?.station_count ?? 0,
@@ -143,9 +151,21 @@ export default async function LandingPage({ searchParams }: LandingPageProps) {
               <div className="glass-panel rounded-[2rem] p-5 shadow-atmosphere">
                 <p className="eyebrow text-soft/60">{copy.signalTitle}</p>
                 <p className="mt-3 font-data text-2xl text-bone">{signalCopy.headline}</p>
-                <p className="mt-3 text-sm leading-6 text-soft/68">
-                  {summary?.observations_ready ? copy.signalReadyBody : signalCopy.body}
-                </p>
+                {summary?.observations_ready && summary.worst_station_id ? (
+                  <div className="mt-3 flex flex-col gap-2">
+                    <div className="flex flex-wrap items-center gap-2">
+                      <span className="text-sm text-bone">{worstStationName}</span>
+                      {worstRiskLevel && <RiskBadge riskLevel={worstRiskLevel} language={language} />}
+                    </div>
+                    {summary.worst_value != null && (
+                      <p className="font-data text-xs text-soft/50">
+                        NO2 · {summary.worst_value.toLocaleString(locale, { maximumFractionDigits: 1 })} µg/m³
+                      </p>
+                    )}
+                  </div>
+                ) : (
+                  <p className="mt-3 text-sm leading-6 text-soft/68">{signalCopy.body}</p>
+                )}
               </div>
               <div className="glass-panel rounded-[2rem] p-5 shadow-atmosphere">
                 <p className="eyebrow text-soft/60">{copy.forecastPolicy}</p>
