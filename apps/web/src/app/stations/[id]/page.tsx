@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation";
 
 import { DataTimestamp } from "@/components/DataTimestamp";
+import { AtmosphericMiniMap } from "@/components/AtmosphericMiniMap";
 import { HistoryForecastChart } from "@/components/HistoryForecastChart";
 import { HourlyHeatmap } from "@/components/HourlyHeatmap";
 import { MobileBottomNav } from "@/components/MobileBottomNav";
@@ -162,6 +163,30 @@ export default async function StationDetailPage({ params, searchParams }: Statio
             </div>
           </div>
         </div>
+
+        {station.latitude != null && station.longitude != null && (
+          <section className="glass-panel rounded-[2rem] p-5 shadow-atmosphere">
+            <div className="mb-4 flex items-center justify-between">
+              <p className="eyebrow text-soft/60">{language === "es" ? "Ubicaci\u00f3n" : "Location"}</p>
+              <p className="font-data text-sm text-soft/55">
+                {station.latitude.toFixed(4)}\u00b0N \u00b7 {station.longitude.toFixed(4)}\u00b0E
+              </p>
+            </div>
+            <AtmosphericMiniMap
+              nodes={[{
+                station_id: station.station_id,
+                label: station.name ? formatPlaceName(station.name) : station.station_id,
+                latitude: station.latitude,
+                longitude: station.longitude,
+                value: no2Current?.value ?? 0,
+                risk_level: no2Current?.risk_level ?? "unknown",
+                freshness: freshnessKey,
+                highlight: true,
+              }]}
+              className="h-[260px] w-full overflow-hidden rounded-[1.5rem] isolate"
+            />
+          </section>
+        )}
 
         <div className="grid gap-6 xl:grid-cols-[1.15fr_0.85fr]">
           <section className="glass-panel rounded-[2rem] p-5 shadow-atmosphere">

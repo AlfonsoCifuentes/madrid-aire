@@ -45,7 +45,7 @@ export function MapShell({ nodes, language = "es" }: MapShellProps) {
         language={language}
       />
 
-      <div className="relative overflow-hidden rounded-[2rem] shadow-atmosphere">
+      <div className="relative isolate overflow-hidden rounded-[2rem] shadow-atmosphere">
         <AtmosphericMap
           nodes={nodes}
           onStationSelect={handleStationSelect}

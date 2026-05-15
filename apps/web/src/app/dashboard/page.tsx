@@ -5,10 +5,12 @@ import { HistoryForecastChart } from "@/components/HistoryForecastChart";
 import { MobileBottomNav } from "@/components/MobileBottomNav";
 import { PublicPageHeader, buildPublicMobileNavItems, type PublicNavLabels } from "@/components/PublicPageHeader";
 import { ObservationTable } from "@/components/ObservationTable";
-import { StationPulseField, type StationPulseNode } from "@/components/StationPulseField";
+import { type StationPulseNode } from "@/components/StationPulseField";
+import { AtmosphericMiniMap } from "@/components/AtmosphericMiniMap";
 import { getDashboardPayload, getHistoryPayload, getSystemStatusPayload } from "@/lib/api";
 import type { LatestObservationItem, StationSummary } from "@/lib/api";
 import { copyByLanguage, resolveLanguage } from "@/lib/i18n";
+import { formatPlaceName } from "@/lib/presentation";
 
 type DashboardPageProps = {
   searchParams?: Promise<{ lang?: string | string[] }>;
@@ -71,6 +73,13 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
   const latest = payload.latest?.items ?? [];
   const stations = payload.stations?.items ?? [];
   const worstStationId = summary?.worst_station_id ?? null;
+  const worstStationName = (() => {
+    if (!worstStationId) return null;
+    const found = stations.find((s) => s.station_id === worstStationId);
+    if (found?.name) return formatPlaceName(found.name);
+    if (found?.municipality) return formatPlaceName(found.municipality);
+    return worstStationId;
+  })();
   const history = worstStationId ? await getHistoryPayload(worstStationId, "NO2", 24) : null;
   const topRows = latest
     .filter((item) => item.pollutant_code === "NO2")
@@ -118,7 +127,7 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
           <div className="grid gap-4 md:grid-cols-2">
             <div className="glass-panel rounded-[1.75rem] p-5 shadow-atmosphere">
               <p className="eyebrow text-soft/55">{copy.worstStation}</p>
-              <p className="mt-4 font-data text-3xl text-bone">{summary?.worst_station_id ?? "-"}</p>
+              <p className="mt-4 font-data text-3xl text-bone">{worstStationName ?? "-"}</p>
               <p className="mt-3 text-sm text-soft/70">
                 {summary?.worst_pollutant_code ?? "-"}
                 {summary?.worst_value != null ? ` · ${summary.worst_value.toLocaleString(locale, { maximumFractionDigits: 1 })}` : ""}
@@ -157,7 +166,7 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
               <p className="font-data text-sm text-soft/55">{language === "es" ? "NO2 · últimas lecturas" : "NO2 · latest readings"}</p>
             </div>
             <div className="mt-5">
-              <ObservationTable items={topRows} language={language} />
+              <ObservationTable items={topRows} language={language} stations={stations} />
             </div>
           </section>
 
@@ -172,7 +181,7 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
               </div>
               <div className="mt-4">
                 {stationNodes.length > 0 ? (
-                  <StationPulseField nodes={stationNodes} />
+                  <AtmosphericMiniMap nodes={stationNodes} className="h-[260px] w-full overflow-hidden rounded-[1.75rem] isolate" />
                 ) : (
                   <p className="font-data text-2xl text-bone">{copy.pendingCoords}</p>
                 )}
@@ -191,7 +200,7 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
           <section className="glass-panel rounded-[2rem] p-5 shadow-atmosphere">
             <div className="flex flex-wrap items-center justify-between gap-3">
               <p className="eyebrow text-soft/60">{copy.dashboardHistoryTitle}</p>
-              <p className="font-data text-sm text-soft/55">{worstStationId ?? ""}</p>
+              <p className="font-data text-sm text-soft/55">{worstStationName ?? worstStationId ?? ""}</p>
             </div>
             <div className="mt-5">
               <HistoryForecastChart

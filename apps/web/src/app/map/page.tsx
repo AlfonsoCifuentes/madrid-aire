@@ -52,6 +52,8 @@ export default async function MapPage({ searchParams }: MapPageProps) {
     })
     .filter((node): node is NonNullable<typeof node> => node !== null);
   const priorityStations = [...pulseNodes].sort((left, right) => right.value - left.value).slice(0, 6);
+  const worstPulseNode = pulseNodes.find((n) => n.station_id === payload.summary?.worst_station_id) ?? null;
+  const worstStationLabel = worstPulseNode?.label ?? payload.summary?.worst_station_id ?? "-";
   const navigationLabels: PublicNavLabels = {
     home: language === "es" ? "Inicio" : "Home",
     dashboard: copy.mobileNavDashboard,
@@ -97,8 +99,10 @@ export default async function MapPage({ searchParams }: MapPageProps) {
               </div>
               <div className="glass-panel rounded-[1.75rem] p-5 shadow-atmosphere">
                 <p className="eyebrow text-soft/55">{copy.worstStation}</p>
-                <p className="mt-4 font-data text-3xl text-bone">{payload.summary?.worst_station_id ?? "-"}</p>
-                <p className="mt-3 text-sm text-soft/70">{priorityStations[0] ? `${priorityStations[0].label} · ${priorityStations[0].value.toFixed(1)}` : "-"}</p>
+                <p className="mt-4 font-data text-3xl text-bone">{worstStationLabel}</p>
+                <p className="mt-3 text-sm text-soft/70">
+                  {worstPulseNode ? `NO2 \u00b7 ${worstPulseNode.value.toFixed(1)} \u00b5g/m\u00b3` : "-"}
+                </p>
               </div>
               <div className="glass-panel rounded-[1.75rem] p-5 shadow-atmosphere">
                 <p className="eyebrow text-soft/55">{language === "es" ? "Cobertura territorial" : "Territorial coverage"}</p>

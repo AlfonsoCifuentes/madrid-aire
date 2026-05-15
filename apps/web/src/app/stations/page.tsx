@@ -54,6 +54,13 @@ export default async function StationsPage({ searchParams }: StationsPageProps) 
     })
     .sort((left, right) => (right.no2?.value ?? -1) - (left.no2?.value ?? -1));
   const coordinatesReady = stations.filter((station) => station.latitude != null && station.longitude != null).length;
+  const worstStationMeta = stations.find((s) => s.station_id === payload.summary?.worst_station_id);
+  const worstStationName =
+    worstStationMeta?.name
+      ? formatPlaceName(worstStationMeta.name)
+      : worstStationMeta?.municipality
+        ? formatPlaceName(worstStationMeta.municipality)
+        : (payload.summary?.worst_station_id ?? "-");
   const navigationLabels: PublicNavLabels = {
     home: language === "es" ? "Inicio" : "Home",
     dashboard: copy.mobileNavDashboard,
@@ -88,7 +95,7 @@ export default async function StationsPage({ searchParams }: StationsPageProps) 
             </div>
             <div className="glass-panel rounded-[1.75rem] p-5 shadow-atmosphere">
               <p className="eyebrow text-soft/55">{copy.worstStation}</p>
-              <p className="mt-4 font-data text-3xl text-bone">{payload.summary?.worst_station_id ?? "-"}</p>
+              <p className="mt-4 font-data text-3xl text-bone">{worstStationName}</p>
             </div>
           </div>
         </div>

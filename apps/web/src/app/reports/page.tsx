@@ -145,6 +145,13 @@ export default async function ReportsPage({ searchParams }: ReportsPageProps) {
   ]);
   const stations = dashboard.stations?.items ?? [];
   const latest = dashboard.latest?.items ?? [];
+  const worstStationMeta = stations.find((s) => s.station_id === dashboard.summary?.worst_station_id);
+  const worstStationLabel =
+    worstStationMeta?.name
+      ? formatPlaceName(worstStationMeta.name)
+      : worstStationMeta?.municipality
+        ? formatPlaceName(worstStationMeta.municipality)
+        : (dashboard.summary?.worst_station_id ?? "-");
   const municipalityWatch = buildMunicipalitySnapshots(stations, latest).slice(0, 6);
   const forecastWatch = buildForecastHotspots(stations, predictions?.items ?? [], predictions?.target ?? "NO2", 4);
   const leadingMunicipality = municipalityWatch[0] ?? null;
@@ -166,7 +173,7 @@ export default async function ReportsPage({ searchParams }: ReportsPageProps) {
           <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
             <div className="glass-panel rounded-[1.75rem] p-5 shadow-atmosphere">
               <p className="eyebrow text-soft/55">{pageCopy.worstStationLabel}</p>
-              <p className="mt-4 font-data text-3xl text-bone">{dashboard.summary?.worst_station_id ?? "-"}</p>
+              <p className="mt-4 font-data text-3xl text-bone">{worstStationLabel}</p>
             </div>
             <div className="glass-panel rounded-[1.75rem] p-5 shadow-atmosphere">
               <p className="eyebrow text-soft/55">{pageCopy.activeAlertsLabel}</p>

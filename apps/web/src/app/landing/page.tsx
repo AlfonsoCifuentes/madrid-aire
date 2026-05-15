@@ -9,6 +9,7 @@ import { PollutantGlow } from "@/components/PollutantGlow";
 import { MadridAireWordmark } from "@/components/branding/MadridAireWordmark";
 import { getDashboardPayload } from "@/lib/api";
 import { copyByLanguage, resolveLanguage } from "@/lib/i18n";
+import { formatPlaceName } from "@/lib/presentation";
 
 type LandingPageProps = {
   searchParams?: Promise<{ lang?: string | string[] }>;
@@ -49,7 +50,13 @@ export default async function LandingPage({ searchParams }: LandingPageProps) {
   const latestTimestampValue = summary?.latest_timestamp
     ? madridDateTimeFormatter.format(new Date(summary.latest_timestamp))
     : "-";
-  const worstStationId = summary?.worst_station_id ?? "-";
+  const worstStationName = (() => {
+    if (!summary?.worst_station_id) return "-";
+    const found = dashboard.stations?.items.find((s) => s.station_id === summary.worst_station_id);
+    if (found?.name) return formatPlaceName(found.name);
+    if (found?.municipality) return formatPlaceName(found.municipality);
+    return summary.worst_station_id;
+  })();
   const signalCopy = buildSignalCopy(
     Boolean(summary?.observations_ready),
     summary?.station_count ?? 0,
@@ -214,7 +221,7 @@ export default async function LandingPage({ searchParams }: LandingPageProps) {
               <div className="relative z-10 grid gap-3 sm:grid-cols-2">
                 <div className="rounded-[1.5rem] border border-white/10 bg-black/25 p-4 backdrop-blur">
                   <p className="eyebrow text-soft/55">{copy.worstStation}</p>
-                  <p className="mt-3 font-data text-xl text-bone">{worstStationId}</p>
+                  <p className="mt-3 font-data text-xl text-bone">{worstStationName}</p>
                 </div>
                 <div className="rounded-[1.5rem] border border-white/10 bg-black/25 p-4 backdrop-blur">
                   <p className="eyebrow text-soft/55">{copy.stationsOnline}</p>

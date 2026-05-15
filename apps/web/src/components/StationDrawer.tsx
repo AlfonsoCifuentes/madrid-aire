@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import type { MapNode } from "./AtmosphericMap";
 
 type StationDrawerProps = {
@@ -43,7 +44,7 @@ export function StationDrawer({ node, onClose, language = "es" }: StationDrawerP
       {/* Backdrop (mobile only) */}
       {isOpen && (
         <div
-          className="fixed inset-0 z-30 bg-graphite/60 backdrop-blur-sm xl:hidden"
+          className="fixed inset-0 z-[1000] bg-graphite/60 backdrop-blur-sm xl:hidden"
           onClick={onClose}
           aria-hidden
         />
@@ -52,7 +53,7 @@ export function StationDrawer({ node, onClose, language = "es" }: StationDrawerP
       {/* Drawer panel */}
       <div
         className={[
-          "fixed z-40 transition-transform duration-300 ease-out",
+          "fixed z-[1001] transition-transform duration-300 ease-out",
           // Mobile: bottom sheet
           "bottom-0 left-0 right-0 rounded-t-3xl xl:rounded-none",
           // Desktop: right panel
@@ -60,7 +61,7 @@ export function StationDrawer({ node, onClose, language = "es" }: StationDrawerP
           // Visibility
           isOpen ? "translate-y-0 xl:translate-x-0" : "translate-y-full xl:translate-x-full",
           "glass-panel shadow-atmosphere border-l border-white/5",
-          "px-6 py-7",
+          "px-7 py-8 xl:pt-16",
         ].join(" ")}
         role="complementary"
         aria-label={language === "es" ? "Detalle de estación" : "Station detail"}
@@ -141,6 +142,12 @@ export function StationDrawer({ node, onClose, language = "es" }: StationDrawerP
                 </p>
               </div>
             )}
+            <Link
+              href={`/stations/${node.station_id}?lang=${language}`}
+              className="mt-1 text-sm text-lime/70 transition hover:text-lime"
+            >
+              {language === "es" ? "Ver estación completa →" : "View full station →"}
+            </Link>
           </div>
         )}
       </div>
