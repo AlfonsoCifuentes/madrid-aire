@@ -231,12 +231,23 @@ export default async function ModelPage({ searchParams }: ModelPageProps) {
         </section>
 
         <section>
-          <p className="eyebrow mb-5 text-soft/55">{modelSections.featuresTitle}</p>
+          <div className="mb-6 flex flex-wrap items-center justify-between gap-4">
+            <p className="eyebrow text-soft/55">{modelSections.featuresTitle}</p>
+            {system?.model.improvement_pct_vs_best_baseline != null && (
+              <div className="glass-panel inline-flex items-center gap-3 rounded-full px-5 py-3 shadow-atmosphere">
+                <span className="font-data text-xl text-lime">
+                  +{system.model.improvement_pct_vs_best_baseline.toLocaleString(language === "es" ? "es-ES" : "en-GB", { maximumFractionDigits: 1 })}%
+                </span>
+                <span className="text-xs text-soft/60">{language === "es" ? "mejora vs. referencia" : "improvement vs. baseline"}</span>
+              </div>
+            )}
+          </div>
           <div className="grid gap-4 md:grid-cols-2">
-            {modelSections.features.map((item) => (
+            {modelSections.features.map((item, index) => (
               <div key={item.title} className="glass-panel rounded-[1.75rem] p-5 shadow-atmosphere">
-                <p className="eyebrow text-soft/55">{item.title}</p>
-                <p className="mt-4 text-sm leading-6 text-soft/74">{item.body}</p>
+                <p className="font-data text-3xl text-lime/25">0{index + 1}</p>
+                <p className="mt-4 text-base font-medium text-bone">{item.title}</p>
+                <p className="mt-3 text-sm leading-6 text-soft/74">{item.body}</p>
               </div>
             ))}
           </div>
@@ -245,10 +256,11 @@ export default async function ModelPage({ searchParams }: ModelPageProps) {
         <section>
           <p className="eyebrow mb-5 text-soft/55">{modelSections.limitationsTitle}</p>
           <div className="grid gap-4 md:grid-cols-2">
-            {modelSections.limitations.map((item) => (
-              <div key={item.title} className="glass-panel rounded-[1.75rem] p-5 shadow-atmosphere">
-                <p className="eyebrow text-soft/55">{item.title}</p>
-                <p className="mt-4 text-sm leading-6 text-soft/74">{item.body}</p>
+            {modelSections.limitations.map((item, index) => (
+              <div key={item.title} className="glass-panel rounded-[1.75rem] border-l-2 border-[#FF6B35]/30 p-5 shadow-atmosphere">
+                <p className="font-data text-3xl text-[#FF6B35]/20">0{index + 1}</p>
+                <p className="mt-4 text-base font-medium text-bone">{item.title}</p>
+                <p className="mt-3 text-sm leading-6 text-soft/74">{item.body}</p>
               </div>
             ))}
           </div>
