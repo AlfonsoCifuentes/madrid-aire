@@ -4,6 +4,7 @@ import { AdvancedPageHeader, buildAdvancedMobileNavItems, type AdvancedNavLabels
 import { MetricBars } from "@/components/MetricBars";
 import { MobileBottomNav } from "@/components/MobileBottomNav";
 import { OperationalStatusStrip } from "@/components/OperationalStatusStrip";
+import { RiskBadge } from "@/components/RiskBadge";
 import { getAlertsPayload, getDashboardPayload, getModelMetricsPayload, getPredictionsPayload, getSystemStatusPayload } from "@/lib/api";
 import { buildForecastHotspots, buildMunicipalitySnapshots, buildPredictionsHref, buildStationDetailHref } from "@/lib/editorial";
 import { copyByLanguage, resolveLanguage } from "@/lib/i18n";
@@ -145,6 +146,7 @@ export default async function ReportsPage({ searchParams }: ReportsPageProps) {
   ]);
   const stations = dashboard.stations?.items ?? [];
   const latest = dashboard.latest?.items ?? [];
+  const targetPollutant = predictions?.target ?? "NO2";
   const worstStationMeta = stations.find((s) => s.station_id === dashboard.summary?.worst_station_id);
   const worstStationLabel =
     worstStationMeta?.name
@@ -152,6 +154,11 @@ export default async function ReportsPage({ searchParams }: ReportsPageProps) {
       : worstStationMeta?.municipality
         ? formatPlaceName(worstStationMeta.municipality)
         : (dashboard.summary?.worst_station_id ?? "-");
+  const worstStationObservation = latest.find(
+    (item) => item.station_id === dashboard.summary?.worst_station_id && item.pollutant_code === targetPollutant,
+  ) ?? null;
+  const leadAlert = alerts?.items[0] ?? null;
+  const selectedMetric = (metrics?.items ?? []).find((item) => item.baseline_name === metrics?.selected_baseline) ?? null;
   const municipalityWatch = buildMunicipalitySnapshots(stations, latest).slice(0, 6);
   const forecastWatch = buildForecastHotspots(stations, predictions?.items ?? [], predictions?.target ?? "NO2", 4);
   const leadingMunicipality = municipalityWatch[0] ?? null;
@@ -174,18 +181,43 @@ export default async function ReportsPage({ searchParams }: ReportsPageProps) {
             <div className="glass-panel rounded-[1.75rem] p-5 shadow-atmosphere">
               <p className="eyebrow text-soft/55">{pageCopy.worstStationLabel}</p>
               <p className="mt-4 font-data text-3xl text-bone">{worstStationLabel}</p>
+              <p className="mt-3 text-sm text-soft/70">
+                {worstStationObservation?.value != null
+                  ? `${worstStationObservation.value.toLocaleString(locale, { maximumFractionDigits: 1 })} µg/m³ · ${targetPollutant}`
+                  : (dashboard.summary?.worst_station_id ?? "-")}
+              </p>
+              {worstStationObservation?.risk_level && (
+                <div className="mt-3">
+                  <RiskBadge riskLevel={worstStationObservation.risk_level} language={language} />
+                </div>
+              )}
             </div>
             <div className="glass-panel rounded-[1.75rem] p-5 shadow-atmosphere">
               <p className="eyebrow text-soft/55">{pageCopy.activeAlertsLabel}</p>
               <p className="mt-4 font-data text-3xl text-bone">{alerts?.items.length ?? 0}</p>
+              <p className="mt-3 text-sm text-soft/70">
+                {leadAlert
+                  ? `${formatAlertSeverity(leadAlert.severity, language)} · ${formatAlertCategory(leadAlert.category, language)}`
+                  : (language === "es" ? "Sin incidencias activas" : "No active issues")}
+              </p>
             </div>
             <div className="glass-panel rounded-[1.75rem] p-5 shadow-atmosphere">
               <p className="eyebrow text-soft/55">{copy.latestTimestamp}</p>
               <p className="mt-4 font-data text-sm text-bone">{formatMoment(dashboard.summary?.latest_timestamp ?? null, locale)}</p>
+              <p className="mt-3 text-sm text-soft/70">
+                {language === "es" ? `${dashboard.summary?.station_count ?? 0} estaciones activas` : `${dashboard.summary?.station_count ?? 0} active stations`}
+              </p>
             </div>
             <div className="glass-panel rounded-[1.75rem] p-5 shadow-atmosphere">
               <p className="eyebrow text-soft/55">{pageCopy.predictorLabel}</p>
               <p className="mt-4 font-data text-sm text-bone">{formatModelName(metrics?.selected_baseline, language)}</p>
+              <p className="mt-3 text-sm text-soft/70">
+                {system?.model.improvement_pct_vs_best_baseline != null
+                  ? `${system.model.improvement_pct_vs_best_baseline > 0 ? "+" : ""}${system.model.improvement_pct_vs_best_baseline.toLocaleString(locale, { maximumFractionDigits: 1 })}% ${language === "es" ? "vs. referencia" : "vs. baseline"}`
+                  : selectedMetric?.mae != null
+                    ? `${copy.metricMae}: ${selectedMetric.mae.toLocaleString(locale, { maximumFractionDigits: 2 })} µg/m³`
+                    : "-"}
+              </p>
             </div>
           </div>
         </div>
