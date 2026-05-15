@@ -162,13 +162,17 @@ export default async function HomePage({ searchParams }: HomePageProps) {
           </div>
         </header>
 
-        <div className="grid flex-1 gap-10 py-12">
-          <div className="max-w-3xl xl:pr-6">
+        <div className="flex flex-1 flex-col gap-10 py-12 xl:gap-12">
+          <div className="w-full">
             <p className="eyebrow mb-6 text-soft/68">{landingCopy.eyebrow}</p>
             <h1 className="sr-only">{language === "es" ? "Madrid Aire, inicio" : "Madrid Aire home"}</h1>
-            <div className="max-w-full pb-2">
+            <div className="w-full max-w-full pb-2">
               <MadridAireWordmark className="max-w-full" size="landing" />
             </div>
+          </div>
+
+          <div className="grid gap-10 xl:grid-cols-2 xl:items-start xl:gap-12">
+            <div className="max-w-none xl:pr-8">
             <p className="mt-8 max-w-2xl text-balance text-xl leading-8 text-soft/82 sm:text-2xl sm:leading-9 lg:text-[2rem] lg:leading-[1.34]">
               {landingCopy.claim}
             </p>
@@ -189,45 +193,46 @@ export default async function HomePage({ searchParams }: HomePageProps) {
                 {copy.mapPageTitle}
               </Link>
             </div>
-          </div>
+            </div>
 
-          <div className="glass-panel max-w-[1120px] rounded-[2.2rem] p-2 shadow-atmosphere">
-            <div className="relative min-h-[440px] overflow-hidden rounded-[2rem] border border-white/10 bg-black/40">
-              <AtmosphericMiniMap nodes={homeMapNodes} className="absolute inset-0 h-full w-full" />
-              <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(6,8,11,0.16),rgba(6,8,11,0.34)_38%,rgba(6,8,11,0.72))]" />
+            <div className="glass-panel w-full rounded-[2.2rem] p-2 shadow-atmosphere">
+              <div className="relative min-h-[440px] overflow-hidden rounded-[2rem] border border-white/10 bg-black/40">
+                <AtmosphericMiniMap nodes={homeMapNodes} className="absolute inset-0 h-full w-full" />
+                <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(6,8,11,0.16),rgba(6,8,11,0.34)_38%,rgba(6,8,11,0.72))]" />
 
-              <div className="absolute inset-x-5 top-5 z-10 grid gap-3 sm:grid-cols-2">
-                <div className="rounded-[1.5rem] border border-white/10 bg-[rgba(4,6,8,0.74)] p-4 backdrop-blur-md">
-                  <p className="eyebrow text-soft/55">{landingCopy.latestLabel}</p>
-                  <p className="mt-3 text-sm leading-6 text-bone">{latestTimestampValue}</p>
-                </div>
-                <div className="rounded-[1.5rem] border border-white/10 bg-[rgba(4,6,8,0.74)] p-4 backdrop-blur-md">
-                  <p className="eyebrow text-soft/55">{copy.stationsOnline}</p>
-                  <p className="mt-3 font-data text-2xl text-bone">{summary?.station_count ?? 0}</p>
-                  <p className="mt-2 text-xs text-soft/62">
-                    {summary?.pollutant_count ?? 0} {copy.pollutantCoverage.toLowerCase()}
-                  </p>
-                </div>
-              </div>
-
-              <div className="absolute inset-x-5 bottom-5 z-10 rounded-[1.75rem] border border-white/10 bg-[rgba(4,6,8,0.76)] p-5 backdrop-blur-md">
-                <p className="eyebrow text-soft/55">{landingCopy.mapLabel}</p>
-                <div className="mt-4 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
-                  <div>
-                    <p className="text-2xl font-medium tracking-[-0.03em] text-bone">
-                      {worstStation?.name
-                        ? formatPlaceName(worstStation.name)
-                        : worstStation?.municipality
-                        ? formatPlaceName(worstStation.municipality)
-                        : language === "es"
-                        ? "Sin estación destacada"
-                        : "No highlighted station"}
-                    </p>
-                    <p className="mt-2 font-data text-sm text-soft/60">
-                      NO2 · {worstNo2?.value == null ? "-" : worstNo2.value.toLocaleString(locale, { maximumFractionDigits: 1 })} µg/m³
+                <div className="absolute inset-x-5 top-5 z-10 grid gap-3 sm:grid-cols-2">
+                  <div className="rounded-[1.5rem] border border-white/10 bg-[rgba(4,6,8,0.74)] p-4 backdrop-blur-md">
+                    <p className="eyebrow text-soft/55">{landingCopy.latestLabel}</p>
+                    <p className="mt-3 text-sm leading-6 text-bone">{latestTimestampValue}</p>
+                  </div>
+                  <div className="rounded-[1.5rem] border border-white/10 bg-[rgba(4,6,8,0.74)] p-4 backdrop-blur-md">
+                    <p className="eyebrow text-soft/55">{copy.stationsOnline}</p>
+                    <p className="mt-3 font-data text-2xl text-bone">{summary?.station_count ?? 0}</p>
+                    <p className="mt-2 text-xs text-soft/62">
+                      {summary?.pollutant_count ?? 0} {copy.pollutantCoverage.toLowerCase()}
                     </p>
                   </div>
-                  {worstNo2?.risk_level ? <RiskBadge riskLevel={worstNo2.risk_level} language={language} /> : null}
+                </div>
+
+                <div className="absolute inset-x-5 bottom-5 z-10 rounded-[1.75rem] border border-white/10 bg-[rgba(4,6,8,0.76)] p-5 backdrop-blur-md">
+                  <p className="eyebrow text-soft/55">{landingCopy.mapLabel}</p>
+                  <div className="mt-4 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+                    <div>
+                      <p className="text-2xl font-medium tracking-[-0.03em] text-bone">
+                        {worstStation?.name
+                          ? formatPlaceName(worstStation.name)
+                          : worstStation?.municipality
+                          ? formatPlaceName(worstStation.municipality)
+                          : language === "es"
+                          ? "Sin estación destacada"
+                          : "No highlighted station"}
+                      </p>
+                      <p className="mt-2 font-data text-sm text-soft/60">
+                        NO2 · {worstNo2?.value == null ? "-" : worstNo2.value.toLocaleString(locale, { maximumFractionDigits: 1 })} µg/m³
+                      </p>
+                    </div>
+                    {worstNo2?.risk_level ? <RiskBadge riskLevel={worstNo2.risk_level} language={language} /> : null}
+                  </div>
                 </div>
               </div>
             </div>
