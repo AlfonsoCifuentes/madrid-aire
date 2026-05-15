@@ -11,7 +11,7 @@ import { AtmosphericMiniMap } from "@/components/AtmosphericMiniMap";
 import { getDashboardPayload, getHistoryPayload, getSystemStatusPayload } from "@/lib/api";
 import type { LatestObservationItem, StationSummary } from "@/lib/api";
 import { copyByLanguage, resolveLanguage } from "@/lib/i18n";
-import { formatPlaceName } from "@/lib/presentation";
+import { formatPlaceName, formatPublicModelName } from "@/lib/presentation";
 
 type DashboardPageProps = {
   searchParams?: Promise<{ lang?: string | string[] }>;
@@ -57,14 +57,6 @@ function buildStationNodes(
     });
 }
 
-function resolveModelName(value: string | null | undefined, language: "es" | "en") {
-  const normalized = (value ?? "").toLowerCase();
-  if (normalized.includes("hist_gradient_boosting")) {
-    return language === "es" ? "Modelo NO2 v1" : "NO2 model v1";
-  }
-  return value?.replaceAll("_", " ") || "-";
-}
-
 export default async function DashboardPage({ searchParams }: DashboardPageProps) {
   const params = searchParams ? await searchParams : undefined;
   const language = resolveLanguage(params?.lang);
@@ -100,11 +92,11 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
     .map((item) => item.value);
   const averageNo2 =
     no2Values.length > 0 ? no2Values.reduce((a, b) => a + b, 0) / no2Values.length : null;
-  const dominantPollutant = summary?.worst_pollutant_code ?? "NO2";
+  const dominantPollutant = "NO2";
   const improvement = system?.model?.improvement_pct_vs_best_baseline;
   const modelImprovementLabel =
     improvement != null ? `${improvement >= 0 ? "+" : ""}${improvement.toFixed(1)}%` : "-";
-  const modelDisplayName = resolveModelName(system?.model?.selected_model, language);
+  const modelDisplayName = formatPublicModelName(system?.model?.selected_model, language);
   const locale = language === "es" ? "es-ES" : "en-GB";
   const predictionsGeneratedAt = system?.predictions?.generated_at
     ? new Intl.DateTimeFormat(locale, {

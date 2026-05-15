@@ -7,7 +7,7 @@ import { RiskBadge } from "@/components/RiskBadge";
 import { getDashboardPayload } from "@/lib/api";
 import { buildMunicipalitySnapshots, buildStationDetailHref } from "@/lib/editorial";
 import { copyByLanguage, resolveLanguage } from "@/lib/i18n";
-import { formatPlaceName } from "@/lib/presentation";
+import { formatPlaceName, getPublicRiskScale } from "@/lib/presentation";
 
 type MapPageProps = {
   searchParams?: Promise<{ lang?: string | string[] }>;
@@ -239,14 +239,7 @@ export default async function MapPage({ searchParams }: MapPageProps) {
                 {/* Color legend */}
                 <div className="rounded-[1.25rem] border border-white/10 bg-white/[0.03] p-4">
                   <div className="mb-2 flex flex-wrap gap-2">
-                    {[
-                      { color: "#80FFB2", label: language === "es" ? "Bueno" : "Good" },
-                      { color: "#D8FF4F", label: language === "es" ? "Aceptable" : "Acceptable" },
-                      { color: "#FFB000", label: language === "es" ? "Moderado" : "Moderate" },
-                      { color: "#FF6B35", label: language === "es" ? "Malo" : "Poor" },
-                      { color: "#C2410C", label: language === "es" ? "Muy malo" : "Unhealthy" },
-                      { color: "#F43F5E", label: language === "es" ? "Peligroso" : "Hazardous" },
-                    ].map(({ color, label }) => (
+                      {getPublicRiskScale(language).map(({ color, label }) => (
                       <span key={color} className="flex items-center gap-1 text-xs">
                         <span className="inline-block h-3 w-3 rounded-full flex-shrink-0" style={{ backgroundColor: color }} />
                         <span className="text-soft/60">{label}</span>

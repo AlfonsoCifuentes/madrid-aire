@@ -6,6 +6,7 @@ import { OperationalStatusStrip } from "@/components/OperationalStatusStrip";
 import { PublicPageHeader, buildPublicMobileNavItems, type PublicNavLabels } from "@/components/PublicPageHeader";
 import { getDashboardPayload, getSystemStatusPayload } from "@/lib/api";
 import { copyByLanguage, resolveLanguage } from "@/lib/i18n";
+import { formatHoursAhead, formatPublicModelName } from "@/lib/presentation";
 
 type AboutPageProps = {
   searchParams?: Promise<{ lang?: string | string[] }>;
@@ -182,12 +183,12 @@ export default async function AboutPage({ searchParams }: AboutPageProps) {
             )}
             {system?.model.horizon_hours != null && (
               <div className="glass-panel rounded-[1.75rem] p-5 shadow-atmosphere">
-                <p className="eyebrow text-soft/55">{language === "es" ? "Horizonte de pronóstico" : "Forecast horizon"}</p>
-                <p className="mt-4 font-data text-2xl text-bone">H+{system.model.horizon_hours}</p>
-                <p className="mt-2 text-xs text-soft/55">{language === "es" ? "horas por adelantado" : "hours ahead"}</p>
+                <p className="eyebrow text-soft/55">{language === "es" ? "Hasta cuándo llega el pronóstico" : "Forecast reach"}</p>
+                <p className="mt-4 font-data text-2xl text-bone">{formatHoursAhead(system.model.horizon_hours, language, true)}</p>
+                <p className="mt-2 text-xs text-soft/55">{language === "es" ? "alcance máximo de la previsión" : "furthest point in the forecast"}</p>
                 {system.model.selected_model && (
                   <p className="mt-2 inline-block rounded-full border border-lime/30 bg-lime/10 px-2.5 py-0.5 font-data text-[10px] uppercase tracking-widest text-lime/80">
-                    {system.model.selected_model}
+                    {formatPublicModelName(system.model.selected_model, language)}
                   </p>
                 )}
               </div>
@@ -196,7 +197,9 @@ export default async function AboutPage({ searchParams }: AboutPageProps) {
               <div className="glass-panel rounded-[1.75rem] p-5 shadow-atmosphere">
                 <p className="eyebrow text-soft/55">{language === "es" ? "Estaciones con pronóstico" : "Stations with forecast"}</p>
                 <p className="mt-4 font-data text-2xl text-bone">{system.predictions.station_count}</p>
-                <p className="mt-2 text-xs text-soft/55">NO2 · {system.predictions.horizon_count ?? "-"} {language === "es" ? "horizontes" : "horizons"}</p>
+                <p className="mt-2 text-xs text-soft/55">
+                  NO2 · {language === "es" ? "hasta" : "up to"} {formatHoursAhead(system.predictions.horizon_count ?? null, language, true)}
+                </p>
               </div>
             )}
             {system?.model.training_period_start != null && (

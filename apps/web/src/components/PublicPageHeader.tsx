@@ -58,7 +58,7 @@ export function PublicPageHeader({ language, pathname, currentPage, labels }: Pu
         <nav className="hidden flex-wrap items-center gap-2 md:flex" aria-label={language === "es" ? "Navegación principal" : "Primary navigation"}>
           <Link
             className="rounded-full px-3 py-2 text-sm text-soft/55 transition hover:text-soft"
-            href={`/landing?lang=${language}`}
+            href={`/?lang=${language}`}
           >
             {labels.home}
           </Link>

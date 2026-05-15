@@ -1,15 +1,58 @@
 import type { Language } from "@/lib/i18n";
 
-const RISK_LABELS: Record<string, Record<Language, string>> = {
-  acceptable: { es: "aceptable", en: "acceptable" },
-  extreme: { es: "extremo", en: "extreme" },
-  good: { es: "bueno", en: "good" },
-  moderate: { es: "moderado", en: "moderate" },
-  poor: { es: "deficiente", en: "poor" },
-  unhealthy: { es: "insalubre", en: "unhealthy" },
-  unknown: { es: "desconocido", en: "unknown" },
-  very_poor: { es: "muy deficiente", en: "very poor" },
-  very_unhealthy: { es: "muy insalubre", en: "very unhealthy" },
+type PublicRiskBand = "low" | "medium" | "high" | "very_high" | "unknown";
+
+const PUBLIC_RISK_BANDS: Record<
+  PublicRiskBand,
+  {
+    className: string;
+    color: string;
+    label: Record<Language, string>;
+    range: string;
+  }
+> = {
+  low: {
+    className: "bg-[#80FFB2]/15 text-[#80FFB2] border border-[#80FFB2]/30",
+    color: "#80FFB2",
+    label: { es: "bajo", en: "low" },
+    range: "0–80 µg/m³",
+  },
+  medium: {
+    className: "bg-[#FFB000]/15 text-[#FFB000] border border-[#FFB000]/30",
+    color: "#FFB000",
+    label: { es: "medio", en: "medium" },
+    range: "81–120 µg/m³",
+  },
+  high: {
+    className: "bg-[#FF6B35]/15 text-[#FFB000] border border-[#FF6B35]/30",
+    color: "#FF6B35",
+    label: { es: "alto", en: "high" },
+    range: "121–200 µg/m³",
+  },
+  very_high: {
+    className: "bg-[#F43F5E]/15 text-[#F43F5E] border border-[#F43F5E]/30",
+    color: "#F43F5E",
+    label: { es: "muy alto", en: "very high" },
+    range: "> 200 µg/m³",
+  },
+  unknown: {
+    className: "bg-white/8 text-soft/55 border border-white/10",
+    color: "rgba(255,255,255,0.35)",
+    label: { es: "sin datos", en: "no data" },
+    range: "-",
+  },
+};
+
+const RISK_LEVEL_TO_PUBLIC_BAND: Record<string, PublicRiskBand> = {
+  acceptable: "low",
+  extreme: "very_high",
+  good: "low",
+  moderate: "medium",
+  poor: "high",
+  unhealthy: "very_high",
+  unknown: "unknown",
+  very_poor: "very_high",
+  very_unhealthy: "very_high",
 };
 
 const ALERT_CATEGORY_LABELS: Record<string, Record<Language, string>> = {
@@ -74,13 +117,68 @@ function normalizeLookupKey(value: string) {
     .replace(/[\u0300-\u036f]/g, "");
 }
 
-export function formatRiskLabel(value: string | null | undefined, language: Language) {
+export function resolvePublicRiskBand(value: string | null | undefined): PublicRiskBand {
   if (!value) {
-    return RISK_LABELS.unknown[language];
+    return "unknown";
   }
 
-  const normalized = value.toLowerCase();
-  return RISK_LABELS[normalized]?.[language] ?? humanizeMachineValue(normalized);
+  return RISK_LEVEL_TO_PUBLIC_BAND[value.toLowerCase()] ?? "unknown";
+}
+
+export function getPublicRiskClassName(value: string | null | undefined) {
+  return PUBLIC_RISK_BANDS[resolvePublicRiskBand(value)].className;
+}
+
+export function getPublicRiskColor(value: string | null | undefined) {
+  return PUBLIC_RISK_BANDS[resolvePublicRiskBand(value)].color;
+}
+
+export function getPublicRiskRange(band: PublicRiskBand) {
+  return PUBLIC_RISK_BANDS[band].range;
+}
+
+export function getPublicRiskScale(language: Language) {
+  return (["low", "medium", "high", "very_high"] as const).map((band) => ({
+    band,
+    color: PUBLIC_RISK_BANDS[band].color,
+    label: PUBLIC_RISK_BANDS[band].label[language],
+    range: PUBLIC_RISK_BANDS[band].range,
+  }));
+}
+
+export function formatPublicModelName(value: string | null | undefined, language: Language) {
+  const normalized = (value ?? "").toLowerCase();
+
+  if (normalized.includes("hist_gradient_boosting")) {
+    return language === "es" ? "Pronóstico a 24 h" : "24h forecast";
+  }
+  if (normalized === "persistence") {
+    return language === "es" ? "Tendencia reciente" : "Recent trend";
+  }
+  if (normalized === "same_hour_yesterday") {
+    return language === "es" ? "Misma hora de ayer" : "Same hour yesterday";
+  }
+  if (normalized === "rolling_mean_24h") {
+    return language === "es" ? "Media diaria" : "Daily average";
+  }
+
+  return value ? humanizeMachineValue(value) : "-";
+}
+
+export function formatHoursAhead(hours: number | null | undefined, language: Language, compact = false) {
+  if (hours == null) {
+    return "-";
+  }
+
+  if (compact) {
+    return language === "es" ? `${hours} h` : `${hours}h`;
+  }
+
+  return language === "es" ? `Dentro de ${hours} h` : `In ${hours}h`;
+}
+
+export function formatRiskLabel(value: string | null | undefined, language: Language) {
+  return PUBLIC_RISK_BANDS[resolvePublicRiskBand(value)].label[language];
 }
 
 export function formatAlertCategory(value: string | null | undefined, language: Language) {

@@ -6,7 +6,7 @@ import { PublicPageHeader, buildPublicMobileNavItems, type PublicNavLabels } fro
 import { getDashboardPayload, getHistoryPayload, getPredictionsPayload, getSystemStatusPayload } from "@/lib/api";
 import { buildPredictionsHref } from "@/lib/editorial";
 import { copyByLanguage, resolveLanguage } from "@/lib/i18n";
-import { formatPlaceName } from "@/lib/presentation";
+import { formatHoursAhead, formatPlaceName, formatPublicModelName, getPublicRiskColor, resolvePublicRiskBand } from "@/lib/presentation";
 
 type PredictionsPageProps = {
   searchParams?: Promise<{ h?: string | string[]; lang?: string | string[]; station?: string | string[] }>;
@@ -31,42 +31,27 @@ type PredictionsPageCopy = {
 };
 
 const RISK_SURFACE_CLASS: Record<string, string> = {
-  acceptable: "border-[#ffd36a]/35 bg-[#ffd36a]/10 text-[#fff2c0]",
-  good: "border-[#d8ff4f]/35 bg-[#d8ff4f]/10 text-[#efffb4]",
-  moderate: "border-[#ffb000]/35 bg-[#ffb000]/10 text-[#ffe0a0]",
-  poor: "border-[#ff7a00]/35 bg-[#ff7a00]/12 text-[#ffd3ad]",
-  unhealthy: "border-[#c60b1e]/35 bg-[#c60b1e]/12 text-[#ffccd2]",
+  low: "border-[#d8ff4f]/35 bg-[#d8ff4f]/10 text-[#efffb4]",
+  medium: "border-[#ffb000]/35 bg-[#ffb000]/10 text-[#ffe0a0]",
+  high: "border-[#ff7a00]/35 bg-[#ff7a00]/12 text-[#ffd3ad]",
+  very_high: "border-[#c60b1e]/35 bg-[#c60b1e]/12 text-[#ffccd2]",
   unknown: "border-white/10 bg-white/[0.04] text-soft/72",
-  very_unhealthy: "border-[#c60b1e]/35 bg-[#c60b1e]/12 text-[#ffccd2]",
-};
-
-const RISK_BAR_COLOR: Record<string, string> = {
-  good: "#80FFB2",
-  acceptable: "#D8FF4F",
-  moderate: "#FFB000",
-  poor: "#FF6B35",
-  unhealthy: "#C2410C",
-  very_unhealthy: "#F43F5E",
-  unknown: "rgba(255,255,255,0.12)",
 };
 
 const RISK_BAR_WIDTH: Record<string, number> = {
-  good: 18,
-  acceptable: 36,
-  moderate: 54,
-  poor: 72,
-  unhealthy: 88,
-  very_unhealthy: 100,
+  low: 25,
+  medium: 50,
+  high: 75,
+  very_high: 100,
   unknown: 0,
 };
 
 function resolveRiskBarColor(riskLevel: string | null | undefined) {
-  const key = (riskLevel ?? "unknown").toLowerCase();
-  return RISK_BAR_COLOR[key] ?? RISK_BAR_COLOR.unknown;
+  return getPublicRiskColor(riskLevel);
 }
 
 function resolveRiskBarWidth(riskLevel: string | null | undefined) {
-  const key = (riskLevel ?? "unknown").toLowerCase();
+  const key = resolvePublicRiskBand(riskLevel);
   return RISK_BAR_WIDTH[key] ?? 0;
 }
 
@@ -77,25 +62,25 @@ function buildPredictionsPageCopy(language: "es" | "en"): PredictionsPageCopy {
       forecastForLabel: "Pronóstico para",
       generatedAtLabel: "Actualizado a las",
       horizonSelectorBody:
-        "Cada horizonte ya está listo para consultar. Puedes revisar el valor previsto, la hora estimada y el nivel de riesgo para el próximo día.",
-      horizonSelectorTitle: "Selector de horizonte",
+        "Elige dentro de cuántas horas quieres consultar la previsión. Verás el valor esperado, la hora estimada y el nivel de aviso.",
+      horizonSelectorTitle: "Horas por delante",
       modelVersionLabel: "Modelo usado",
       priorityStationLabel: "Estación prioritaria",
-      riskEvolutionTitle: "Evolución del riesgo",
-      riskLabel: "Riesgo",
+      riskEvolutionTitle: "Evolución del aviso",
+      riskLabel: "Aviso",
       riskLabels: {
-        acceptable: "aceptable",
-        good: "bueno",
-        moderate: "moderado",
-        poor: "deficiente",
-        unhealthy: "insalubre",
+        acceptable: "bajo",
+        good: "bajo",
+        moderate: "medio",
+        poor: "alto",
+        unhealthy: "muy alto",
         unknown: "desconocido",
-        very_unhealthy: "muy insalubre",
+        very_unhealthy: "muy alto",
       },
-      selectedForecastTitle: "Previsión seleccionada",
+      selectedForecastTitle: "Tramo seleccionado",
       stationSelectorBody: "Puedes cambiar de estación para revisar cómo cambia la previsión esperada en cada punto prioritario de la red.",
       stationSelectorTitle: "Selector de estación",
-      statusLabel: "Horizontes disponibles",
+      statusLabel: "Horas disponibles",
       targetLabel: "Contaminante",
     };
   }
@@ -105,25 +90,25 @@ function buildPredictionsPageCopy(language: "es" | "en"): PredictionsPageCopy {
     forecastForLabel: "Forecast for",
     generatedAtLabel: "Updated at",
     horizonSelectorBody:
-      "Each horizon is ready to view. You can inspect the expected value, estimated time, and risk level for the next day.",
-    horizonSelectorTitle: "Horizon selector",
+      "Choose how many hours ahead you want to inspect. You will see the expected value, estimated time and alert level.",
+    horizonSelectorTitle: "Hours ahead",
     modelVersionLabel: "Model used",
     priorityStationLabel: "Priority station",
-    riskEvolutionTitle: "Risk evolution",
-    riskLabel: "Risk",
+    riskEvolutionTitle: "Alert trend",
+    riskLabel: "Alert",
     riskLabels: {
-      acceptable: "acceptable",
-      good: "good",
-      moderate: "moderate",
-      poor: "poor",
-      unhealthy: "unhealthy",
+      acceptable: "low",
+      good: "low",
+      moderate: "medium",
+      poor: "high",
+      unhealthy: "very high",
       unknown: "unknown",
-      very_unhealthy: "very unhealthy",
+      very_unhealthy: "very high",
     },
-    selectedForecastTitle: "Selected forecast",
+    selectedForecastTitle: "Selected slot",
     stationSelectorBody: "Switch stations to inspect how the forecast changes across the most relevant points in the network.",
     stationSelectorTitle: "Station selector",
-    statusLabel: "Available horizons",
+    statusLabel: "Available hours",
     targetLabel: "Pollutant",
   };
 }
@@ -166,27 +151,12 @@ function resolveRiskLabel(riskLevel: string | null | undefined, pageCopy: Predic
 }
 
 function resolveRiskSurfaceClass(riskLevel: string | null | undefined) {
-  const normalized = (riskLevel ?? "unknown").toLowerCase();
+  const normalized = resolvePublicRiskBand(riskLevel);
   return RISK_SURFACE_CLASS[normalized] ?? RISK_SURFACE_CLASS.unknown;
 }
 
 function formatModelName(value: string | null | undefined, language: "es" | "en") {
-  const normalized = (value ?? "").toLowerCase();
-
-  if (normalized.includes("hist_gradient_boosting")) {
-    return language === "es" ? "Modelo NO2 v1" : "NO2 model v1";
-  }
-  if (normalized === "persistence") {
-    return language === "es" ? "Tendencia reciente" : "Recent trend reference";
-  }
-  if (normalized === "same_hour_yesterday") {
-    return language === "es" ? "Ayer a esta hora" : "Same time yesterday";
-  }
-  if (normalized === "rolling_mean_24h") {
-    return language === "es" ? "Media reciente" : "Recent average";
-  }
-
-  return value?.replaceAll("_", " ") ?? "-";
+  return formatPublicModelName(value, language);
 }
 
 export default async function PredictionsPage({ searchParams }: PredictionsPageProps) {
@@ -290,7 +260,7 @@ export default async function PredictionsPage({ searchParams }: PredictionsPageP
             </div>
             <div className="glass-panel rounded-[1.75rem] p-5 shadow-atmosphere">
               <p className="eyebrow text-soft/55">{pageCopy.selectedForecastTitle}</p>
-              <p className="mt-4 font-data text-3xl text-bone">{selectedHorizon == null ? "-" : `H+${selectedHorizon}`}</p>
+              <p className="mt-4 font-data text-3xl text-bone">{formatHoursAhead(selectedHorizon, language)}</p>
               <p className="mt-3 text-sm text-soft/70">
                 {selectedPrediction ? `${selectedPrediction.predicted_value.toLocaleString(locale, { maximumFractionDigits: 1 })} µg/m³ · ${resolveRiskLabel(selectedPrediction.risk_level, pageCopy)}` : "-"}
               </p>
@@ -353,7 +323,9 @@ export default async function PredictionsPage({ searchParams }: PredictionsPageP
               <p className="eyebrow text-soft/60">{pageCopy.horizonSelectorTitle}</p>
               <p className="mt-3 max-w-3xl text-sm leading-6 text-soft/70">{pageCopy.horizonSelectorBody}</p>
             </div>
-            <p className="font-data text-sm text-soft/55">{language === "es" ? `${targetPollutant} · ${availableHorizons.length} horizontes` : `${targetPollutant} · ${availableHorizons.length} horizons`}</p>
+            <p className="font-data text-sm text-soft/55">
+              {targetPollutant} · {language === "es" ? "hasta" : "up to"} {formatHoursAhead(availableHorizons.at(-1) ?? null, language, true)}
+            </p>
           </div>
           <div className="mt-5 flex flex-wrap gap-2">
             {availableHorizons.length > 0 ? (
@@ -372,7 +344,7 @@ export default async function PredictionsPage({ searchParams }: PredictionsPageP
                         : "border-white/10 bg-white/[0.03] text-soft/78 hover:bg-white/[0.08]",
                     ].join(" ")}
                   >
-                    <span className="font-data text-sm">H+{horizon}</span>
+                    <span className="font-data text-sm">{formatHoursAhead(horizon, language, true)}</span>
                     <span className="mt-2 text-xs text-soft/65">{forecast ? `${forecast.predicted_value.toLocaleString(locale, { maximumFractionDigits: 1 })} µg/m³` : "-"}</span>
                     {forecast?.risk_level && (
                       <span className="mt-1.5 flex items-center gap-1.5">
@@ -452,7 +424,7 @@ export default async function PredictionsPage({ searchParams }: PredictionsPageP
                         ].join(" ")}
                       >
                         <div className="flex items-start justify-between gap-3">
-                          <p className="font-data text-sm text-bone">H+{item.horizon_hours}</p>
+                          <p className="font-data text-sm text-bone">{formatHoursAhead(item.horizon_hours, language, true)}</p>
                           <p className="text-xs uppercase tracking-[0.18em]">{resolveRiskLabel(item.risk_level, pageCopy)}</p>
                         </div>
                         <p className="mt-3 font-data text-xl text-bone">

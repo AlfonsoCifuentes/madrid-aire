@@ -11,7 +11,7 @@ import { ScrollCue } from "@/components/ScrollCue";
 import { MadridAireWordmark } from "@/components/branding/MadridAireWordmark";
 import { getDashboardPayload } from "@/lib/api";
 import { copyByLanguage, resolveLanguage } from "@/lib/i18n";
-import { formatPlaceName } from "@/lib/presentation";
+import { formatPlaceName, getPublicRiskScale } from "@/lib/presentation";
 
 type LandingPageProps = {
   searchParams?: Promise<{ lang?: string | string[] }>;
@@ -177,18 +177,11 @@ export default async function LandingPage({ searchParams }: LandingPageProps) {
             <div className="mt-6 max-w-3xl">
               <p className="eyebrow mb-3 text-soft/50">{language === "es" ? "Escala de riesgo NO2" : "NO2 risk scale"}</p>
               <div className="flex flex-wrap gap-2">
-                {[
-                  { color: "#80FFB2", label: language === "es" ? "Bueno" : "Good", sub: "< 40" },
-                  { color: "#D8FF4F", label: language === "es" ? "Aceptable" : "Acceptable", sub: "40–80" },
-                  { color: "#FFB000", label: language === "es" ? "Moderado" : "Moderate", sub: "80–120" },
-                  { color: "#FF6B35", label: language === "es" ? "Malo" : "Poor", sub: "120–200" },
-                  { color: "#C2410C", label: language === "es" ? "Muy malo" : "Unhealthy", sub: "200–400" },
-                  { color: "#F43F5E", label: language === "es" ? "Peligroso" : "Hazardous", sub: "> 400" },
-                ].map(({ color, label, sub }) => (
+                {getPublicRiskScale(language).map(({ color, label, range }) => (
                   <div key={color} className="flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.03] px-3 py-1.5">
                     <span className="h-2.5 w-2.5 flex-shrink-0 rounded-full" style={{ backgroundColor: color }} />
                     <span className="text-xs text-soft/80">{label}</span>
-                    <span className="font-data text-[10px] text-soft/40">{sub}</span>
+                    <span className="font-data text-[10px] text-soft/40">{range}</span>
                   </div>
                 ))}
               </div>
