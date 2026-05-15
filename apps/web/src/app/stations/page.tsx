@@ -147,8 +147,10 @@ export default async function StationsPage({ searchParams }: StationsPageProps) 
                 {rows.map(({ station, no2, freshnessKey }) => (
                   <tr key={station.station_id} className="border-b border-white/6 last:border-b-0">
                     <td className="px-5 py-4">
-                      <p className="font-data text-sm text-bone">{station.station_id}</p>
-                      <p className="mt-2 text-sm text-soft/72">{station.name ? formatPlaceName(station.name) : station.municipality ? formatPlaceName(station.municipality) : station.station_id}</p>
+                      <p className="text-sm font-medium text-bone">
+                        {station.name ? formatPlaceName(station.name) : station.municipality ? formatPlaceName(station.municipality) : station.station_id}
+                      </p>
+                      <p className="mt-1 font-data text-xs text-soft/40">{station.station_id}</p>
                     </td>
                     <td className="px-5 py-4 text-sm text-soft/76">{station.municipality ? formatPlaceName(station.municipality) : "-"}</td>
                     <td className="px-5 py-4 text-sm text-soft/76">{station.area_type ?? "-"}</td>
