@@ -30,6 +30,8 @@ const MADRID_REFERENCE_BOUNDS: [[number, number], [number, number]] = [
 
 const MADRID_CORE: [number, number] = [40.4168, -3.7038];
 
+const DARK_BASEMAP_URL = "https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png";
+
 const RISK_COLORS: Record<string, string> = {
   good: "#80FFB2",
   acceptable: "#D8FF4F",
@@ -163,7 +165,7 @@ export function AtmosphericMap({
       });
       map.setView([40.4168, -3.7038], 10.5);
 
-      leaflet.tileLayer("https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png", {
+      leaflet.tileLayer(DARK_BASEMAP_URL, {
         subdomains: "abcd",
         maxZoom: 20,
         attribution: "&copy; OpenStreetMap contributors &copy; CARTO",

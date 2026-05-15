@@ -1,6 +1,7 @@
 import Link from "next/link";
 
 import { AtmosphericField } from "@/components/AtmosphericField";
+import { AtmosphericMiniMap } from "@/components/AtmosphericMiniMap";
 import { CinematicOverlay } from "@/components/CinematicOverlay";
 import { IsobarLines } from "@/components/IsobarLines";
 import { LanguageSelector } from "@/components/LanguageSelector";
@@ -9,7 +10,7 @@ import { PollutantGlow } from "@/components/PollutantGlow";
 import { RiskBadge } from "@/components/RiskBadge";
 import { ScrollCue } from "@/components/ScrollCue";
 import { MadridAireWordmark } from "@/components/branding/MadridAireWordmark";
-import { getDashboardPayload } from "@/lib/api";
+import { getDashboardPayload, type LatestObservationItem, type StationSummary } from "@/lib/api";
 import { copyByLanguage, resolveLanguage } from "@/lib/i18n";
 import { formatPlaceName, getPublicRiskScale } from "@/lib/presentation";
 
@@ -37,12 +38,58 @@ function buildSignalCopy(
   };
 }
 
+function buildLandingMapNodes(
+  stations: StationSummary[],
+  latestItems: LatestObservationItem[],
+  worstStationId: string | null,
+) {
+  const no2Map = new Map<string, LatestObservationItem>();
+
+  for (const item of latestItems) {
+    if (item.pollutant_code === "NO2" && item.valid !== false) {
+      const existing = no2Map.get(item.station_id);
+      if (!existing || item.measured_at > existing.measured_at) {
+        no2Map.set(item.station_id, item);
+      }
+    }
+  }
+
+  const now = Date.now();
+
+  return stations
+    .filter(
+      (station): station is StationSummary & { latitude: number; longitude: number } =>
+        station.latitude != null && station.longitude != null,
+    )
+    .map((station) => {
+      const observation = no2Map.get(station.station_id);
+      let freshness: "fresh" | "delayed" | "stale" | "unknown" = "unknown";
+
+      if (observation) {
+        const ageHours = (now - new Date(observation.measured_at).getTime()) / (1000 * 3600);
+        freshness = ageHours < 2 ? "fresh" : ageHours < 8 ? "delayed" : "stale";
+      }
+
+      return {
+        station_id: station.station_id,
+        label: station.name ? formatPlaceName(station.name) : station.station_id,
+        latitude: station.latitude,
+        longitude: station.longitude,
+        value: observation?.value ?? 0,
+        risk_level: observation?.risk_level ?? null,
+        freshness,
+        highlight: station.station_id === worstStationId,
+      };
+    });
+}
+
 export default async function LandingPage({ searchParams }: LandingPageProps) {
   const params = searchParams ? await searchParams : undefined;
   const language = resolveLanguage(params?.lang);
   const copy = copyByLanguage[language];
   const dashboard = await getDashboardPayload();
   const summary = dashboard.summary;
+  const stations = dashboard.stations?.items ?? [];
   const madridDateTimeFormatter = new Intl.DateTimeFormat(language === "es" ? "es-ES" : "en-GB", {
     dateStyle: "short",
     timeStyle: "short",
@@ -54,12 +101,13 @@ export default async function LandingPage({ searchParams }: LandingPageProps) {
     : "-";
   const worstStationName = (() => {
     if (!summary?.worst_station_id) return "-";
-    const found = dashboard.stations?.items.find((s) => s.station_id === summary.worst_station_id);
+    const found = stations.find((s) => s.station_id === summary.worst_station_id);
     if (found?.name) return formatPlaceName(found.name);
     if (found?.municipality) return formatPlaceName(found.municipality);
     return summary.worst_station_id;
   })();
   const latestItems = dashboard.latest?.items ?? [];
+  const landingMapNodes = buildLandingMapNodes(stations, latestItems, summary?.worst_station_id ?? null);
   const worstRiskLevel = summary?.worst_station_id
     ? latestItems.find(
         (item) => item.station_id === summary.worst_station_id && item.pollutant_code === "NO2",
@@ -238,18 +286,12 @@ export default async function LandingPage({ searchParams }: LandingPageProps) {
 
           <div className="glass-panel rounded-[2rem] p-5 shadow-atmosphere">
             <div className="relative min-h-[360px] overflow-hidden rounded-[1.75rem] border border-white/10 p-5">
+              <AtmosphericMiniMap nodes={landingMapNodes} className="pointer-events-none absolute inset-0 h-full w-full" />
+              <div className="absolute inset-0 bg-[radial-gradient(circle_at_18%_22%,rgba(216,255,79,0.12),transparent_0_26%),radial-gradient(circle_at_76%_74%,rgba(198,11,30,0.14),transparent_0_30%)]" />
+              <div className="absolute inset-0 bg-gradient-to-br from-[#080a0c]/28 via-[#080a0c]/10 to-[#080a0c]/48" />
               <CinematicOverlay className="absolute inset-0" variant="panel" />
-              <AtmosphericField className="absolute inset-0 opacity-35" />
-              <IsobarLines className="absolute inset-0 opacity-10" />
-              <NoiseOverlay className="absolute inset-0 opacity-60" />
-              <PollutantGlow className="absolute left-[12%] top-[14%] h-36 w-36 opacity-55" variant="lime" />
-              <PollutantGlow className="absolute bottom-[12%] right-[10%] h-32 w-32 opacity-45" variant="alert" />
-              <PollutantGlow className="absolute right-[22%] top-[20%] h-24 w-24 opacity-40" variant="cool" />
-              <div className="absolute left-[18%] top-[28%] h-5 w-5 rounded-full bg-[#f6ff9e] shadow-[0_0_36px_rgba(209,255,117,0.7)]" />
-              <div className="absolute left-[35%] top-[54%] h-4 w-4 rounded-full bg-[#87f2ff] shadow-[0_0_28px_rgba(135,242,255,0.55)]" />
-              <div className="absolute left-[52%] top-[35%] h-6 w-6 rounded-full bg-[#ff8c5f] shadow-[0_0_44px_rgba(255,140,95,0.7)]" />
-              <div className="absolute left-[61%] top-[62%] h-4 w-4 rounded-full bg-[#b7ff80] shadow-[0_0_30px_rgba(183,255,128,0.6)]" />
-              <div className="absolute left-[74%] top-[44%] h-5 w-5 rounded-full bg-[#ffd36b] shadow-[0_0_34px_rgba(255,211,107,0.6)]" />
+              <IsobarLines className="absolute inset-0 opacity-[0.05]" />
+              <NoiseOverlay className="absolute inset-0 opacity-35" />
               <div className="absolute inset-x-[12%] top-[18%] h-px bg-gradient-to-r from-transparent via-white/18 to-transparent" />
               <div className="absolute inset-x-[18%] bottom-[24%] h-px bg-gradient-to-r from-transparent via-white/12 to-transparent" />
               <div className="absolute inset-y-[20%] left-[24%] w-px bg-gradient-to-b from-transparent via-white/12 to-transparent" />

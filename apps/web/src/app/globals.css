@@ -38,12 +38,27 @@ body {
 }
 
 .leaflet-container {
-  background: linear-gradient(180deg, #d8e5ef 0%, #c7d7e3 100%);
+  background:
+    radial-gradient(circle at 18% 20%, rgba(216, 255, 79, 0.08), transparent 0 24%),
+    radial-gradient(circle at 76% 78%, rgba(198, 11, 30, 0.1), transparent 0 32%),
+    linear-gradient(180deg, #131922 0%, #0b1015 100%);
   font-family: var(--font-ui), sans-serif;
 }
 
 .leaflet-control-zoom a {
-  color: var(--graphite);
+  color: var(--soft) !important;
+  background: rgba(8, 10, 12, 0.92) !important;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08) !important;
+}
+
+.leaflet-control-zoom a:hover {
+  color: var(--lime) !important;
+  background: rgba(26, 30, 35, 0.98) !important;
+}
+
+.leaflet-bar {
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.28);
 }
 
 .leaflet-control-attribution {
@@ -56,6 +71,10 @@ body {
 
 .leaflet-control-attribution a {
   color: rgba(216, 255, 79, 0.9) !important;
+}
+
+.leaflet-tile-pane {
+  filter: saturate(0.86) brightness(0.84) contrast(1.04);
 }
 
 .leaflet-tooltip {
