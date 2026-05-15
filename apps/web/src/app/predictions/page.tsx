@@ -293,7 +293,9 @@ export default async function PredictionsPage({ searchParams }: PredictionsPageP
                     ].join(" ")}
                   >
                     <span className="font-data text-sm">{candidate.name ? formatPlaceName(candidate.name) : candidate.station_id}</span>
-                    <span className="mt-2 text-xs text-soft/65">{candidate.municipality ? formatPlaceName(candidate.municipality) : candidate.station_id}</span>
+                    {candidate.municipality && formatPlaceName(candidate.municipality) !== formatPlaceName(candidate.name ?? "") && (
+                      <span className="mt-2 text-xs text-soft/65">{formatPlaceName(candidate.municipality)}</span>
+                    )}
                     {(() => {
                       const obs = currentNo2ByStation.get(candidate.station_id);
                       if (!obs?.value) return null;

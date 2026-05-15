@@ -30,7 +30,7 @@ const MADRID_REFERENCE_BOUNDS: [[number, number], [number, number]] = [
 
 const MADRID_CORE: [number, number] = [40.4168, -3.7038];
 
-const DARK_BASEMAP_URL = "https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}.png";
+const DARK_BASEMAP_URL = "https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}g";
 
 const RISK_COLORS: Record<string, string> = {
   good: "#80FFB2",
