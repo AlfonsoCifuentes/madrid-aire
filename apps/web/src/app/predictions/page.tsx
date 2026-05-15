@@ -232,8 +232,18 @@ export default async function PredictionsPage({ searchParams }: PredictionsPageP
     ? null
     : (stationPredictions.find((item) => item.horizon_hours === selectedHorizon) ?? null);
   const history = stationId ? await getHistoryPayload(stationId, targetPollutant, 24) : null;
-  const observed = (history?.items ?? []).map((item) => ({ timestamp: item.measured_at, value: item.value }));
+  const historyItems = history?.items ?? [];
+  const observed = historyItems.map((item) => ({ timestamp: item.measured_at, value: item.value }));
   const predicted = stationPredictions.map((item) => ({ timestamp: item.predicted_for, value: item.predicted_value }));
+  const latestObservedItem = historyItems.reduce<(typeof historyItems)[number] | null>((latestItem, item) => {
+    if (!latestItem || item.measured_at > latestItem.measured_at) {
+      return item;
+    }
+    return latestItem;
+  }, null);
+  const forecastDelta = latestObservedItem && selectedPrediction
+    ? selectedPrediction.predicted_value - latestObservedItem.value
+    : null;
   const currentNo2ByStation = new Map(
     (dashboard.latest?.items ?? [])
       .filter((item) => item.pollutant_code === targetPollutant)
@@ -388,16 +398,29 @@ export default async function PredictionsPage({ searchParams }: PredictionsPageP
             <div className="mt-5">
               <HistoryForecastChart observed={observed} predicted={predicted} observedLabel={copy.observedLabel} predictedLabel={copy.predictedLabel} language={language} />
             </div>
-            <div className="mt-5 grid gap-4 sm:grid-cols-2 2xl:grid-cols-3">
+            <div className="mt-5 grid gap-4 sm:grid-cols-2 2xl:grid-cols-4">
               <div className="rounded-[1.5rem] border border-white/10 bg-white/[0.03] p-4">
                 <p className="eyebrow text-soft/55">{pageCopy.forecastForLabel}</p>
                 <p className="mt-2 font-data text-sm text-bone">{formatMoment(selectedPrediction?.predicted_for, locale)}</p>
+              </div>
+              <div className="rounded-[1.5rem] border border-white/10 bg-white/[0.03] p-4">
+                <p className="eyebrow text-soft/55">{language === "es" ? "Última observación" : "Latest observation"}</p>
+                <p className="mt-2 font-data text-2xl text-bone">
+                  {latestObservedItem ? latestObservedItem.value.toLocaleString(locale, { maximumFractionDigits: 1 }) : "-"}
+                  {latestObservedItem && <span className="ml-1 font-sans text-xs text-soft/50">µg/m³</span>}
+                </p>
+                <p className="mt-2 text-xs text-soft/55">{formatMoment(latestObservedItem?.measured_at, locale)}</p>
               </div>
               <div className="rounded-[1.5rem] border border-white/10 bg-white/[0.03] p-4">
                 <p className="eyebrow text-soft/55">{copy.tableValue}</p>
                 <p className="mt-2 font-data text-2xl text-bone">
                   {selectedPrediction ? selectedPrediction.predicted_value.toLocaleString(locale, { maximumFractionDigits: 1 }) : "-"}
                 </p>
+                {forecastDelta != null && (
+                  <p className={`mt-2 text-xs ${forecastDelta > 0 ? "text-[#FFB000]" : forecastDelta < 0 ? "text-lime" : "text-soft/55"}`}>
+                    {forecastDelta > 0 ? "+" : ""}{forecastDelta.toLocaleString(locale, { maximumFractionDigits: 1 })} µg/m³ {language === "es" ? "vs. ahora" : "vs. now"}
+                  </p>
+                )}
               </div>
               <div className="rounded-[1.5rem] border border-white/10 bg-white/[0.03] p-4">
                 <p className="eyebrow text-soft/55">{pageCopy.riskLabel}</p>
