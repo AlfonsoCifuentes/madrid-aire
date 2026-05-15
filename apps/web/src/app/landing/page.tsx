@@ -266,10 +266,21 @@ export default async function LandingPage({ searchParams }: LandingPageProps) {
                 <div className="rounded-[1.5rem] border border-white/10 bg-black/25 p-4 backdrop-blur">
                   <p className="eyebrow text-soft/55">{copy.worstStation}</p>
                   <p className="mt-3 font-data text-xl text-bone">{worstStationName}</p>
+                  {summary?.worst_value != null && (
+                    <p className="mt-2 font-data text-xs text-soft/60">NO2 · {summary.worst_value.toLocaleString(locale, { maximumFractionDigits: 1 })} µg/m³</p>
+                  )}
+                  {worstRiskLevel && (
+                    <div className="mt-3">
+                      <RiskBadge riskLevel={worstRiskLevel} language={language} />
+                    </div>
+                  )}
                 </div>
                 <div className="rounded-[1.5rem] border border-white/10 bg-black/25 p-4 backdrop-blur">
                   <p className="eyebrow text-soft/55">{copy.stationsOnline}</p>
                   <p className="mt-3 font-data text-xl text-bone">{summary?.station_count ?? 0}</p>
+                  <p className="mt-2 text-xs text-soft/60">
+                    {summary?.pollutant_count ?? 0} {copy.pollutantCoverage.toLowerCase()} · {freshnessLabel}
+                  </p>
                 </div>
               </div>
 
