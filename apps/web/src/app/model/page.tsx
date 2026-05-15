@@ -239,6 +239,25 @@ export default async function ModelPage({ searchParams }: ModelPageProps) {
             <p className="eyebrow text-soft/60">NO2 · {language === "es" ? "error visual por modelo" : "error chart by model"}</p>
             <p className="font-data text-sm text-soft/55">{language === "es" ? "MAE y RMSE comparados" : "MAE & RMSE compared"}</p>
           </div>
+          <div className="mb-5 flex flex-wrap gap-2">
+            <span className="rounded-full border border-lime/25 bg-lime/10 px-3 py-1 font-data text-[11px] uppercase tracking-[0.16em] text-lime/85">
+              {formatModelName(metrics?.selected_baseline, language)}
+            </span>
+            <span className="rounded-full border border-white/10 bg-white/[0.03] px-3 py-1 font-data text-[11px] uppercase tracking-[0.16em] text-soft/65">
+              {language === "es"
+                ? `${metrics?.items.length ?? 0} referencias comparadas`
+                : `${metrics?.items.length ?? 0} baselines compared`}
+            </span>
+            <span className="rounded-full border border-white/10 bg-white/[0.03] px-3 py-1 font-data text-[11px] uppercase tracking-[0.16em] text-soft/65">
+              {copy.testWindow}: {formatWindow(metrics?.test_period_start ?? null, metrics?.test_period_end ?? null)}
+            </span>
+            {system?.model.improvement_pct_vs_best_baseline != null && (
+              <span className="rounded-full border border-lime/25 bg-lime/10 px-3 py-1 font-data text-[11px] uppercase tracking-[0.16em] text-lime/85">
+                {system.model.improvement_pct_vs_best_baseline > 0 ? "+" : ""}
+                {system.model.improvement_pct_vs_best_baseline.toLocaleString(language === "es" ? "es-ES" : "en-GB", { maximumFractionDigits: 1 })}%
+              </span>
+            )}
+          </div>
           <ModelErrorChart
             items={metrics?.items ?? []}
             maeLabel={copy.metricMae}
