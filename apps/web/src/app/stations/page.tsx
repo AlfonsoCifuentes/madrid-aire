@@ -56,6 +56,10 @@ export default async function StationsPage({ searchParams }: StationsPageProps) 
     })
     .sort((left, right) => (right.no2?.value ?? -1) - (left.no2?.value ?? -1));
   const coordinatesReady = stations.filter((station) => station.latitude != null && station.longitude != null).length;
+  const stationsWithNo2 = rows.filter((row) => row.no2?.value != null).length;
+  const municipalitiesRepresented = new Set(
+    stations.map((station) => station.municipality ?? station.name ?? station.station_id),
+  ).size;
   const worstStationMeta = stations.find((s) => s.station_id === payload.summary?.worst_station_id);
   const worstStationName =
     worstStationMeta?.name
@@ -89,14 +93,27 @@ export default async function StationsPage({ searchParams }: StationsPageProps) 
             </h1>
             <p className="mt-6 max-w-2xl text-lg leading-8 text-soft/74">{copy.stationsPageSubtitle}</p>
           </div>
-          <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+          <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
             <div className="glass-panel rounded-[1.75rem] p-5 shadow-atmosphere">
               <p className="eyebrow text-soft/55">{copy.stationsOnline}</p>
               <p className="mt-4 font-data text-3xl text-bone">{stations.length}</p>
+              <p className="mt-2 text-sm text-soft/70">
+                {language === "es" ? `${stationsWithNo2} con NO2 actual` : `${stationsWithNo2} with live NO2`}
+              </p>
             </div>
             <div className="glass-panel rounded-[1.75rem] p-5 shadow-atmosphere">
               <p className="eyebrow text-soft/55">{copy.mapCoordinatesReady}</p>
               <p className="mt-4 font-data text-3xl text-bone">{coordinatesReady}</p>
+              <p className="mt-2 text-sm text-soft/70">
+                {language === "es" ? "listas para mapa y detalle" : "ready for map and detail"}
+              </p>
+            </div>
+            <div className="glass-panel rounded-[1.75rem] p-5 shadow-atmosphere">
+              <p className="eyebrow text-soft/55">{language === "es" ? "Cobertura territorial" : "Territorial coverage"}</p>
+              <p className="mt-4 font-data text-3xl text-bone">{municipalitiesRepresented}</p>
+              <p className="mt-2 text-sm text-soft/70">
+                {language === "es" ? "municipios representados" : "municipalities represented"}
+              </p>
             </div>
             <div className="glass-panel rounded-[1.75rem] p-5 shadow-atmosphere">
               <p className="eyebrow text-soft/55">{copy.worstStation}</p>
