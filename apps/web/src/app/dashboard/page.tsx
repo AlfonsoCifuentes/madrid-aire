@@ -11,7 +11,7 @@ import { AtmosphericMiniMap } from "@/components/AtmosphericMiniMap";
 import { getDashboardPayload, getHistoryPayload, getSystemStatusPayload } from "@/lib/api";
 import type { LatestObservationItem, StationSummary } from "@/lib/api";
 import { copyByLanguage, resolveLanguage } from "@/lib/i18n";
-import { formatPlaceName, formatPublicModelName } from "@/lib/presentation";
+import { formatPlaceName } from "@/lib/presentation";
 
 type DashboardPageProps = {
   searchParams?: Promise<{ lang?: string | string[] }>;
@@ -93,10 +93,6 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
   const averageNo2 =
     no2Values.length > 0 ? no2Values.reduce((a, b) => a + b, 0) / no2Values.length : null;
   const dominantPollutant = "NO2";
-  const improvement = system?.model?.improvement_pct_vs_best_baseline;
-  const modelImprovementLabel =
-    improvement != null ? `${improvement >= 0 ? "+" : ""}${improvement.toFixed(1)}%` : "-";
-  const modelDisplayName = formatPublicModelName(system?.model?.selected_model, language);
   const locale = language === "es" ? "es-ES" : "en-GB";
   const predictionsGeneratedAt = system?.predictions?.generated_at
     ? new Intl.DateTimeFormat(locale, {
@@ -269,21 +265,20 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
             </Link>
           </div>
           <div className="glass-panel rounded-[1.75rem] p-5 shadow-atmosphere">
-            <p className="eyebrow text-soft/55">{copy.dashboardModelStatusTitle}</p>
-            <p className="mt-4 font-data text-2xl text-bone">{modelDisplayName}</p>
-            {improvement != null ? (
-              <p className={`mt-3 font-data text-xl ${improvement >= 0 ? "text-lime" : "text-red-400"}`}>
-                {modelImprovementLabel}
-                <span className="ml-1 text-xs text-soft/50">{copy.dashboardModelImprovementLabel}</span>
-              </p>
-            ) : (
-              <p className="mt-3 text-sm text-soft/70">{copy.dashboardModelImprovementLabel} · {modelImprovementLabel}</p>
-            )}
+            <p className="eyebrow text-soft/55">{language === "es" ? "Cómo interpretar esta página" : "How to read this page"}</p>
+            <p className="mt-4 font-data text-2xl text-bone">
+              {language === "es" ? "Primero mira el valor y después la hora" : "Check the value first, then the time"}
+            </p>
+            <p className="mt-3 text-sm leading-6 text-soft/70">
+              {language === "es"
+                ? "Si el valor te preocupa, mira cuándo se actualizó la red y después abre el mapa o la previsión. La parte técnica queda aparte en la guía."
+                : "If the value worries you, check when the network last updated and then open the map or the forecast. The technical detail stays separate in the guide."}
+            </p>
             <Link
               className="mt-4 inline-flex text-sm text-soft/60 hover:text-soft"
-              href={`/model?lang=${language}`}
+              href={`/about?lang=${language}`}
             >
-              {copy.openModel} →
+              {copy.openAbout} →
             </Link>
           </div>
         </div>

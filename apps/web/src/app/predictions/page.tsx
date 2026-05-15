@@ -6,7 +6,7 @@ import { PublicPageHeader, buildPublicMobileNavItems, type PublicNavLabels } fro
 import { getDashboardPayload, getHistoryPayload, getPredictionsPayload, getSystemStatusPayload } from "@/lib/api";
 import { buildPredictionsHref } from "@/lib/editorial";
 import { copyByLanguage, resolveLanguage } from "@/lib/i18n";
-import { formatHoursAhead, formatPlaceName, formatPublicModelName, getPublicRiskColor, resolvePublicRiskBand } from "@/lib/presentation";
+import { formatHoursAhead, formatPlaceName, formatSecondaryPlaceName, getPublicRiskColor, resolvePublicRiskBand } from "@/lib/presentation";
 
 type PredictionsPageProps = {
   searchParams?: Promise<{ h?: string | string[]; lang?: string | string[]; station?: string | string[] }>;
@@ -58,14 +58,14 @@ function resolveRiskBarWidth(riskLevel: string | null | undefined) {
 function buildPredictionsPageCopy(language: "es" | "en"): PredictionsPageCopy {
   if (language === "es") {
     return {
-      artifactContextTitle: "Cómo leer esta previsión",
-      forecastForLabel: "Pronóstico para",
-      generatedAtLabel: "Actualizado a las",
+      artifactContextTitle: "Resumen rápido",
+      forecastForLabel: "Momento previsto",
+      generatedAtLabel: "Previsión actualizada a las",
       horizonSelectorBody:
-        "Elige dentro de cuántas horas quieres consultar la previsión. Verás el valor esperado, la hora estimada y el nivel de aviso.",
-      horizonSelectorTitle: "Horas por delante",
-      modelVersionLabel: "Modelo usado",
-      priorityStationLabel: "Estación prioritaria",
+        "Elige el momento que quieres mirar. Puedes comparar si el aire podría mejorar, empeorar o mantenerse dentro de las próximas 24 horas.",
+      horizonSelectorTitle: "Elige el momento",
+      modelVersionLabel: "Tipo de previsión",
+      priorityStationLabel: "Estación elegida",
       riskEvolutionTitle: "Evolución del aviso",
       riskLabel: "Aviso",
       riskLabels: {
@@ -77,23 +77,23 @@ function buildPredictionsPageCopy(language: "es" | "en"): PredictionsPageCopy {
         unknown: "desconocido",
         very_unhealthy: "muy alto",
       },
-      selectedForecastTitle: "Tramo seleccionado",
-      stationSelectorBody: "Puedes cambiar de estación para revisar cómo cambia la previsión esperada en cada punto prioritario de la red.",
-      stationSelectorTitle: "Selector de estación",
-      statusLabel: "Horas disponibles",
+      selectedForecastTitle: "Momento que estás mirando",
+      stationSelectorBody: "Cambia de estación si quieres comparar cómo podría variar el NO2 entre distintas zonas de Madrid.",
+      stationSelectorTitle: "Cambia de estación",
+      statusLabel: "Momentos disponibles",
       targetLabel: "Contaminante",
     };
   }
 
   return {
-    artifactContextTitle: "How to read this forecast",
-    forecastForLabel: "Forecast for",
-    generatedAtLabel: "Updated at",
+    artifactContextTitle: "Quick summary",
+    forecastForLabel: "Forecast moment",
+    generatedAtLabel: "Forecast updated at",
     horizonSelectorBody:
-      "Choose how many hours ahead you want to inspect. You will see the expected value, estimated time and alert level.",
-    horizonSelectorTitle: "Hours ahead",
-    modelVersionLabel: "Model used",
-    priorityStationLabel: "Priority station",
+      "Pick the moment you want to inspect. You can compare whether air quality may improve, worsen, or stay similar over the next 24 hours.",
+    horizonSelectorTitle: "Choose the moment",
+    modelVersionLabel: "Forecast type",
+    priorityStationLabel: "Selected station",
     riskEvolutionTitle: "Alert trend",
     riskLabel: "Alert",
     riskLabels: {
@@ -105,10 +105,10 @@ function buildPredictionsPageCopy(language: "es" | "en"): PredictionsPageCopy {
       unknown: "unknown",
       very_unhealthy: "very high",
     },
-    selectedForecastTitle: "Selected slot",
-    stationSelectorBody: "Switch stations to inspect how the forecast changes across the most relevant points in the network.",
-    stationSelectorTitle: "Station selector",
-    statusLabel: "Available hours",
+    selectedForecastTitle: "Moment you are viewing",
+    stationSelectorBody: "Switch stations if you want to compare how NO2 may change across different parts of Madrid.",
+    stationSelectorTitle: "Switch station",
+    statusLabel: "Moments available",
     targetLabel: "Pollutant",
   };
 }
@@ -153,10 +153,6 @@ function resolveRiskLabel(riskLevel: string | null | undefined, pageCopy: Predic
 function resolveRiskSurfaceClass(riskLevel: string | null | undefined) {
   const normalized = resolvePublicRiskBand(riskLevel);
   return RISK_SURFACE_CLASS[normalized] ?? RISK_SURFACE_CLASS.unknown;
-}
-
-function formatModelName(value: string | null | undefined, language: "es" | "en") {
-  return formatPublicModelName(value, language);
 }
 
 export default async function PredictionsPage({ searchParams }: PredictionsPageProps) {
@@ -246,12 +242,15 @@ export default async function PredictionsPage({ searchParams }: PredictionsPageP
             <div className="glass-panel rounded-[1.75rem] p-5 shadow-atmosphere">
               <p className="eyebrow text-soft/55">{pageCopy.priorityStationLabel}</p>
               <p className="mt-4 font-data text-2xl text-bone">{station?.name ? formatPlaceName(station.name) : stationId ?? "-"}</p>
-              <p className="mt-3 text-sm text-soft/70">{stationId ?? "-"}</p>
+              {formatSecondaryPlaceName(station?.name, station?.municipality) && (
+                <p className="mt-2 text-sm text-soft/70">{formatSecondaryPlaceName(station?.name, station?.municipality)}</p>
+              )}
+              <p className="mt-3 text-xs text-soft/45">{stationId ?? "-"}</p>
             </div>
             <div className="glass-panel rounded-[1.75rem] p-5 shadow-atmosphere">
               <p className="eyebrow text-soft/55">{pageCopy.modelVersionLabel}</p>
-              <p className="mt-4 font-data text-xl text-bone">{formatModelName(selectedPrediction?.baseline_name ?? system?.model.selected_model, language)}</p>
-              <p className="mt-3 text-sm text-soft/70">{copy.selectedBaseline}</p>
+              <p className="mt-4 font-data text-xl text-bone">{language === "es" ? "Orientativa a 24 h" : "Indicative 24h outlook"}</p>
+              <p className="mt-3 text-sm text-soft/70">{language === "es" ? "Úsala para planificar, no como aviso oficial." : "Use it for planning, not as an official alert."}</p>
             </div>
             <div className="glass-panel rounded-[1.75rem] p-5 shadow-atmosphere">
               <p className="eyebrow text-soft/55">{pageCopy.generatedAtLabel}</p>
