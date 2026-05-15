@@ -1,5 +1,6 @@
 import Link from "next/link";
 
+import { FreshnessIndicator } from "@/components/FreshnessIndicator";
 import { MobileBottomNav } from "@/components/MobileBottomNav";
 import { PublicPageHeader, buildPublicMobileNavItems, type PublicNavLabels } from "@/components/PublicPageHeader";
 import { RiskBadge } from "@/components/RiskBadge";
@@ -62,6 +63,9 @@ export default async function StationsPage({ searchParams }: StationsPageProps) 
       : worstStationMeta?.municipality
         ? formatPlaceName(worstStationMeta.municipality)
         : (payload.summary?.worst_station_id ?? "-");
+  const worstStationNo2 = payload.summary?.worst_station_id
+    ? no2ByStation.get(payload.summary.worst_station_id)
+    : null;
   const navigationLabels: PublicNavLabels = {
     home: language === "es" ? "Inicio" : "Home",
     dashboard: copy.mobileNavDashboard,
@@ -97,6 +101,16 @@ export default async function StationsPage({ searchParams }: StationsPageProps) 
             <div className="glass-panel rounded-[1.75rem] p-5 shadow-atmosphere">
               <p className="eyebrow text-soft/55">{copy.worstStation}</p>
               <p className="mt-4 font-data text-3xl text-bone">{worstStationName}</p>
+              {worstStationNo2?.value != null && (
+                <p className="mt-2 font-data text-sm text-soft/70">
+                  {worstStationNo2.value.toLocaleString(locale, { maximumFractionDigits: 1 })} µg/m³
+                </p>
+              )}
+              {worstStationNo2?.risk_level && (
+                <div className="mt-2">
+                  <RiskBadge riskLevel={worstStationNo2.risk_level} language={language} />
+                </div>
+              )}
             </div>
           </div>
         </div>
@@ -164,7 +178,9 @@ export default async function StationsPage({ searchParams }: StationsPageProps) 
                         <div className="mt-1.5"><RiskBadge riskLevel={no2.risk_level} language={language} /></div>
                       )}
                     </td>
-                    <td className="px-5 py-4 text-sm text-soft/76">{copy.freshness[freshnessKey]}</td>
+                    <td className="px-5 py-4">
+                      <FreshnessIndicator freshness={freshnessKey} label={copy.freshness[freshnessKey]} />
+                    </td>
                     <td className="px-5 py-4">
                       <Link className="font-data text-sm text-lime" href={`/stations/${station.station_id}?lang=${language}`}>
                         {copy.stationsOpenDetail}
