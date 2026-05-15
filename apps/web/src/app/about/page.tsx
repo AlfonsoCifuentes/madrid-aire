@@ -33,14 +33,16 @@ type RouteCardProps = {
   eyebrow: string;
   title: string;
   description: string;
+  accent?: string;
 };
 
-function RouteCard({ href, eyebrow, title, description }: RouteCardProps) {
+function RouteCard({ href, eyebrow, title, description, accent }: RouteCardProps) {
   return (
     <Link className="glass-panel rounded-[1.75rem] p-5 shadow-atmosphere transition hover:bg-white/10" href={href}>
       <p className="eyebrow text-soft/55">{eyebrow}</p>
       <h2 className="mt-4 text-2xl font-medium text-bone">{title}</h2>
       <p className="mt-4 text-sm leading-6 text-soft/72">{description}</p>
+      {accent && <p className="mt-5 font-data text-xs uppercase tracking-[0.18em] text-lime/80">{accent}</p>}
     </Link>
   );
 }
@@ -52,17 +54,83 @@ export default async function AboutPage({ searchParams }: AboutPageProps) {
   const copy = copyByLanguage[language];
   const [dashboard, system] = await Promise.all([getDashboardPayload(), getSystemStatusPayload()]);
   const summary = dashboard.summary;
+  const worstStationMeta = dashboard.stations?.items.find((item) => item.station_id === summary?.worst_station_id) ?? null;
+  const worstStationLabel = worstStationMeta?.name ?? worstStationMeta?.municipality ?? summary?.worst_station_id ?? "-";
   const publicRoutes = [
-    { href: `/dashboard?lang=${language}`, title: copy.dashboardTitle, description: copy.aboutDashboardDesc },
-    { href: `/map?lang=${language}`, title: copy.mapPageTitle, description: copy.aboutMapDesc },
-    { href: `/stations?lang=${language}`, title: copy.stationsPageTitle, description: copy.aboutStationsDesc },
-    { href: `/predictions?lang=${language}`, title: copy.predictionsTitle, description: copy.aboutPredictionsDesc },
+    {
+      href: `/dashboard?lang=${language}`,
+      title: copy.dashboardTitle,
+      description: copy.aboutDashboardDesc,
+      accent:
+        language === "es"
+          ? `${summary?.station_count ?? 0} estaciones · ${summary?.pollutant_count ?? 0} contaminantes`
+          : `${summary?.station_count ?? 0} stations · ${summary?.pollutant_count ?? 0} pollutants`,
+    },
+    {
+      href: `/map?lang=${language}`,
+      title: copy.mapPageTitle,
+      description: copy.aboutMapDesc,
+      accent:
+        language === "es"
+          ? `${copy.freshness[summary?.freshness ?? "pending"] ?? copy.freshness.pending} · red visible`
+          : `${copy.freshness[summary?.freshness ?? "pending"] ?? copy.freshness.pending} · visible network`,
+    },
+    {
+      href: `/stations?lang=${language}`,
+      title: copy.stationsPageTitle,
+      description: copy.aboutStationsDesc,
+      accent:
+        language === "es"
+          ? `peor nodo: ${worstStationLabel}`
+          : `worst node: ${worstStationLabel}`,
+    },
+    {
+      href: `/predictions?lang=${language}`,
+      title: copy.predictionsTitle,
+      description: copy.aboutPredictionsDesc,
+      accent:
+        language === "es"
+          ? `NO2 · ${system?.predictions.station_count ?? 0} estaciones · ${system?.predictions.horizon_count ?? 0} horizontes`
+          : `NO2 · ${system?.predictions.station_count ?? 0} stations · ${system?.predictions.horizon_count ?? 0} horizons`,
+    },
   ];
   const technicalRoutes = [
-    { href: `/model?lang=${language}`, title: copy.modelTitle, description: copy.aboutModelDesc },
-    { href: `/methodology?lang=${language}`, title: copy.methodologyTitle, description: copy.aboutMethodologyDesc },
-    { href: `/reports?lang=${language}`, title: copy.reportsTitle, description: copy.aboutReportsDesc },
-    { href: `/system?lang=${language}`, title: copy.systemTitle, description: copy.aboutSystemDesc },
+    {
+      href: `/model?lang=${language}`,
+      title: copy.modelTitle,
+      description: copy.aboutModelDesc,
+      accent:
+        system?.model.improvement_pct_vs_best_baseline != null
+          ? `${system.model.improvement_pct_vs_best_baseline > 0 ? "+" : ""}${system.model.improvement_pct_vs_best_baseline.toLocaleString(locale, { maximumFractionDigits: 1 })}% ${language === "es" ? "vs. referencia" : "vs. baseline"}`
+          : undefined,
+    },
+    {
+      href: `/methodology?lang=${language}`,
+      title: copy.methodologyTitle,
+      description: copy.aboutMethodologyDesc,
+      accent:
+        summary?.latest_timestamp
+          ? `${language === "es" ? "última señal" : "latest signal"}: ${formatMoment(summary.latest_timestamp, locale)}`
+          : undefined,
+    },
+    {
+      href: `/reports?lang=${language}`,
+      title: copy.reportsTitle,
+      description: copy.aboutReportsDesc,
+      accent:
+        language === "es"
+          ? `${system?.predictions.generated_at ? `forecast ${formatMoment(system.predictions.generated_at, locale)}` : "forecast -"}`
+          : `${system?.predictions.generated_at ? `forecast ${formatMoment(system.predictions.generated_at, locale)}` : "forecast -"}`,
+    },
+    {
+      href: `/system?lang=${language}`,
+      title: copy.systemTitle,
+      description: copy.aboutSystemDesc,
+      accent:
+        language === "es"
+          ? `${copy.freshness[system?.data_quality.freshness ?? "pending"] ?? copy.freshness.pending} · estado operativo`
+          : `${copy.freshness[system?.data_quality.freshness ?? "pending"] ?? copy.freshness.pending} · operational state`,
+    },
   ];
   const navigationLabels: PublicNavLabels = {
     home: language === "es" ? "Inicio" : "Home",
@@ -163,6 +231,7 @@ export default async function AboutPage({ searchParams }: AboutPageProps) {
                 eyebrow={copy.aboutLiveLabel}
                 title={route.title}
                 description={route.description}
+                accent={route.accent}
               />
             ))}
           </div>
@@ -183,6 +252,7 @@ export default async function AboutPage({ searchParams }: AboutPageProps) {
                 eyebrow={copy.aboutTechnicalLabel}
                 title={route.title}
                 description={route.description}
+                accent={route.accent}
               />
             ))}
           </div>
