@@ -362,7 +362,7 @@ export default async function PredictionsPage({ searchParams }: PredictionsPageP
           </div>
         </section>
 
-        <div className="grid gap-6 xl:grid-cols-[1.15fr_0.85fr]">
+        <div className="grid gap-6">
           <section className="glass-panel rounded-[2rem] p-5 shadow-atmosphere">
             <div className="flex flex-wrap items-center justify-between gap-3">
               <p className="eyebrow text-soft/60">{copy.historyLabel}</p>
@@ -403,76 +403,74 @@ export default async function PredictionsPage({ searchParams }: PredictionsPageP
             <p className="mt-5 text-sm leading-6 text-soft/70">{copy.notOfficialForecast}</p>
           </section>
 
-          <aside className="grid gap-6">
-            <section className="glass-panel rounded-[2rem] p-5 shadow-atmosphere">
-              <div className="flex flex-wrap items-center justify-between gap-3">
-                <p className="eyebrow text-soft/60">{pageCopy.riskEvolutionTitle}</p>
-                <p className="font-data text-sm text-soft/55">{language === "es" ? `${stationPredictions.length} tramos` : `${stationPredictions.length} steps`}</p>
-              </div>
-              <div className="mt-5 grid gap-3 sm:grid-cols-2">
-                {stationPredictions.length > 0 ? (
-                  stationPredictions.map((item) => {
-                    const isActive = item.horizon_hours === selectedHorizon;
+          <section className="glass-panel rounded-[2rem] p-5 shadow-atmosphere">
+            <div className="flex flex-wrap items-center justify-between gap-3">
+              <p className="eyebrow text-soft/60">{pageCopy.riskEvolutionTitle}</p>
+              <p className="font-data text-sm text-soft/55">{language === "es" ? `${stationPredictions.length} tramos` : `${stationPredictions.length} steps`}</p>
+            </div>
+            <div className="mt-5 grid gap-3 sm:grid-cols-2">
+              {stationPredictions.length > 0 ? (
+                stationPredictions.map((item) => {
+                  const isActive = item.horizon_hours === selectedHorizon;
 
-                    return (
-                      <Link
-                        key={`${item.station_id}-${item.horizon_hours}`}
-                        href={buildPredictionsHref(language, item.station_id, item.horizon_hours)}
-                        className={[
-                          "rounded-[1.5rem] border p-4 transition hover:translate-y-[-1px]",
-                          resolveRiskSurfaceClass(item.risk_level),
-                          isActive ? "ring-1 ring-lime/60" : "",
-                        ].join(" ")}
-                      >
-                        <div className="flex items-start justify-between gap-3">
-                          <p className="font-data text-sm text-bone">{formatHoursAhead(item.horizon_hours, language, true)}</p>
-                          <p className="text-xs uppercase tracking-[0.18em]">{resolveRiskLabel(item.risk_level, pageCopy)}</p>
-                        </div>
-                        <p className="mt-3 font-data text-xl text-bone">
-                          {item.predicted_value.toLocaleString(locale, { maximumFractionDigits: 1 })}
-                          <span className="ml-1 font-sans text-xs text-soft/50">µg/m³</span>
-                        </p>
-                        <div className="mt-3 h-[3px] w-full overflow-hidden rounded-full bg-white/10">
-                          <div
-                            className="h-full rounded-full transition-all duration-500"
-                            style={{
-                              width: `${resolveRiskBarWidth(item.risk_level)}%`,
-                              backgroundColor: resolveRiskBarColor(item.risk_level),
-                            }}
-                          />
-                        </div>
-                        <p className="mt-2 text-xs text-soft/70">{formatMoment(item.predicted_for, locale)}</p>
-                      </Link>
-                    );
-                  })
-                ) : (
-                  <p className="text-sm leading-6 text-soft/70">{copy.stationNoPredictions}</p>
-                )}
-              </div>
-            </section>
+                  return (
+                    <Link
+                      key={`${item.station_id}-${item.horizon_hours}`}
+                      href={buildPredictionsHref(language, item.station_id, item.horizon_hours)}
+                      className={[
+                        "rounded-[1.5rem] border p-4 transition hover:translate-y-[-1px]",
+                        resolveRiskSurfaceClass(item.risk_level),
+                        isActive ? "ring-1 ring-lime/60" : "",
+                      ].join(" ")}
+                    >
+                      <div className="flex items-start justify-between gap-3">
+                        <p className="font-data text-sm text-bone">{formatHoursAhead(item.horizon_hours, language, true)}</p>
+                        <p className="text-xs uppercase tracking-[0.18em]">{resolveRiskLabel(item.risk_level, pageCopy)}</p>
+                      </div>
+                      <p className="mt-3 font-data text-xl text-bone">
+                        {item.predicted_value.toLocaleString(locale, { maximumFractionDigits: 1 })}
+                        <span className="ml-1 font-sans text-xs text-soft/50">µg/m³</span>
+                      </p>
+                      <div className="mt-3 h-[3px] w-full overflow-hidden rounded-full bg-white/10">
+                        <div
+                          className="h-full rounded-full transition-all duration-500"
+                          style={{
+                            width: `${resolveRiskBarWidth(item.risk_level)}%`,
+                            backgroundColor: resolveRiskBarColor(item.risk_level),
+                          }}
+                        />
+                      </div>
+                      <p className="mt-2 text-xs text-soft/70">{formatMoment(item.predicted_for, locale)}</p>
+                    </Link>
+                  );
+                })
+              ) : (
+                <p className="text-sm leading-6 text-soft/70">{copy.stationNoPredictions}</p>
+              )}
+            </div>
+          </section>
 
-            <section className="glass-panel rounded-[2rem] p-5 shadow-atmosphere">
-              <p className="eyebrow text-soft/60">{pageCopy.artifactContextTitle}</p>
-              <div className="mt-5 grid gap-4 sm:grid-cols-2 xl:grid-cols-1">
-                <div>
-                  <p className="eyebrow text-soft/55">{pageCopy.targetLabel}</p>
-                  <p className="mt-2 font-data text-sm text-bone">{targetPollutant}</p>
-                </div>
-                <div>
-                  <p className="eyebrow text-soft/55">{pageCopy.statusLabel}</p>
-                  <p className="mt-2 font-data text-sm text-bone">{availableHorizons.length}</p>
-                </div>
-                <div>
-                  <p className="eyebrow text-soft/55">{pageCopy.priorityStationLabel}</p>
-                  <p className="mt-2 font-data text-sm text-bone">{station?.name ? formatPlaceName(station.name) : stationId ?? "-"}</p>
-                </div>
-                <div>
-                  <p className="eyebrow text-soft/55">{pageCopy.generatedAtLabel}</p>
-                  <p className="mt-2 font-data text-sm text-bone">{formatMoment(predictions?.generated_at ?? system?.predictions.generated_at, locale)}</p>
-                </div>
+          <section className="glass-panel rounded-[2rem] p-5 shadow-atmosphere">
+            <p className="eyebrow text-soft/60">{pageCopy.artifactContextTitle}</p>
+            <div className="mt-5 grid gap-4 sm:grid-cols-2 xl:grid-cols-1">
+              <div>
+                <p className="eyebrow text-soft/55">{pageCopy.targetLabel}</p>
+                <p className="mt-2 font-data text-sm text-bone">{targetPollutant}</p>
               </div>
-            </section>
-          </aside>
+              <div>
+                <p className="eyebrow text-soft/55">{pageCopy.statusLabel}</p>
+                <p className="mt-2 font-data text-sm text-bone">{availableHorizons.length}</p>
+              </div>
+              <div>
+                <p className="eyebrow text-soft/55">{pageCopy.priorityStationLabel}</p>
+                <p className="mt-2 font-data text-sm text-bone">{station?.name ? formatPlaceName(station.name) : stationId ?? "-"}</p>
+              </div>
+              <div>
+                <p className="eyebrow text-soft/55">{pageCopy.generatedAtLabel}</p>
+                <p className="mt-2 font-data text-sm text-bone">{formatMoment(predictions?.generated_at ?? system?.predictions.generated_at, locale)}</p>
+              </div>
+            </div>
+          </section>
         </div>
       </section>
       <MobileBottomNav currentLanguage={language} currentPage="predictions" ariaLabel={copy.mobileNavAriaLabel} items={mobileNavItems} />
