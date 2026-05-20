@@ -263,8 +263,16 @@ export const getModelMetricsPayload = cache(async (): Promise<MetricEnvelope | n
   });
 
 export const getPredictionsPayload = cache(async (stationId?: string): Promise<PredictionEnvelope | null> => {
-    const search = stationId ? `?station_id=${encodeURIComponent(stationId)}` : "";
-    return fetchJson<PredictionEnvelope>(`/api/predictions${search}`);
+    const payload = await fetchJson<PredictionEnvelope>("/api/predictions");
+
+    if (!payload || !stationId) {
+      return payload;
+    }
+
+    return {
+      ...payload,
+      items: payload.items.filter((item) => item.station_id === stationId),
+    };
   });
 
 export const getAlertsPayload = cache(async (): Promise<AlertEnvelope | null> => {
