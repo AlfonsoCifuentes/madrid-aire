@@ -8,7 +8,7 @@ import { PublicPageHeader, buildPublicMobileNavItems, type PublicNavLabels } fro
 import { ObservationTable } from "@/components/ObservationTable";
 import { type StationPulseNode } from "@/components/StationPulseField";
 import { AtmosphericMiniMap } from "@/components/AtmosphericMiniMap";
-import { getDashboardPayload, getHistoryPayload, getSystemStatusPayload } from "@/lib/api";
+import { getDashboardPayload, getHistoryPayload, getPredictionsPayload, getSystemStatusPayload } from "@/lib/api";
 import type { LatestObservationItem, StationSummary } from "@/lib/api";
 import { copyByLanguage, resolveLanguage } from "@/lib/i18n";
 import { formatPlaceName } from "@/lib/presentation";
@@ -77,7 +77,12 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
     ?? (worstStationId
       ? latest.find((item) => item.station_id === worstStationId && item.pollutant_code === "NO2")?.risk_level ?? null
       : null);
-  const history = worstStationId ? await getHistoryPayload(worstStationId, "NO2", 24) : null;
+  const [history, predictions] = worstStationId
+    ? await Promise.all([
+        getHistoryPayload(worstStationId, "NO2", 24),
+        getPredictionsPayload(worstStationId),
+      ])
+    : [null, null];
   const topRows = latest
     .filter((item) => item.pollutant_code === "NO2")
     .sort((left, right) => right.value - left.value)
@@ -87,6 +92,13 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
     timestamp: item.measured_at,
     value: item.value,
   }));
+  const historyPredicted = (predictions?.items ?? [])
+    .filter((item) => item.station_id === worstStationId && item.pollutant_code === "NO2")
+    .sort((left, right) => left.horizon_hours - right.horizon_hours)
+    .map((item) => ({
+      timestamp: item.predicted_for,
+      value: item.predicted_value,
+    }));
   const no2Values = latest
     .filter((item) => item.pollutant_code === "NO2" && item.valid !== false)
     .map((item) => item.value);
@@ -215,7 +227,7 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
             <div className="mt-5">
               <HistoryForecastChart
                 observed={historyObserved}
-                predicted={[]}
+                predicted={historyPredicted}
                 observedLabel={copy.observedLabel}
                 predictedLabel={copy.predictedLabel}
                 language={language}
