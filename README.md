@@ -42,7 +42,7 @@ Este proyecto esta orientado a convertir datos reales en una lectura accionable 
 | Complejidad | Advanced |
 | Lenguaje principal | Next.js |
 | Primera version | 14 de mayo de 2026 |
-| Ultima actualizacion | 20 de mayo de 2026 |
+| Ultima actualizacion | 21 de mayo de 2026 |
 
 ## Enlaces
 
