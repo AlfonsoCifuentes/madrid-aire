@@ -1,84 +1,54 @@
-# MADRID Aire
+# Madrid Aire
 
-MADRID Aire is a premium atmospheric intelligence product for Madrid built from the engineering bible in this repository. The current implementation already covers real observations, a real-station map, stations explorer and detail, model-v1 forecasts, operational system status, methodology, and reports without fabricating stations, observations, or forecasts.
+> Madrid Aire: análisis de datos con foco en lectura útil y criterio analítico
 
-## Current status
+## Resumen
 
-- `apps/web` contains the landing, dashboard, map, stations explorer, station detail, predictions, model, methodology, system, and reports surfaces.
-- `apps/api` exposes lightweight observation, prediction, metrics, alerts, and system endpoints plus protected job routes.
-- `data` stores official normalized snapshots and ML artifacts, while `docs` now documents sources, ETL, architecture, MLOps, deployment, and known limitations.
+Panel de calidad del aire de Madrid con resumen operativo, mapa, estaciones, comparativas y prevision de NO2 a 24 horas.
 
-## Stack
+## Valor del proyecto
 
-- Frontend: Next.js, React, TypeScript, Tailwind CSS
-- Backend: FastAPI, Pydantic Settings, Cloudflare D1 hooks
-- Data and ML: pandas, NumPy, scikit-learn, joblib
+Aporta una capa de análisis que facilita detectar patrones, resumir hallazgos y comunicar conclusiones de forma útil a perfiles técnicos y no técnicos.
 
-## Repository layout
+Este proyecto esta orientado a convertir datos reales en una lectura accionable mediante analitica, visualizacion y una narrativa clara para la toma de decisiones.
 
-```text
-apps/
- api/
- web/
-data/
-docs/
-sql/
-MADRID_Aire_ultimate_product_engineering_bible_v6_copilot.md
-```
+## Funcionalidades o puntos fuertes
 
-## Product surfaces currently implemented
+- Exploración de datos con énfasis en patrones, sesgos y contexto
+- Visualizaciones pensadas para comunicar resultados sin ruido
+- Enfoque analítico orientado a interpretación y toma de decisiones
+- Stack principal visible y coherente: Next.js, TypeScript, Air Quality y Maps.
 
-- `/`
-- `/dashboard`
-- `/map`
-- `/stations`
-- `/stations/[id]`
-- `/predictions`
-- `/model`
-- `/methodology`
-- `/system`
-- `/reports`
+## Stack principal
 
-## Local start
+- Next.js
+- TypeScript
+- Air Quality
+- Maps
 
-### Web
+## Como explorar este proyecto
 
-```powershell
-npm install
-npm run dev:web
-```
+- Examinar el dashboard, notebook o flujo analitico principal para entender la historia de los datos.
+- Revisar las variables, metricas y visualizaciones que sostienen las conclusiones.
+- Valorar como el proyecto conecta tratamiento de datos, interpretacion y presentacion ejecutiva.
 
-### API
+## Ficha rapida
 
-```powershell
-Set-Location apps/api
-python -m venv .venv
-.\.venv\Scripts\Activate.ps1
-pip install -r requirements.txt
-uvicorn src.main:app --reload
-```
+| Campo | Detalle |
+| --- | --- |
+| Repositorio | madrid-aire |
+| Categoria | Data Science |
+| Grupo | Análisis de Datos |
+| Complejidad | Advanced |
+| Lenguaje principal | Next.js |
+| Primera version | 14 de mayo de 2026 |
+| Ultima actualizacion | 20 de mayo de 2026 |
 
-### ML artifact rebuilds
+## Enlaces
 
-```powershell
-pip install -r data/requirements-ml.txt
-python data/build_no2_model_v1_artifacts.py
-```
+- Demo en vivo: https://madrid-aire-web.vercel.app/
+- Repositorio: https://github.com/AlfonsoCifuentes/madrid-aire
 
-### Containerized API
+## Nota
 
-```powershell
-docker build -f apps/api/Dockerfile -t madrid-aire-api .
-docker run --rm -p 8000:8000 --env-file .env madrid-aire-api
-```
-
-## Environment
-
-Copy values from `.env.example` into your local environment before wiring Cloudflare D1 or frontend API calls.
-
-## Rules carried into code
-
-- No synthetic observations, stations, coordinates, or predictions.
-- Official data only from documented sources.
-- Landing quality must remain premium from the first visual commit.
-- ML starts with an honest baseline and temporal validation, and now advances through model v1 with precomputed artifacts.
+Este README se ha generado a partir del catalogo enriquecido del portfolio para mantener una descripcion consistente, explicativa y lista para evolucionar en cada repositorio.
