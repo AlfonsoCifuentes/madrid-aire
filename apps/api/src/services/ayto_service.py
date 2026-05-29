@@ -132,7 +132,11 @@ def _fetch_raw_rows() -> list[dict]:
     try:
         response = requests.get(AYTO_REALTIME_URL, timeout=12)
         response.raise_for_status()
-        return response.json()
+        data = response.json()
+        # The API wraps rows in a "records" key: {"records": [...], "totalRecords": N, ...}
+        if isinstance(data, dict):
+            return data.get("records", [])
+        return data  # defensive: handle if the API ever returns a plain list
     except Exception as exc:
         print(f"[ayto_service] Real-time fetch failed: {exc}")
         return []
