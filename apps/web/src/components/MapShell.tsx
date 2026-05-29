@@ -27,27 +27,63 @@ type MapShellProps = {
   language?: "es" | "en";
 };
 
+type SourceFilter = "all" | "comunidad" | "ayuntamiento";
+
+const SOURCE_FILTER_LABELS: Record<SourceFilter, Record<"es" | "en", string>> = {
+  all:           { es: "Todas las redes",       en: "All networks"       },
+  comunidad:     { es: "Comunidad de Madrid",   en: "Comunidad de Madrid" },
+  ayuntamiento:  { es: "Ayuntamiento de Madrid", en: "Ayto. de Madrid"   },
+};
+
 export function MapShell({ nodes, language = "es" }: MapShellProps) {
   const [selectedPollutant, setSelectedPollutant] = useState("NO2");
   const [selectedNode, setSelectedNode] = useState<MapNode | null>(null);
+  const [sourceFilter, setSourceFilter] = useState<SourceFilter>("all");
+
+  const hasBothSources = nodes.some((n) => n.source === "comunidad") && nodes.some((n) => n.source === "ayuntamiento");
+
+  const visibleNodes =
+    sourceFilter === "all"
+      ? nodes
+      : nodes.filter((n) => n.source === sourceFilter || n.source === undefined);
 
   function handleStationSelect(stationId: string) {
-    const node = nodes.find((n) => n.station_id === stationId) ?? null;
+    const node = visibleNodes.find((n) => n.station_id === stationId) ?? null;
     setSelectedNode(node);
   }
 
   return (
     <div className="relative flex flex-col gap-4">
-      <PollutantSelector
-        selected={selectedPollutant}
-        available={["NO2"]}
-        onSelect={setSelectedPollutant}
-        language={language}
-      />
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <PollutantSelector
+          selected={selectedPollutant}
+          available={["NO2"]}
+          onSelect={setSelectedPollutant}
+          language={language}
+        />
+        {hasBothSources && (
+          <div className="flex items-center gap-1.5 rounded-2xl border border-white/10 bg-white/[0.04] p-1">
+            {(["all", "comunidad", "ayuntamiento"] as SourceFilter[]).map((key) => (
+              <button
+                key={key}
+                onClick={() => setSourceFilter(key)}
+                className={[
+                  "rounded-xl px-3 py-1.5 text-xs font-medium transition",
+                  sourceFilter === key
+                    ? "bg-white/15 text-bone"
+                    : "text-soft/50 hover:text-soft/80",
+                ].join(" ")}
+              >
+                {SOURCE_FILTER_LABELS[key][language]}
+              </button>
+            ))}
+          </div>
+        )}
+      </div>
 
       <div className="relative isolate overflow-hidden rounded-[2rem] shadow-atmosphere">
         <AtmosphericMap
-          nodes={nodes}
+          nodes={visibleNodes}
           onStationSelect={handleStationSelect}
           className="h-[520px] w-full rounded-[2rem] lg:h-[620px] xl:h-[680px]"
         />

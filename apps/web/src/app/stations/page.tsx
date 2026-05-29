@@ -4,7 +4,7 @@ import { FreshnessIndicator } from "@/components/FreshnessIndicator";
 import { MobileBottomNav } from "@/components/MobileBottomNav";
 import { PublicPageHeader, buildPublicMobileNavItems, type PublicNavLabels } from "@/components/PublicPageHeader";
 import { RiskBadge } from "@/components/RiskBadge";
-import { getDashboardPayload } from "@/lib/api";
+import { getDashboardPayload, getAytoPayload } from "@/lib/api";
 import { copyByLanguage, resolveLanguage } from "@/lib/i18n";
 import { formatPlaceName, formatSecondaryPlaceName, formatStationAreaType, formatStationType } from "@/lib/presentation";
 
@@ -39,9 +39,17 @@ export default async function StationsPage({ searchParams }: StationsPageProps) 
   const language = resolveLanguage(params?.lang);
   const copy = copyByLanguage[language];
   const payload = await getDashboardPayload();
+  const ayto = await getAytoPayload();
   const locale = language === "es" ? "es-ES" : "en-GB";
-  const stations = payload.stations?.items ?? [];
-  const latest = payload.latest?.items ?? [];
+  const comunidadStations = payload.stations?.items ?? [];
+  const aytoStations = (ayto.stations?.items ?? []).map((s) => ({ ...s, _network: "ayuntamiento" as const }));
+  const stations = [
+    ...comunidadStations.map((s) => ({ ...s, _network: "comunidad" as const })),
+    ...aytoStations,
+  ];
+  const comunidadLatest = payload.latest?.items ?? [];
+  const aytoLatest = ayto.latest?.items ?? [];
+  const latest = [...comunidadLatest, ...aytoLatest];
   const no2ByStation = new Map(
     latest.filter((item) => item.pollutant_code === "NO2").map((item) => [item.station_id, item]),
   );
@@ -141,7 +149,19 @@ export default async function StationsPage({ searchParams }: StationsPageProps) 
             >
               <div className="flex items-start justify-between gap-4">
                 <div className="min-w-0 flex-1">
-                  <p className="font-data text-sm text-bone">{station.name ? formatPlaceName(station.name) : station.municipality ? formatPlaceName(station.municipality) : station.station_id}</p>
+                  <div className="flex items-center gap-2">
+                    <p className="font-data text-sm text-bone">{station.name ? formatPlaceName(station.name) : station.municipality ? formatPlaceName(station.municipality) : station.station_id}</p>
+                    <span
+                      className="shrink-0 rounded-full px-2 py-0.5 text-[10px] font-medium"
+                      style={station._network === "ayuntamiento"
+                        ? { background: "rgba(255,149,0,0.15)", color: "#FF9500" }
+                        : { background: "rgba(244,241,234,0.10)", color: "#B5B09E" }}
+                    >
+                      {station._network === "ayuntamiento"
+                        ? (language === "es" ? "Ayto." : "City")
+                        : (language === "es" ? "C. Madrid" : "Region")}
+                    </span>
+                  </div>
                   {formatSecondaryPlaceName(station.name, station.municipality) && (
                     <p className="mt-1 text-xs text-soft/50">{formatSecondaryPlaceName(station.name, station.municipality)}</p>
                   )}
@@ -168,6 +188,7 @@ export default async function StationsPage({ searchParams }: StationsPageProps) 
               <thead className="border-b border-white/10 bg-white/[0.03]">
                 <tr>
                   <th className="px-5 py-4 text-xs font-medium uppercase tracking-[0.18em] text-soft/55">{copy.tableStation}</th>
+                  <th className="px-5 py-4 text-xs font-medium uppercase tracking-[0.18em] text-soft/55">{language === "es" ? "Red" : "Network"}</th>
                   <th className="px-5 py-4 text-xs font-medium uppercase tracking-[0.18em] text-soft/55">{copy.stationsTableMunicipality}</th>
                   <th className="px-5 py-4 text-xs font-medium uppercase tracking-[0.18em] text-soft/55">{copy.stationsTableAreaType}</th>
                   <th className="px-5 py-4 text-xs font-medium uppercase tracking-[0.18em] text-soft/55">{copy.stationsTableStationType}</th>
@@ -184,6 +205,18 @@ export default async function StationsPage({ searchParams }: StationsPageProps) 
                         {station.name ? formatPlaceName(station.name) : station.municipality ? formatPlaceName(station.municipality) : station.station_id}
                       </p>
                       <p className="mt-1 font-data text-xs text-soft/40">{station.station_id}</p>
+                    </td>
+                    <td className="px-5 py-4">
+                      <span
+                        className="inline-block rounded-full px-2.5 py-0.5 text-xs font-medium"
+                        style={station._network === "ayuntamiento"
+                          ? { background: "rgba(255,149,0,0.15)", color: "#FF9500" }
+                          : { background: "rgba(244,241,234,0.10)", color: "#B5B09E" }}
+                      >
+                        {station._network === "ayuntamiento"
+                          ? (language === "es" ? "Ayto." : "City")
+                          : (language === "es" ? "C. Madrid" : "Region")}
+                      </span>
                     </td>
                     <td className="px-5 py-4 text-sm text-soft/76">{formatSecondaryPlaceName(station.name, station.municipality) ?? "-"}</td>
                     <td className="px-5 py-4 text-sm text-soft/76">{formatStationAreaType(station.area_type, language)}</td>

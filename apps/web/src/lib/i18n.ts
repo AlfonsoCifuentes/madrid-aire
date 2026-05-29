@@ -178,6 +178,9 @@ type Copy = {
   mapNoStation: string;
   mapStationDrawerClose: string;
   mapStationDrawerCoords: string;
+  mapSourceFilterAll: string;
+  mapSourceFilterComunidad: string;
+  mapSourceFilterAyuntamiento: string;
   freshness: Record<string, string>;
 };
 
@@ -397,6 +400,9 @@ export const copyByLanguage: Record<Language, Copy> = {
     mapNoStation: "Selecciona una estación",
     mapStationDrawerClose: "Cerrar",
     mapStationDrawerCoords: "Coordenadas",
+    mapSourceFilterAll: "Todas las redes",
+    mapSourceFilterComunidad: "Comunidad de Madrid",
+    mapSourceFilterAyuntamiento: "Ayuntamiento de Madrid",
     freshness: {
       fresh: "menos de 3 h",
       delayed: "3 a 12 h",
@@ -620,6 +626,9 @@ export const copyByLanguage: Record<Language, Copy> = {
     mapNoStation: "Select a station",
     mapStationDrawerClose: "Close",
     mapStationDrawerCoords: "Coordinates",
+    mapSourceFilterAll: "All networks",
+    mapSourceFilterComunidad: "Comunidad de Madrid",
+    mapSourceFilterAyuntamiento: "Ayto. de Madrid",
     freshness: {
       fresh: "under 3h old",
       delayed: "3 to 12h old",

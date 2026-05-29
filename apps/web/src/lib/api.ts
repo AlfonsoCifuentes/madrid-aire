@@ -204,6 +204,11 @@ export type DashboardPayload = {
   apiAvailable: boolean;
 };
 
+export type AytoPayload = {
+  stations: StationCollection | null;
+  latest: LatestObservationEnvelope | null;
+};
+
 function getApiBaseUrl() {
   if (process.env.NEXT_PUBLIC_API_BASE_URL) {
     return process.env.NEXT_PUBLIC_API_BASE_URL;
@@ -281,4 +286,12 @@ export const getAlertsPayload = cache(async (): Promise<AlertEnvelope | null> =>
 
 export const getSystemStatusPayload = cache(async (): Promise<SystemStatusEnvelope | null> => {
   return fetchJson<SystemStatusEnvelope>("/api/system-status");
+});
+
+export const getAytoPayload = cache(async (): Promise<AytoPayload> => {
+  const [stations, latest] = await Promise.all([
+    fetchJson<StationCollection>("/api/ayto/stations"),
+    fetchJson<LatestObservationEnvelope>("/api/ayto/latest"),
+  ]);
+  return { stations, latest };
 });

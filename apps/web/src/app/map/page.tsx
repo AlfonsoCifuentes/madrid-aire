@@ -4,7 +4,7 @@ import { MapShell } from "@/components/MapShell";
 import { MobileBottomNav } from "@/components/MobileBottomNav";
 import { PublicPageHeader, buildPublicMobileNavItems, type PublicNavLabels } from "@/components/PublicPageHeader";
 import { RiskBadge } from "@/components/RiskBadge";
-import { getDashboardPayload } from "@/lib/api";
+import { getDashboardPayload, getAytoPayload } from "@/lib/api";
 import { buildMunicipalitySnapshots, buildStationDetailHref } from "@/lib/editorial";
 import { copyByLanguage, resolveLanguage } from "@/lib/i18n";
 import { areEquivalentPlaceNames, formatPlaceName, formatSecondaryPlaceName, getPublicRiskScale } from "@/lib/presentation";
@@ -18,6 +18,7 @@ export default async function MapPage({ searchParams }: MapPageProps) {
   const language = resolveLanguage(params?.lang);
   const copy = copyByLanguage[language];
   const payload = await getDashboardPayload();
+  const ayto = await getAytoPayload();
   const stations = payload.stations?.items ?? [];
   const latest = payload.latest?.items ?? [];
   const no2ByStation = new Map(
@@ -49,9 +50,37 @@ export default async function MapPage({ searchParams }: MapPageProps) {
         risk_level: observation.risk_level,
         freshness: toFreshnessBucket(observation.measured_at),
         highlight: station.station_id === payload.summary?.worst_station_id,
+        source: "comunidad" as const,
       };
     })
     .filter((node): node is NonNullable<typeof node> => node !== null);
+
+  // Ayuntamiento de Madrid nodes (second real-time network, city-level)
+  const aytoNo2ByStation = new Map(
+    (ayto.latest?.items ?? [])
+      .filter((item) => item.pollutant_code === "NO2")
+      .map((item) => [item.station_id, item]),
+  );
+  const aytoNodes = (ayto.stations?.items ?? [])
+    .filter((station) => station.latitude != null && station.longitude != null)
+    .map((station) => {
+      const observation = aytoNo2ByStation.get(station.station_id);
+      if (!observation) return null;
+      return {
+        station_id: station.station_id,
+        label: station.name ? formatPlaceName(station.name) : station.station_id,
+        latitude: station.latitude as number,
+        longitude: station.longitude as number,
+        value: observation.value,
+        risk_level: observation.risk_level,
+        freshness: toFreshnessBucket(observation.measured_at),
+        highlight: false,
+        source: "ayuntamiento" as const,
+      };
+    })
+    .filter((node): node is NonNullable<typeof node> => node !== null);
+
+  const allNodes = [...pulseNodes, ...aytoNodes];
   const priorityStations = [...pulseNodes].sort((left, right) => right.value - left.value).slice(0, 6);
   const worstPulseNode = pulseNodes.find((n) => n.station_id === payload.summary?.worst_station_id) ?? null;
   const worstStationMeta = stations.find((station) => station.station_id === payload.summary?.worst_station_id) ?? null;
@@ -83,7 +112,7 @@ export default async function MapPage({ searchParams }: MapPageProps) {
             <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
             <div className="glass-panel rounded-[1.75rem] p-5 shadow-atmosphere">
                 <p className="eyebrow text-soft/55">{copy.mapStationsReady}</p>
-                <p className="mt-4 font-data text-3xl text-bone">{pulseNodes.length}</p>
+                <p className="mt-4 font-data text-3xl text-bone">{allNodes.length}</p>
                 <p className="mt-3 text-sm text-soft/70">{language === "es" ? "Estaciones con lectura reciente listas para comparar." : "Stations with recent readings ready to compare."}</p>
             </div>
             <div className="glass-panel rounded-[1.75rem] p-5 shadow-atmosphere">
@@ -139,7 +168,7 @@ export default async function MapPage({ searchParams }: MapPageProps) {
                 {language === "es" ? "NO2 · lectura actual · toca un punto" : "NO2 · latest reading · tap a point"}
               </p>
             </div>
-            <MapShell nodes={pulseNodes} language={language} />
+            <MapShell nodes={allNodes} language={language} />
           </section>
 
           {/* Below-map panels */}

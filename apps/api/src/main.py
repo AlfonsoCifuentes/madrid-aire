@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 
-from src.routes import alerts, health, jobs, metrics, observations, pollutants, predictions, stations, system
+from src.routes import alerts, ayto, health, jobs, metrics, observations, pollutants, predictions, stations, system
 from src.settings import get_settings
 
 settings = get_settings()
@@ -36,3 +36,4 @@ app.include_router(metrics.router, prefix=settings.api_prefix, tags=["metrics"])
 app.include_router(alerts.router, prefix=settings.api_prefix, tags=["alerts"])
 app.include_router(system.router, prefix=settings.api_prefix, tags=["system"])
 app.include_router(jobs.router, prefix=settings.api_prefix, tags=["jobs"])
+app.include_router(ayto.router, prefix=settings.api_prefix, tags=["ayto"])

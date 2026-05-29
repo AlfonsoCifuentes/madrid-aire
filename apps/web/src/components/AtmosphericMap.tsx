@@ -15,6 +15,7 @@ export type MapNode = {
   risk_level: string | null;
   freshness: "fresh" | "delayed" | "stale" | "unknown";
   highlight?: boolean;
+  source?: "comunidad" | "ayuntamiento";
 };
 
 type AtmosphericMapProps = {
@@ -74,6 +75,9 @@ function renderStations(
     const color = RISK_COLORS[node.risk_level ?? "unknown"] ?? RISK_COLORS.unknown;
     const opacity = FRESHNESS_OPACITY[node.freshness] ?? 0.5;
     const radius = valueToRadius(node.value);
+    const isAyto = node.source === "ayuntamiento";
+    // Ayuntamiento stations use a warm-orange ring; Comunidad uses cream
+    const ringColor = isAyto ? "#FF9500" : "#F4F1EA";
 
     if (node.highlight) {
       leaflet.circleMarker([node.latitude, node.longitude], {
@@ -87,7 +91,7 @@ function renderStations(
 
     leaflet.circleMarker([node.latitude, node.longitude], {
       radius: radius + 4,
-      color: "#F4F1EA",
+      color: ringColor,
       weight: node.highlight ? 2.6 : 2,
       opacity: 0.9,
       fillOpacity: 0,
