@@ -44,9 +44,13 @@ class CloudflareD1Client:
         if not payload.get("success"):
             raise RuntimeError(str(payload.get("errors") or "Cloudflare D1 query failed"))
 
-        result = payload.get("result") or []
+        result = payload.get("result")
         if not result:
-            return []
+            raise RuntimeError(
+                "Cloudflare D1 returned a null or empty result array. "
+                "The query may have been silently rejected (e.g. too many bound parameters). "
+                f"Response errors: {payload.get('errors') or 'none'}"
+            )
 
         first_result = result[0]
         if not first_result.get("success"):
