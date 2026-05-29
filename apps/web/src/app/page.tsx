@@ -81,25 +81,25 @@ export default async function HomePage({ searchParams }: HomePageProps) {
         eyebrow: "Inicio",
         claim: "Consulta la calidad del aire en Madrid de forma clara, rápida y visual.",
         support: "Madrid Aire reúne datos de estaciones, mapa interactivo y previsión de contaminación para ayudarte a entender el estado del aire en la ciudad sin complicaciones técnicas.",
-        liveLabel: "Red pública activa",
+        liveLabel: "Red de medición activa",
         latestLabel: "Última actualización",
         mapLabel: "Vista general",
-        quickLinksTitle: "Accesos directos",
-        quickLinksBody: "Cinco rutas claras. Sin menús densos ni contenido duplicado.",
-        openGuide: "Cómo leer la web",
-        openGuideBody: "Guía breve para entender niveles, tiempos y contexto sin entrar en la parte interna.",
+        quickLinksTitle: "Qué puedes consultar",
+        quickLinksBody: "Accede rápidamente a las principales secciones de Madrid Aire: estado actual, mapa, estaciones, previsión y guía de interpretación.",
+        openGuide: "Leer la guía",
+        openGuideBody: "Guía breve para entender niveles, tiempos y contexto.",
       }
     : {
         eyebrow: "Home",
-        claim: "A clean front page to reach the current summary, the map, stations, and the forecast without getting lost in technical explanation.",
-        support: "Start with the overview, open the map to compare areas, and move into stations or forecast once you know which place matters to you.",
-        liveLabel: "Public network live",
+        claim: "Check Madrid's air quality clearly, quickly, and visually.",
+        support: "Madrid Aire brings together monitoring station data, an interactive map, and a pollution forecast to help you understand the city's air quality without technical complexity.",
+        liveLabel: "Live air quality network",
         latestLabel: "Latest update",
         mapLabel: "Overview map",
-        quickLinksTitle: "Direct routes",
-        quickLinksBody: "Five clear routes. No dense menus and no duplicated content.",
-        openGuide: "How to read the site",
-        openGuideBody: "A short guide to levels, timing, and context without getting into the internal layer.",
+        quickLinksTitle: "What you can check",
+        quickLinksBody: "Quick access to the main sections of Madrid Aire: current status, map, stations, forecast, and the interpretation guide.",
+        openGuide: "Read the guide",
+        openGuideBody: "A short guide to levels, timing, and context.",
       };
   const latestTimestampValue = summary?.latest_timestamp
     ? formatter.format(new Date(summary.latest_timestamp))
@@ -113,27 +113,32 @@ export default async function HomePage({ searchParams }: HomePageProps) {
     {
       href: `/dashboard?lang=${language}`,
       title: copy.dashboardTitle,
-      description: language === "es" ? "Qué está pasando ahora, explicado de forma rápida." : "What is happening right now, explained quickly.",
+      description: language === "es" ? "Consulta de un vistazo el punto con la lectura más alta y cuándo se actualizó la red." : "See at a glance the highest reading and when the network last updated.",
+      cta: language === "es" ? "Ver resumen →" : "View overview →",
     },
     {
       href: `/map?lang=${language}`,
       title: copy.mapPageTitle,
-      description: language === "es" ? "Comparar zonas y abrir un punto concreto del mapa." : "Compare areas and open a specific point on the map.",
+      description: language === "es" ? "Compara zonas de la ciudad y selecciona una estación en el mapa." : "Compare areas of the city and select a station on the map.",
+      cta: language === "es" ? "Abrir mapa →" : "Open map →",
     },
     {
       href: `/stations?lang=${language}`,
       title: copy.stationsPageTitle,
-      description: language === "es" ? "Encontrar una estación y ver su contexto en detalle." : "Find a station and inspect its context in detail.",
+      description: language === "es" ? "Localiza una estación, revisa su última lectura e histórico reciente." : "Locate a station, review its latest reading, and recent history.",
+      cta: language === "es" ? "Ver estaciones →" : "View stations →",
     },
     {
       href: `/predictions?lang=${language}`,
       title: copy.predictionsTitle,
-      description: language === "es" ? "Orientación a 24 horas para planificar mejor." : "A 24-hour outlook to help you plan ahead.",
+      description: language === "es" ? "Orientación a 24 horas para anticipar cambios y planificar mejor." : "A 24-hour outlook to anticipate changes and plan ahead.",
+      cta: language === "es" ? "Consultar previsión →" : "Check forecast →",
     },
     {
       href: `/about?lang=${language}`,
       title: copy.openAbout,
       description: landingCopy.openGuideBody,
+      cta: language === "es" ? "Leer guía →" : "Read guide →",
     },
   ];
 
@@ -184,13 +189,13 @@ export default async function HomePage({ searchParams }: HomePageProps) {
                 className="inline-flex min-h-12 items-center justify-center rounded-full bg-lime px-7 py-3 font-medium text-graphite transition hover:bg-[#ebff93]"
                 href={`/dashboard?lang=${language}`}
               >
-                {copy.dashboardTitle}
+                {language === "es" ? "Ver resumen del aire" : "View air overview"}
               </Link>
               <Link
                 className="inline-flex min-h-12 items-center justify-center rounded-full border border-white/14 bg-white/5 px-7 py-3 font-medium text-soft transition hover:bg-white/10"
                 href={`/map?lang=${language}`}
               >
-                {copy.mapPageTitle}
+                {language === "es" ? "Abrir mapa" : "Open map"}
               </Link>
             </div>
             </div>
@@ -228,7 +233,7 @@ export default async function HomePage({ searchParams }: HomePageProps) {
                           : "No highlighted station"}
                       </p>
                       <p className="mt-2 font-data text-sm text-soft/60">
-                        NO2 · {worstNo2?.value == null ? "-" : worstNo2.value.toLocaleString(locale, { maximumFractionDigits: 1 })} µg/m³
+                        NO₂ · {worstNo2?.value == null ? "-" : worstNo2.value.toLocaleString(locale, { maximumFractionDigits: 1 })} µg/m³
                       </p>
                     </div>
                     {worstNo2?.risk_level ? <RiskBadge riskLevel={worstNo2.risk_level} language={language} /> : null}
@@ -260,7 +265,7 @@ export default async function HomePage({ searchParams }: HomePageProps) {
                 <p className="eyebrow text-soft/50">{card.title}</p>
                 <p className="mt-4 text-base leading-7 text-soft/78">{card.description}</p>
                 <p className="mt-6 text-sm text-lime/72 transition group-hover:text-lime">
-                  {language === "es" ? "Abrir ruta →" : "Open route →"}
+                  {card.cta}
                 </p>
               </Link>
             ))}

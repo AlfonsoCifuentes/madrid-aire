@@ -162,7 +162,7 @@ export default async function AboutPage({ searchParams }: AboutPageProps) {
       title: language === "es" ? "Si quieres planificar las próximas horas" : "If you want to plan the next few hours",
       body:
         language === "es"
-          ? "Abre Pronóstico. Ahí verás cómo podría cambiar el NO₂ y si la tendencia sube, baja o se mantiene."
+          ? "Abre Previsión. Ahí verás cómo podría cambiar el NO₂ y si la tendencia sube, baja o se mantiene."
           : "Open Forecast. There you can see how NO₂ might change and whether the trend is rising, falling, or holding steady.",
     },
   ];
@@ -172,7 +172,7 @@ export default async function AboutPage({ searchParams }: AboutPageProps) {
       title: copy.modelTitle,
       description: copy.aboutModelDesc,
       eyebrow: copy.aboutTechnicalLabel,
-      accent: language === "es" ? "Precisión y límites del pronóstico." : "Accuracy and forecast limits.",
+      accent: language === "es" ? "Precisión y límites de la previsión." : "Accuracy and forecast limits.",
     },
     {
       href: `/methodology?lang=${language}`,
@@ -231,7 +231,7 @@ export default async function AboutPage({ searchParams }: AboutPageProps) {
             <div className="glass-panel rounded-[1.75rem] p-5 shadow-atmosphere">
               <p className="eyebrow text-soft/55">{language === "es" ? "Contaminantes visibles" : "Visible pollutants"}</p>
               <p className="mt-4 font-data text-3xl text-bone">{summary?.pollutant_count ?? 0}</p>
-              <p className="mt-2 text-sm text-soft/60">NO2 · O3 · PM10 · PM2.5</p>
+              <p className="mt-2 text-sm text-soft/60">NO₂ · O₃ · PM10 · PM2.5</p>
             </div>
             <div className="glass-panel rounded-[1.75rem] p-5 shadow-atmosphere">
               <p className="eyebrow text-soft/55">{copy.latestTimestamp}</p>
@@ -243,7 +243,7 @@ export default async function AboutPage({ searchParams }: AboutPageProps) {
               <p className="mt-4 font-data text-2xl text-bone">{worstStationLabel}</p>
               <p className="mt-2 text-sm text-soft/60">
                 {summary?.worst_value != null
-                  ? `NO2 · ${summary.worst_value.toLocaleString(locale, { maximumFractionDigits: 1 })} µg/m³`
+                  ? `NO₂ · ${summary.worst_value.toLocaleString(locale, { maximumFractionDigits: 1 })} µg/m³`
                   : language === "es"
                   ? "Sin valor destacado"
                   : "No highlighted value"}

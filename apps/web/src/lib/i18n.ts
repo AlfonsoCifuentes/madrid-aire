@@ -201,7 +201,7 @@ export const copyByLanguage: Record<Language, Copy> = {
       "La red está lista. Los datos aparecerán en cuanto llegue la siguiente actualización oficial.",
     forecastPolicy: "Próximas 24 horas",
     forecastBody:
-      "La previsión resume lo que puede pasar con el NO2 durante las próximas 24 horas y se muestra junto a la evolución observada recientemente.",
+      "La previsión resume lo que puede pasar con el NO₂ durante las próximas 24 horas y se muestra junto a la evolución observada recientemente.",
     currentSignal: "Situación actual",
     noSyntheticMetrics: "Solo datos observados",
     constraintLabel: "Condición",
@@ -243,7 +243,7 @@ export const copyByLanguage: Record<Language, Copy> = {
     mobileNavDashboard: "Resumen",
     mobileNavMap: "Mapa",
     mobileNavStations: "Estaciones",
-    mobileNavPredictions: "Pronóstico",
+    mobileNavPredictions: "Previsión",
     mobileNavModel: "Modelo",
     mobileNavMethodology: "Método",
     mobileNavReports: "Informes",
@@ -265,26 +265,26 @@ export const copyByLanguage: Record<Language, Copy> = {
     pendingCoords: "Puntos con lectura reciente",
     sourceLabel: "Fuente",
     localFileLabel: "Archivo local",
-    mapPageTitle: "El aire, punto por punto",
+    mapPageTitle: "Mapa de calidad del aire",
     mapPageSubtitle:
-      "Localiza las estaciones de Madrid, compara zonas y toca un punto para entender qué está pasando en ese lugar ahora mismo.",
+      "Compara zonas de Madrid y selecciona una estación para ver sus datos de forma rápida y en contexto.",
     mapStationsReady: "Estaciones con lectura ahora",
     mapCoordinatesReady: "Lecturas situadas en el mapa",
     mapMetadataStatus: "Actualización de la señal",
     mapRosterTitle: "Mapa actual",
     mapLegendTitle: "Cómo leer cada punto",
-    mapNodeSize: "El tamaño refleja el nivel relativo de NO2.",
+    mapNodeSize: "El tamaño refleja el nivel relativo de NO₂.",
     mapNodeColor: "El color resume el nivel de riesgo en ese punto.",
     mapNodeFreshness: "La intensidad ayuda a distinguir si la lectura es más reciente o más antigua.",
     mapPriorityStations: "Puntos a vigilar ahora",
     mapStationContext: "Lugares destacados",
-    stationsPageTitle: "Estaciones de medida",
+    stationsPageTitle: "Estaciones de medición",
     stationsPageSubtitle:
-      "Consulta la red de estaciones de Madrid, ordena las que ahora muestran más NO2 y entra al detalle de cada punto.",
+      "Consulta las estaciones de la red de Madrid y revisa sus mediciones más recientes de NO₂.",
     stationsTableMunicipality: "Municipio",
     stationsTableAreaType: "Zona",
     stationsTableStationType: "Entorno",
-    stationsTableLatestNo2: "NO2 actual",
+    stationsTableLatestNo2: "NO₂ actual",
     stationsTableFreshness: "Frescura",
     stationsOpenDetail: "Abrir detalle",
     stationDetailTitle: "Detalle de estación",
@@ -302,16 +302,16 @@ export const copyByLanguage: Record<Language, Copy> = {
     stationZone: "Zona oficial",
     stationAltitude: "Altitud",
     stationCoordinates: "Coordenadas",
-    stationLatestNo2: "NO2 actual",
+    stationLatestNo2: "NO₂ actual",
     stationGlobalErrorReference: "Referencia general del modelo",
     stationGlobalErrorNote:
       "Todavía no mostramos un acierto específico para cada estación. Esta referencia resume el comportamiento general del modelo con datos recientes.",
-    stationBackToExplorer: "Volver al explorer",
+    stationBackToExplorer: "Volver a estaciones",
     stationNoHistory: "No hay histórico reciente disponible para esta estación y contaminante.",
     stationNoPredictions: "Todavía no hay previsión disponible para esta estación.",
-    predictionsTitle: "Previsión de NO2 para las próximas 24 horas",
+    predictionsTitle: "Previsión de NO₂",
     predictionsSubtitle:
-      "Esta vista combina lo observado recientemente con una previsión orientativa para ayudarte a anticipar cambios de las próximas horas.",
+      "Combina lecturas recientes con una previsión orientativa para anticipar cómo podría evolucionar el NO₂ en las próximas 24 horas.",
     modelTitle: "Modelo v1 y métricas",
     modelSubtitle:
       "Aquí resumimos qué modelo de previsión usamos, con qué datos se ha comprobado y cómo interpretar sus errores sin perder la trazabilidad técnica.",
@@ -356,13 +356,13 @@ export const copyByLanguage: Record<Language, Copy> = {
     validationWindow: "Ventana de validación",
     testWindow: "Ventana de test",
     notOfficialForecast: "Es una previsión orientativa basada en patrones recientes. No sustituye a los avisos oficiales.",
-    aboutEyebrow: "Cómo leer MADRID Aire",
-    aboutTitle: "Guía para seguir el aire de Madrid",
+    aboutEyebrow: "Guía de interpretación",
+    aboutTitle: "Guía para interpretar la calidad del aire",
     aboutSubtitle:
-      "Empieza aquí si quieres entender qué está pasando ahora, dónde mirar en Madrid y cómo profundizar solo cuando te haga falta. La parte técnica sigue disponible, pero ya no compite con la lectura pública.",
+      "Empieza aquí si quieres entender qué está pasando ahora, dónde mirar en Madrid y cómo profundizar solo cuando lo necesites. La información técnica sigue disponible, pero no compite con la lectura pública.",
     aboutPublicRoutesTitle: "Empieza por aquí",
     aboutPublicRoutesBody:
-      "Estas rutas están pensadas para cualquiera: ver la situación actual, ubicarla en el mapa, comparar estaciones y mirar el pronóstico de las próximas horas.",
+      "Estas rutas están pensadas para cualquiera: ver la situación actual, ubicarla en el mapa, comparar estaciones y consultar la previsión de las próximas horas.",
     aboutTechnicalRoutesTitle: "Si quieres más detalle",
     aboutTechnicalRoutesBody:
       "Aquí están la metodología, las métricas del modelo, los informes y el estado operativo. Entra solo cuando quieras profundizar.",
@@ -375,7 +375,7 @@ export const copyByLanguage: Record<Language, Copy> = {
     aboutStationsDesc:
       "Explorador por estaciones con detalle de ubicación, valores actuales e histórico reciente.",
     aboutPredictionsDesc:
-      "Previsión de NO2 para las próximas horas, con evolución del riesgo y comparación con lo observado.",
+      "Previsión de NO₂ para las próximas horas, con evolución del riesgo y comparación con lo observado.",
     aboutModelDesc:
       "Página para revisar la precisión del modelo y entender qué significan sus métricas.",
     aboutMethodologyDesc:
@@ -384,11 +384,11 @@ export const copyByLanguage: Record<Language, Copy> = {
       "Resúmenes e interpretación para contextualizar el estado del sistema y del modelo.",
     aboutSystemDesc:
       "Estado operativo del proyecto: actualizaciones de datos, alertas y señales de mantenimiento.",
-    dashboardHistoryTitle: "NO2 · últimas 24 h",
+    dashboardHistoryTitle: "NO₂ · últimas 24 h",
     dashboardForecastTrendTitle: "Próximas horas",
     dashboardForecastTrendBody:
-      "Consulta cómo podría cambiar el NO2 en las próximas horas y compáralo con la última lectura disponible.",
-    dashboardForecastTrendReady: "Pronóstico listo",
+      "Consulta cómo podría cambiar el NO₂ en las próximas horas y compáralo con la última lectura disponible.",
+    dashboardForecastTrendReady: "Previsión lista",
     dashboardModelStatusTitle: "Cómo se calcula",
     dashboardModelImprovementLabel: "frente a métodos simples",
     dashboardDominantPollutant: "Indicador principal",
@@ -424,7 +424,7 @@ export const copyByLanguage: Record<Language, Copy> = {
       "The monitoring network is ready. Data will appear as soon as the next official update arrives.",
     forecastPolicy: "Next 24 hours",
     forecastBody:
-      "The forecast summarises what may happen with NO2 over the next 24 hours and is shown together with the most recent observed trend.",
+      "The forecast summarises what may happen with NO₂ over the next 24 hours and is shown together with the most recent observed trend.",
     currentSignal: "Current situation",
     noSyntheticMetrics: "Observed data only",
     constraintLabel: "Constraint",
@@ -488,26 +488,26 @@ export const copyByLanguage: Record<Language, Copy> = {
     pendingCoords: "Points with recent readings",
     sourceLabel: "Source",
     localFileLabel: "Local file",
-    mapPageTitle: "Air quality, point by point",
+    mapPageTitle: "Air quality map",
     mapPageSubtitle:
-      "Find Madrid's monitoring stations, compare areas, and tap a point to understand what is happening there right now.",
+      "Compare areas of Madrid and select a station to view its data quickly and in context.",
     mapStationsReady: "Stations with readings now",
     mapCoordinatesReady: "Readings placed on the map",
     mapMetadataStatus: "Signal update",
     mapRosterTitle: "Current map",
     mapLegendTitle: "How to read each point",
-    mapNodeSize: "Size reflects the relative NO2 level.",
+    mapNodeSize: "Size reflects the relative NO₂ level.",
     mapNodeColor: "Color summarises the risk level at each point.",
     mapNodeFreshness: "Intensity helps distinguish fresher and older readings.",
     mapPriorityStations: "Points to watch now",
     mapStationContext: "Highlighted locations",
-    stationsPageTitle: "Measurement stations",
+    stationsPageTitle: "Monitoring stations",
     stationsPageSubtitle:
-      "Browse Madrid's station network, sort the places currently showing more NO2, and open the detail view for each point.",
+      "Browse Madrid's monitoring network and check the most recent NO₂ readings for each station.",
     stationsTableMunicipality: "Municipality",
     stationsTableAreaType: "Area",
     stationsTableStationType: "Setting",
-    stationsTableLatestNo2: "Current NO2",
+    stationsTableLatestNo2: "Current NO₂",
     stationsTableFreshness: "Freshness",
     stationsOpenDetail: "Open detail",
     stationDetailTitle: "Station detail",
@@ -525,16 +525,16 @@ export const copyByLanguage: Record<Language, Copy> = {
     stationZone: "Official zone",
     stationAltitude: "Altitude",
     stationCoordinates: "Coordinates",
-    stationLatestNo2: "Current NO2",
+    stationLatestNo2: "Current NO₂",
     stationGlobalErrorReference: "General model reference",
     stationGlobalErrorNote:
       "We do not yet show a station-specific accuracy score. This reference summarises the model's overall behaviour on recent data.",
-    stationBackToExplorer: "Back to explorer",
+    stationBackToExplorer: "Back to stations",
     stationNoHistory: "No recent history is available for this station and pollutant.",
     stationNoPredictions: "There is no forecast available yet for this station.",
-    predictionsTitle: "NO2 forecast for the next 24 hours",
+    predictionsTitle: "NO₂ forecast",
     predictionsSubtitle:
-      "This view combines recent observations with an indicative forecast to help you anticipate how the next few hours may evolve.",
+      "Combines recent observations with an indicative forecast to help you anticipate how NO₂ may evolve over the next 24 hours.",
     modelTitle: "Model v1 and metrics",
     modelSubtitle:
       "This page explains which forecast model we use, which data it was checked against, and how to interpret its errors without losing the technical traceability.",
@@ -579,13 +579,13 @@ export const copyByLanguage: Record<Language, Copy> = {
     validationWindow: "Validation window",
     testWindow: "Test window",
     notOfficialForecast: "This is an indicative forecast based on recent patterns. It does not replace official public warnings.",
-    aboutEyebrow: "How to read MADRID Aire",
-    aboutTitle: "Guide to following Madrid's air quality",
+    aboutEyebrow: "Interpretation guide",
+    aboutTitle: "Guide to interpreting air quality in Madrid",
     aboutSubtitle:
       "Start here if you want to understand what is happening now, where to look in Madrid, and how to go deeper only when you need it. The technical layer is still available, but it no longer competes with the public reading.",
     aboutPublicRoutesTitle: "Start here",
     aboutPublicRoutesBody:
-      "These routes are meant for anyone: see current conditions, place them on the map, compare stations, and check the short-term forecast.",
+      "These routes are meant for anyone: see current conditions, place them on the map, compare stations, and check the short-term NO₂ forecast.",
     aboutTechnicalRoutesTitle: "If you want more detail",
     aboutTechnicalRoutesBody:
       "This is where methodology, model metrics, reports, and operational status live. Open it only when you want to go deeper.",
@@ -598,7 +598,7 @@ export const copyByLanguage: Record<Language, Copy> = {
     aboutStationsDesc:
       "A station explorer with location details, current values, and recent history.",
     aboutPredictionsDesc:
-      "NO2 forecast for the next few hours, with risk evolution and comparison against what has been observed.",
+      "NO₂ forecast for the next few hours, with risk evolution and comparison against what has been observed.",
     aboutModelDesc:
       "A page to review model accuracy and understand what its metrics mean.",
     aboutMethodologyDesc:
@@ -607,10 +607,10 @@ export const copyByLanguage: Record<Language, Copy> = {
       "Editorial summaries that add context to the state of the system and the model.",
     aboutSystemDesc:
       "Operational project status: data updates, alerts, and maintenance signals.",
-    dashboardHistoryTitle: "NO2 · last 24 h",
+    dashboardHistoryTitle: "NO₂ · last 24 h",
     dashboardForecastTrendTitle: "Next hours",
     dashboardForecastTrendBody:
-      "See how NO2 may change over the next hours and compare it with the latest observed reading.",
+      "See how NO₂ may change over the next hours and compare it with the latest observed reading.",
     dashboardForecastTrendReady: "Forecast ready",
     dashboardModelStatusTitle: "How it is estimated",
     dashboardModelImprovementLabel: "vs simple methods",

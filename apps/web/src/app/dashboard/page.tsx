@@ -171,7 +171,7 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
             <div className="glass-panel rounded-[1.75rem] p-5 shadow-atmosphere">
               <p className="eyebrow text-soft/55">{copy.pollutantCoverage}</p>
               <p className="mt-4 font-data text-3xl text-bone">{summary?.pollutant_count ?? 0}</p>
-              <p className="mt-3 text-sm text-soft/70">NO2 · O3 · PM10 · PM25 · SO2 · CO</p>
+              <p className="mt-3 text-sm text-soft/70">NO₂ · O₃ · PM10 · PM25 · SO₂ · CO</p>
             </div>
             <div className="glass-panel rounded-[1.75rem] p-5 shadow-atmosphere">
               <p className="eyebrow text-soft/55">{copy.stationsOnline}</p>
@@ -185,7 +185,7 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
           <section className="glass-panel rounded-[2rem] p-5 shadow-atmosphere">
             <div className="flex flex-wrap items-center justify-between gap-3">
               <p className="eyebrow text-soft/60">{copy.observationsPanel}</p>
-              <p className="font-data text-sm text-soft/55">{language === "es" ? "NO2 · últimas lecturas" : "NO2 · latest readings"}</p>
+              <p className="font-data text-sm text-soft/55">{language === "es" ? "NO₂ · últimas lecturas" : "NO₂ · latest readings"}</p>
             </div>
             <div className="mt-5">
               <ObservationTable items={topRows} language={language} stations={stations} />
