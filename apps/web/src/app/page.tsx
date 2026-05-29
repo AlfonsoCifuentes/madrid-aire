@@ -79,8 +79,8 @@ export default async function HomePage({ searchParams }: HomePageProps) {
   const landingCopy = language === "es"
     ? {
         eyebrow: "Inicio",
-        claim: "Una portada limpia para entrar rápido a la situación actual, el mapa, las estaciones y el pronóstico sin perderte en explicaciones técnicas.",
-        support: "Consulta primero el resumen, abre el mapa si quieres comparar zonas y entra en estaciones o pronóstico cuando ya sepas qué punto te interesa.",
+        claim: "Consulta la calidad del aire en Madrid de forma clara, rápida y visual.",
+        support: "Madrid Aire reúne datos de estaciones, mapa interactivo y previsión de contaminación para ayudarte a entender el estado del aire en la ciudad sin complicaciones técnicas.",
         liveLabel: "Red pública activa",
         latestLabel: "Última actualización",
         mapLabel: "Vista general",
