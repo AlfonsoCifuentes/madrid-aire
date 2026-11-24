@@ -15,3 +15,6 @@ apps/api/.pytest_cache/
 .vercel
 .env*.local
 .playwright-mcp/
+
+.open-next
+.wrangler
